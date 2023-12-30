@@ -1,0 +1,48 @@
+truncate wpw1_cwa_consolidated_student;
+insert into wpw1_cwa_consolidated_student (
+call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
+country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
+messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
+request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
+response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
+no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
+hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
+student_survey_completion_date, available_class_days, intervention_required, copy_control, 
+first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
+second_class_choice_utc, third_class_choice_utc, date_created, date_updated) 
+select 
+call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
+country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
+messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
+request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
+response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
+no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
+hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
+student_survey_completion_date, available_class_days, intervention_required, copy_control, 
+first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
+second_class_choice_utc, third_class_choice_utc, date_created, date_updated 
+from wpw1_cwa_student;
+insert into wpw1_cwa_consolidated_student (
+call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
+country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
+messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
+request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
+response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
+no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
+hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
+student_survey_completion_date, available_class_days, intervention_required, copy_control, 
+first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
+second_class_choice_utc, third_class_choice_utc, date_created, date_updated) 
+select 
+call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
+country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
+messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
+request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
+response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
+no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
+hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
+student_survey_completion_date, available_class_days, intervention_required, copy_control, 
+first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
+second_class_choice_utc, third_class_choice_utc, date_created, date_updated 
+from wpw1_cwa_past_student;
+

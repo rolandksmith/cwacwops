@@ -1,0 +1,185 @@
+
+
+To create a PHP API to receive a variable and store it in MySQL, you can follow these steps:
+
+Create a MySQL database and table to store the data.
+Create a PHP script to connect to the MySQL database.
+Create a PHP endpoint to receive the variable and store it in the database.
+Create a client application to make requests to the PHP endpoint.
+Here is an example of a PHP API to receive a variable and store it in MySQL:
+
+PHP
+<?php
+
+// Connect to the MySQL database
+$db = new mysqli('localhost', 'username', 'password', 'database');
+
+// Create a prepared statement to insert the variable into the database
+$stmt = $db->prepare('INSERT INTO table (variable) VALUES (?)');
+
+// Bind the variable to the prepared statement
+$stmt->bind_param('s', $_POST['variable']);
+
+// Execute the prepared statement
+$stmt->execute();
+
+// Close the prepared statement
+$stmt->close();
+
+// Close the database connection
+$db->close();
+
+// Respond to the client with a success message
+echo json_encode(['success' => true]);
+
+?>
+Use code with caution. Learn more
+To use the API, you can make a POST request to the endpoint with the variable in the variable parameter. For example, you could use the following curl command:
+
+curl -X POST http://localhost/api/store-variable -d 'variable=my_variable'
+If the API is successful, it will respond with a JSON object containing a success key set to true.
+
+You can also modify the API to receive multiple variables or to store the variables in different tables. You can also add additional security features, such as authentication and authorization.
+
+profile picture
+what would the javascript be to call this api?
+View other drafts
+
+
+
+https://cw-assessment.vercel.app?mode=Fundamental&callsign=K7OJL target='_blank'
+https://cw-assessment.vercel.app/?mode=specific&callsign=K7OJL&level=Fundamental&cpm=25&eff=15&freq=600&questions=5&words=2&characters=3
+
+
+
+curl -X POST https://cwa.cwops.org/wp-content/uploads/assessmentapi.php -d 'variable=eyJjYWxsc2lnbiI6Iks3T0pMIiwiY3BtIjoyNSwiZWZmIjoxNSwiZnJlcSI6NjAwLCJxdWVzdGlvbnMiOjUsIndvcmRzIjoyLCJjaGFyYWN0ZXJzIjozLCJzY29yZSI6IjkwIiwic2V0Ijp7IjEiOnsic2VudCI6IndoeSB0aGUiLCJjb3BpZWQiOiJhbnkgdGhlIiwicG9pbnRzIjoxfSwiMiI6eyJzZW50IjoiZm9yIGxvdyIsImNvcGllZCI6ImZvciBsb3ciLCJwb2ludHMiOjJ9LCIzIjp7InNlbnQiOiJmZXcgd2UiLCJjb3BpZWQiOiJmZXcgd2UiLCJwb2ludHMiOjJ9LCI0Ijp7InNlbnQiOiJiaXQgb2giLCJjb3BpZWQiOiJidXQgb2giLCJwb2ludHMiOjF9LCI1Ijp7InNlbnQiOiJzbyBwZXIiLCJjb3BpZWQiOiJzbyBwZXIiLCJwb2ludHMiOjJ9fX0='
+curl -X POST https://cwa.cwops.org/wp-content/uploads/assessmentapi.php -d 'variable=eyJjYWxsc2lnbiI6Ik43QVNUIiwibGV2ZWwiOiJBZHZhbmNlZCIsImNwbSI6MzAsImVmZiI6MjAsImZyZXEiOiI1MDAsNTUwLDYwMCw2NTAsNzAwIiwicXVlc3Rpb25zIjo1LCJ3b3JkcyI6MiwiY2hhcmFjdGVycyI6NCwic2NvcmUiOjgwLCJzZXQiOnsiMSI6eyJzZW50IjoidGVybSBob3ciLCJjb3BpZWQiOiJ0ZXJtIGhvdyIsInBvaW50cyI6Mn0sIjIiOnsic2VudCI6ImZvdXIgc2l6ZSIsImNvcGllZCI6ImZvdXIgc2l6ZSIsInBvaW50cyI6Mn0sIjMiOnsic2VudCI6Imdvb2Qgd2lmZSIsImNvcGllZCI6Imdvb2Qgd2lmZSIsInBvaW50cyI6Mn0sIjQiOnsic2VudCI6InNhZmUgZm9ybSIsImNvcGllZCI6InNhZmUgZm9ybSIsInBvaW50cyI6Mn0sIjUiOnsic2VudCI6IndhaXQgbm9yIiwiY29waWVkIjoid2hhdCBmb3IiLCJwb2ludHMiOjB9fX0='
+curl -X POST https://cwa.cwops.org/wp-content/uploads/assessmentapi.php -d 'variable=eyJjYWxsc2lnbiI6Ik43QVNUIiwibGV2ZWwiOiJBZHZhbmNlZCIsImNwbSI6MzAsImVmZiI6MjAsImZyZXEiOiI1MDAsNTUwLDYwMCw2NTAsNzAwIiwicXVlc3Rpb25zIjo1LCJ3b3JkcyI6MiwiY2hhcmFjdGVycyI6NCwic2NvcmUiOjgwLCJzZXQiOnsiMSI6eyJzZW50IjoidGVybSBob3ciLCJjb3BpZWQiOiJ0ZXJtIGhvdyIsInBvaW50cyI6Mn0sIjIiOnsic2VudCI6ImZvdXIgc2l6ZSIsImNvcGllZCI6ImZvdXIgc2l6ZSIsInBvaW50cyI6Mn0sIjMiOnsic2VudCI6Imdvb2Qgd2lmZSIsImNvcGllZCI6Imdvb2Qgd2lmZSIsInBvaW50cyI6Mn0sIjQiOnsic2VudCI6InNhZmUgZm9ybSIsImNvcGllZCI6InNhZmUgZm9ybSIsInBvaW50cyI6Mn0sIjUiOnsic2VudCI6IndhaXQgbm9yIiwiY29waWVkIjoid2hhdCBmb3IiLCJwb2ludHMiOjB9fX0='
+
+
+curl -X POST http://localhost:3073/wp-content/uploads/refreshapi.php -d 'callsign=K7OJL&role=administrator'
+
+
+To call the PHP API from JavaScript, you can use the following code:
+
+JavaScript
+function storeVariable(variable) {
+  // Create a new XMLHttpRequest object
+  const xhr = new XMLHttpRequest();
+
+  // Open a POST request to the API endpoint
+  xhr.open('POST', '/api/store-variable');
+
+  // Set the request headers
+  xhr.setRequestHeader('Content-Type', 'application/json');
+
+  // Prepare the request body
+  const requestBody = JSON.stringify({ variable });
+
+  // Send the request
+  xhr.send(requestBody);
+
+  // Handle the response
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      // The request was successful
+      console.log('Variable stored successfully!');
+    } else {
+      // The request failed
+      console.error('Failed to store variable:', xhr.statusText);
+    }
+  };
+}
+
+// Example usage:
+const variable = 'my_variable';
+storeVariable(variable);
+Use code with caution. Learn more
+You can also use a JavaScript library such as jQuery to make the API call. For example:
+
+JavaScript
+$(function() {
+  // Store the variable
+  $.ajax({
+    url: '/api/store-variable',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ variable: 'my_variable' }),
+    success: function() {
+      // The request was successful
+      console.log('Variable stored successfully!');
+    },
+    error: function(xhr) {
+      // The request failed
+      console.error('Failed to store variable:', xhr.statusText);
+    }
+  });
+});
+Use code with caution. Learn more
+Which method you choose to use depends on your personal preference and the needs of your project.
+
+
+
+
+http://localhost:3073/wp-content/uploads/ss-10.113.mp3
+
+Y3M9SzdPSkwsc2NvcmU9MC45MCxsZXZlbD1GdW5kYW1lbnRhbA==
+
+
+
+https://cw-assessment.vercel.app?callsign=wr7q&wpm=25&eff=6&freq=600&questions=5&words=1&characters=3
+
+
+
+
+
+(
+    [PATH] => /usr/local/bin:/usr/bin:/bin
+    [TEMP] => /tmp
+    [TMP] => /tmp
+    [TMPDIR] => /tmp
+    [PWD] => /
+    [HTTP_ACCEPT] => */*
+    [CONTENT_TYPE] => application/x-www-form-urlencoded
+    [CONTENT_LENGTH] => 57
+    [HTTP_HOST] => cwa.cwops.org
+    [HTTP_USER_AGENT] => curl/8.1.2
+    [HTTP_X_HTTPS] => 1
+    [UNIQUE_ID] => ZQ-d8FUwg-ubjKPCoOEZBgABBxk
+    [SCRIPT_URL] => /wp-content/uploads/testapi.php
+    [SCRIPT_URI] => https://cwa.cwops.org/wp-content/uploads/testapi.php
+    [WP_UPDATE_PHP_URL] => https://hosting.qth.com/index.php/knowledgebase/101/Change-PHP-Version-and-Customize-PHP-Options-and-Extensions.html
+    [HTTP_AUTHORIZATION] => 
+    [HTTPS] => on
+    [SSL_TLS_SNI] => cwa.cwops.org
+    [HTTP2] => on
+    [H2PUSH] => off
+    [H2_PUSH] => off
+    [H2_PUSHED] => 
+    [H2_PUSHED_ON] => 
+    [H2_STREAM_ID] => 1
+    [H2_STREAM_TAG] => 2490074-754-1
+    [SERVER_SIGNATURE] => 
+    [SERVER_SOFTWARE] => Apache
+    [SERVER_NAME] => cwa.cwops.org
+    [SERVER_ADDR] => 50.28.8.76
+    [SERVER_PORT] => 443
+    [REMOTE_ADDR] => 216.147.122.136
+    [DOCUMENT_ROOT] => /home/cwacwops/public_html
+    [REQUEST_SCHEME] => https
+    [CONTEXT_PREFIX] => 
+    [CONTEXT_DOCUMENT_ROOT] => /home/cwacwops/public_html
+    [SERVER_ADMIN] => webmaster@cwa.cwops.org
+    [SCRIPT_FILENAME] => /home/cwacwops/public_html/wp-content/uploads/testapi.php
+    [REMOTE_PORT] => 51499
+    [SERVER_PROTOCOL] => HTTP/2.0
+    [REQUEST_METHOD] => POST
+    [QUERY_STRING] => 
+    [REQUEST_URI] => /wp-content/uploads/testapi.php
+    [SCRIPT_NAME] => /wp-content/uploads/testapi.php
+    [PHP_SELF] => /wp-content/uploads/testapi.php
+    [REQUEST_TIME_FLOAT] => 1695522288.5547
+    [REQUEST_TIME] => 1695522288
+)
+
+

@@ -1,0 +1,522 @@
+function push_advisor_class_v2_func() {
+
+/*
+	edited by Roland on 2020-01-03 10:30 to select the semester for the display
+	edited by Roland on 2019-12-15 20:47 to fix the data passed to pass 3
+	Original version significantly revised on 17Aug2020. Simplified the logic,
+		made the look and feel like other programs that display advisor classes,
+		and got the "all" function to work correctly
+
+	modified 10Dec2020 by Roland to properly handle student assigned with a 
+		different time zone.
+	Modified 26Dec2020 by Roland to add student state and advisor class times to the report
+	Modified 4Mar21 by Roland to change Joe Fisher's email address
+	Modified 13Mar21 by Roland to add a message to the advisor
+	Modified 3Aug21 by Roland to use new advisor and advisorClass pods
+	Modified 20Dec21 by Roland to select only students assigned to the advisor if only one advisor is being requested
+	Modified 31Dec21 by Roland to use the mysql tables instead of pods
+	Modified 17Apr23 by Roland to fix action_log
+	Modified 20Jul23 by Roland to use consolidated tables
+	
+	studentArray[] = student_assigned_advisor|student_assigned_advisor_class|student_level|student_id|student_call_sign
+	
+	studentDataArray[student_call_sign]['name']
+									   ['city']
+									   ['state']
+									   ['country']
+									   ['email']
+									   ['phone']
+									   ['messaging']
+									   ['youth']
+									   ['age']
+									   ['parent']
+									   ['parent email']
+	
+	
+	
+	
+*/	
+
+	global $wpdb;
+
+	$doDebug					= FALSE;
+	$testMode					= FALSE;
+	$initializationArray 	= data_initialization_func();
+	if ($doDebug) {
+		echo "Initialization Array:<br /><pre>";
+		print_r($initializationArray);
+		echo "</pre><br />";
+	}
+	$validUser 				= $initializationArray['validUser'];
+	$userName				= $initializationArray['userName'];
+	$validTestmode			= $initializationArray['validTestmode'];
+	$siteURL				= $initializationArray['siteurl'];
+	$versionNumber			= "2";
+
+	if ($validUser == "N") {
+		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
+	}
+	/// get the time that the process started
+	$startingMicroTime			= microtime(TRUE);
+
+	ini_set('memory_limit','256M');
+	ini_set('display_errors','1');
+	error_reporting(E_ALL);	
+	ini_set('max_execution_time',360);
+
+
+	$theURL						= "$siteURL/cwa-push-advisor-class/";
+	$advisorVerificationURL		= "$siteURL/cwa-advisor-verification-of-student/";
+	$currentSemester			= $initializationArray['currentSemester'];
+	$nextSemester				= $initializationArray['nextSemester'];
+	$semesterTwo				= $initializationArray['semesterTwo'];
+	$defaultClassSize			= $initializationArray['defaultClassSize'];
+	$jobname					= "Push Advisor Class V$versionNumber";
+	$strPass					= "1";
+	$requestString				= "";
+	$request_type				= "Full";
+	$inp_semester				= "";
+	$gotRecord					= FALSE;
+	$sendEmail					= array();
+	$inp_msg					= "";
+	$inp_cc						= '';
+	$inp_bcc					= '';
+	$studentArray				= array();
+	$studentDataArray			= array();
+	$totalStudents				= 0;
+	$studentCount				= 0;
+	$inpMode					= "";
+	$inp_verbose				= '';
+	$increment					= 0;
+	
+	// get the input information
+	if (isset($_REQUEST)) {
+		foreach($_REQUEST as $str_key => $str_value) {
+			if ($doDebug) {
+				if (is_array($str_value) === FALSE) {
+					echo "Key: $str_key | Value: $str_value <br />\n";
+				}
+			}
+			if ($str_key 		== "strpass") {
+				$strPass		 = $str_value;
+				$strPass		 = filter_var($strPass,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "inp_mode") {
+				$inp_mode		 = $str_value;
+				$inp_mode		 = filter_var($inp_mode,FILTER_SANITIZE_STRING);
+				if ($inp_mode == 'TESTMODE') {
+					$testMode	= TRUE;
+				}
+			}
+			if ($str_key 		== "inp_verbose") {
+				$inp_verbose	 = $str_value;
+				$inp_verbose	 = filter_var($inp_verbose,FILTER_SANITIZE_STRING);
+				if ($inp_verbose == 'Y') {
+					$doDebug	= TRUE;
+				}
+			}
+			if ($str_key 		== "inp_semester") {
+				$inp_semester	 = $str_value;
+				$inp_semester	 = filter_var($inp_semester,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "request_info") {
+				$request_info	 = $str_value;
+				$request_info	 = filter_var($request_info,FILTER_SANITIZE_STRING);
+				$request_info	 = strtoupper($request_info);
+			}
+			if ($str_key 		== "email_content") {
+				$email_content	 = $str_value;
+				$email_content	 = filter_var($email_content,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "theSubject") {
+				$theSubject	 = $str_value;
+				$theSubject	 = filter_var($theSubject,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "theEmail") {
+				$theEmail	 = $str_value;
+				$theEmail	 = filter_var($theEmail,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "request_type") {
+				$request_type	 = $str_value;
+				$request_type	 = filter_var($request_type,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "inp_cc") {
+				$inp_cc	 = $str_value;
+				$inp_cc	 = filter_var($inp_cc,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key 		== "inp_bcc") {
+				$inp_bcc	 = $str_value;
+				$inp_bcc	 = filter_var($inp_bcc,FILTER_SANITIZE_STRING);
+			}
+			if ($str_key		== "sendEmail") {
+				$sendEmail		 = $str_value;
+			}
+			if ($str_key		== "inp_msg") {
+				$inp_msg		 = $str_value;
+				$inp_msg		 = filter_var($inp_msg,FILTER_SANITIZE_STRING);
+				$inp_msg		= stripslashes($inp_msg);
+			}
+		}
+	}
+
+	$firstTime						= TRUE;
+	$prevAdvisor					= "";
+	$prevClass						= "";
+	$prevTZ							= 99;
+	$emailCount						= 0;
+	$emailArray						= array();
+
+	if ($testMode) {
+		$studentTableName			= 'wpw1_cwa_consolidated_student2';
+		$advisorTableName			= 'wpw1_cwa_consolidated_advisor2';
+		$advisorClassTableName		= 'wpw1_cwa_consolidated_advisorclass2';
+		$audioAssessmentTableName	= 'wpw1_cwa_audio_assessment2';
+		$thisMode					= 'TM';
+		$theStatement				= "<p>Function is running in TEST MODE using test files.</p>";
+	} else {
+		$studentTableName			= 'wpw1_cwa_consolidated_student';
+		$advisorTableName			= 'wpw1_cwa_consolidated_advisor';
+		$advisorClassTableName		= 'wpw1_cwa_consolidated_advisorclass';
+		$audioAssessmentTableName	= 'wpw1_cwa_audio_assessment2';
+		$thisMode					= 'PM';
+		$theStatement				= "";
+	}
+
+
+
+	$content = "<style type='text/css'>
+fieldset {font:'Times New Roman', sans-serif;color:#666;background-image:none;
+background:#efefef;padding:2px;border:solid 1px #d3dd3;}
+
+legend {font:'Times New Roman', sans-serif;color:#666;font-weight:bold;
+font-variant:small-caps;background:#d3d3d3;padding:2px 6px;margin-bottom:8px;}
+
+label {font:'Times New Roman', sans-serif;font-weight:bold;line-height:normal;
+text-align:right;margin-right:10px;position:relative;display:block;float:left;width:150px;}
+
+textarea.formInputText {font:'Times New Roman', sans-serif;color:#666;
+background:#fee;padding:2px;border:solid 1px #f66;margin-right:5px;margin-bottom:5px;}
+
+textarea.formInputText:focus {color:#000;background:#ffffff;border:solid 1px #006600;}
+
+textarea.formInputText:hover {color:#000;background:#ffffff;border:solid 1px #006600;}
+
+input.formInputText {color:#666;background:#fee;padding:2px;
+border:solid 1px #f66;margin-right:5px;margin-bottom:5px;}
+
+input.formInputText:focus {color:#000;background:#ffffff;border:solid 1px #006600;}
+
+input.formInputText:hover {color:#000;background:#ffffff;border:solid 1px #006600;}
+
+input.formInputFile {color:#666;background:#fee;padding:2px;border:
+solid 1px #f66;margin-right:5px;margin-bottom:5px;height:20px;}
+
+input.formInputFile:focus {color:#000;background:#ffffff;border:solid 1px #006600;}
+
+select.formSelect {color:#666;background:#fee;padding:2px;
+border:solid 1px #f66;margin-right:5px;margin-bottom:5px;cursor:pointer;}
+
+select.formSelect:hover {color:#333;background:#ccffff;border:solid 1px #006600;}
+
+input.formInputButton {vertical-align:middle;font-weight:bolder;
+text-align:center;color:#300;background:#f99;padding:1px;border:solid 1px #f66;
+cursor:pointer;position:relative;float:left;}
+
+input.formInputButton:hover {color:#f8f400;}
+
+input.formInputButton:active {color:#00ffff;}
+
+tr {color:#333;background:#eee;}
+
+table{font:'Times New Roman', sans-serif;background-image:none;border-collapse:collapse;}
+
+th {color:#ffff;background-color:#000;padding:5px;font-size:small;}
+
+td {padding:5px;font-size:small;}
+
+th:first-child,
+td:first-child {
+ padding-left: 10px;
+}
+
+th:last-child,
+td:last-child {
+	padding-right: 5px;
+}
+</style>";	
+	
+	if (in_array($userName,$validTestmode)) {			// give option to run in test mode 
+		$testModeOption	= "<tr><td>Operation Mode</td>
+								<td><input type='radio' class='formInputButton' name='inp_mode' value='Production' checked='checked'> Production<br />
+									<input type='radio' class='formInputButton' name='inp_mode' value='TESTMODE'> TESTMODE</td></tr>
+								<tr><td>Verbose Debugging?</td>
+									<td><input type='radio' class='formInputButton' name='inp_verbose' value='N' checked='checked'> Standard Output<br />
+										<input type='radio' class='formInputButton' name='inp_verbose' value='Y'> Turn on Debugging </td></tr>";
+	} else {
+		$testModeOption	= '';
+	}
+
+
+	
+/*
+ * When strPass is equal to 1 then get the information needed to build the display.
+ * The information entered can be a comma-separated list of advisor call signs
+ * or the word 'all'
+*/
+	if ("1" == $strPass) {
+		$content .= "<h3>$jobname</h3>
+					$theStatement
+					<p>Please enter (a) the advisor call sign to be processed, or (b) 
+					a comma-separated list of advisor call signs and click 'Next'. The next 
+					step will display the classes for each advisor specified and provide the option to 
+					send the advisor an email with the current class makeup.</p>
+					<form method='post' action='$theURL' 
+					name='selection_form' ENCTYPE='multipart/form-data''>
+					<input type='hidden' name='strpass' value='2'>
+					<input type='hidden' name='inp_semester' value='$inp_semester'>
+					<table style='border-collapse:collapse;'><tr><td style='width:150px;'>Requested Advisor(s):</td><td>
+					<input class='formInputText' type='text' maxlength='150' name='request_info' size='10' autofocus></td></tr>
+					<tr><td>Select One</td><td><select name='request_type' class='formInputSelect' size='2' required='required'>
+						<option selected='selected' value='Full'>Display & Send Full Class</option>
+						<option value='sonly'>Display & Send S Students only</option>
+						</select></td></tr>
+					$testModeOption
+					<tr><td>&nbsp;</td><td><input class='formInputButton' type='submit' value='Next' /></td></tr></table>
+					</form>
+					<p><u>Display & Send Full Class</u>: shows all students assigned and will send full information to the advisor.</p>
+					<p><u>Display & Send S Students only:</u> shows only students who have not confirmed attendance and sends only 
+					that information to the advisor.</p>";
+		
+		
+		
+		
+	} elseif ("2" == $strPass) {
+	
+		$doProceed					= TRUE;
+		$emailsToSend				= 0;
+	
+		$currentSemester	= $initializationArray['currentSemester'];
+		$nextSemester		= $initializationArray['nextSemester'];
+		if ($currentSemester == "Not in Session") {
+			$inp_semester	= $nextSemester;
+		} else {
+			$inp_semester	= $currentSemester;
+		}
+		if ($doDebug) {
+			echo "<br />Got to pass 2 with request_info: $request_info and semester: $inp_semester. request_info: $request_type<br />";
+		}
+		if ($request_type == 'Full') {
+			$theStatment	= "<p>Sending full class</p>";
+		} elseif ($request_type == 'sonly') {
+			$theStatment	= "<p>Sending S students only</p>";
+		} else {
+			$theStatment	= "<p>Nothing requested. End of process.</p>";
+			$doProceed		= FALSE;
+		}
+		$content .= "<h3>Push Advisor Class</h3>$theStatement";
+		
+		
+		$numberAdvisors				= 0;		
+		if ($request_info == "") {
+		} else {
+			if ($doProceed) {
+				$requestArray 			= explode(",",$request_info);
+				$numberAdvisors			= count($requestArray);
+				if ($numberAdvisors < 1) {
+					$content		= "<p>Must specify at least one advisor call sign. End of process.</p>";
+					$doProceed		= FALSE;
+				}
+			}
+		}
+		if ($doProceed) {
+			sort($requestArray);
+			// Now display each requested advisor and their class
+
+			if ($doDebug) {
+				echo "<br /><b>Starting Display of Requested Advisor's Classes</b><br />";
+			}
+			$content					.= "<form method='post' action='$theURL' 
+											name='selection_form' ENCTYPE='multipart/form-data''>
+											<input type='hidden' name='strpass' value='3'>
+											<input type='hidden' name='inp_semester' value='$inp_semester'>
+											<input type='hidden' name='inp_mode' value='$inp_mode'>
+											<input type='hidden' name='inp_verbose' value='$inp_verbose'>
+											<input type='hidden' name='request_type' value='$request_type'>
+											<input type='hidden' name='request_info' value='$request_info'>";
+			foreach($requestArray as $advisorCallSign) {
+				$prepareResult			= prepare_advisor_class_display($advisorCallSign,
+																		$inp_semester,
+																		$request_type,
+																		FALSE,
+																		FALSE,
+																		$testMode,
+																		$doDebug);
+				if ($prepareResult[0] == FALSE) {
+					$content			.= "Getting data to displayfailed. $prepareResult[1]<br/>";
+					$myStr				= "Production";
+					if($testMode) {
+						$myStr			= "TestMode";
+					}
+					$errorMsg			= "prepare_advisor_class_display failed in the Push. $myStr. $userName. $prepareResult[1]";
+					sendErrorEmail($errorMsg);
+				} else {
+					$content			.=	$prepareResult[1]; 
+					if ($prepareResult[3] != 0) {
+						$content			.= "<p><input type='checkbox' class='formInputButton' name='sendEmail[]' value='$advisorCallSign' 
+													checked='checked'> Send advisor an email</p><br />";
+						$emailsToSend++;
+					} else {
+						$content			.= "<p>No Students. No email can be sent</p><br />";
+					}
+				}
+			}
+			if ($emailsToSend > 0) {
+				$content					.= "<p>Enter any additional information for the advisor(s) below:<br />
+												<textarea class='formInputText' name='inp_msg' rows='5' cols='50'></textarea><p>
+												<p>Enter any additional cc or bcc to the email in the appropriate box. Format as an email address. Separate email addresses by commas. 
+												for example: rolandksmith@yahoo.com,k7ojl@arrl.net<br />
+												cc: <input type='text' class='formInputText' name='inp_cc' size='50' maxlength='90'><br />
+												bcc: <input type='text' class='formInputText' name='inp_bcc' size='50' maxlength='90'></p>
+
+												<input class='formInputButton' type='submit' value='Submit' /></form>";
+			} else {
+				$content					.= "<p>No advisors are getting an email.</p>";
+			}
+		}
+///////////
+
+	} elseif ("3" == $strPass) {
+// $doDebug	= TRUE;
+		if ($doDebug) {
+			echo "Arrived at pass 3<br /><br />Input values:<br />
+				  inp_semester: $inp_semester<br />
+				  inp_mode: $inp_mode<br />
+				  request_type: $request_type<br />
+				  request_info: $request_info<br />
+				  inp_msg: $inp_msg<br />
+				  sendEmail array:<br />";
+	 		foreach($sendEmail as $value) {
+				echo "Value: $value<br />";
+			}
+		}
+		$content .= "<h3>Advisor Class Pariticipants for $inp_semester Semester</h3>$theStatement";
+
+		$myCount					= 0;
+
+		foreach($sendEmail as $advisorCallSign) {
+
+			$sql						 	= "select email 
+												from $advisorTableName 
+												where call_sign = '$advisorCallSign' 
+												order by date_created DESC 
+												limit 1 ";
+			$wpw1_cwa_advisor	= $wpdb->get_results($sql);
+			if ($wpw1_cwa_advisor === FALSE) {
+				$myError			= $wpdb->last_error;
+				$myQuery			= $wpdb->last_query;
+				if ($doDebug) {
+					echo "Reading $advisorTableName table failed<br />
+						  wpdb->last_query: $myQuery<br />
+						  wpdb->last_error: $myError<br />";
+				}
+				$errorMsg			= "$jobname Reading $advisorTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
+				sendErrorEmail($errorMsg);
+			} else {
+				$numARows			= $wpdb->num_rows;
+				if ($doDebug) {
+					$myStr			= $wpdb->last_query;
+					echo "ran $myStr<br />and found $numARows rows in $advisorTableName table<br />";
+				}
+				if ($numARows > 0) {
+					foreach ($wpw1_cwa_advisor as $advisorRow) {
+						$advisor_email		= $advisorRow->email;
+						if ($inp_msg != '') {
+							 $inp_msg		= "<p>$inp_msg</p>";
+						}
+						if ($request_type == 'Full') {
+							$advisor_subject			= "CW Academy - Complete List of Students in Your Class";
+							$email_to_advisor			= $inp_msg;
+						} else {
+							$advisor_subject			= "CW Academy - List of Unconfirmed Students in Your Class";
+							$email_to_advisor			= $inp_msg;
+						}
+						if ($testMode) {
+							$advisor_subject		= "TESTMODE $advisor_subject";
+						}
+						$prepareResult				= prepare_advisor_class_display($advisorCallSign,
+																					$inp_semester,
+																					$request_type,
+																					TRUE,
+																					FALSE,
+																					$testMode,
+																					$doDebug);
+						if ($prepareResult[0] == FALSE) {
+							$content				.= "<p>Getting the data to send to the advisor failed. $prepareResult[1]<br />";
+							$errorMsg				= "prepare_advisor_class_display failed: $prepareResult[1]";
+							sendErrorEmail($errorMsg);
+						} else {
+							$email_to_advisor		.= $prepareResult[1];
+
+							$email_to_advisor .= "<p>You can at any time see your class and assigned students as well as update the student's verification 
+													status by going to cwops.org --> CW Academy --> Advisor Resources --> Show Advisor Class Assignments.</p>
+													<p>Thanks for your service as an advisor!<br />
+													CW Academy</p>
+													<p><span style='color:red;font-size:14pt;'><b>Do not reply to this email as the address is not monitored. 
+													<br />Please refer to the appropriate person at <a href='https://cwops.org/cwa-class-resolution/'>CWA Class 
+													Resolution</a> for assistance.</b></span><br /></p>";
+
+
+							if ($testMode) {
+								$mailCode				= 5;
+								$email_to				= 'rolandksmith@gmail.com';
+								$increment++;
+							} else {
+								$email_to				= $advisor_email;
+								$mailCode				= 21;
+							}
+							$mailResult		= emailFromCWA_v2(array('theRecipient'=>$email_to,
+																	'theSubject'=>$advisor_subject,
+																	'jobname'=>$jobname,
+																	'theContent'=>$email_to_advisor,
+																	'theCc'=>$inp_cc,
+																	'mailCode'=>$mailCode,
+																	'increment'=>$increment,
+																	'testMode'=>$testMode,
+																	'doDebug'=>$doDebug));
+							if ($mailResult === TRUE) {
+								if ($doDebug) {
+									echo "An email for $advisorCallSign was sent to $email_to<br />";
+								}
+								$content .= "An email for $advisorCallSign was sent to $email_to<br /><br />";
+								$myCount++;
+							} else {
+								$content .= "The mail send function to $email_to failed.<br /><br />";
+							}
+						}
+					}
+				} else {
+					$content	.= "No $advisorTableName record found for $advisorCallSign<br />";
+				}
+			}
+		}
+		$content				.= "$myCount Emails sent<br />";
+	}
+	$thisTime 					= date('Y-m-d H:i:s');
+	$content					.= "<br /><br /><br /><p>Report displayed at $thisTime.</p>";
+	$endingMicroTime = microtime(TRUE);
+	$elapsedTime	= $endingMicroTime - $startingMicroTime;
+	$elapsedTime	= number_format($elapsedTime, 4, '.', ',');
+	$content		.= "<p>Report pass $strPass took $elapsedTime seconds to run</p>";
+	$nowDate		= date('Y-m-d');
+	$nowTime		= date('H:i:s');
+	$thisStr			= 'Production';
+	if ($testMode) {
+		$thisStr		= 'Testmode';
+	}
+	$result			= write_joblog_func("$jobname|$nowDate|$nowTime|$userName|$thisStr|Time|$strPass: $elapsedTime");
+	if ($result == 'FAIL') {
+		$content	.= "<p>writing to joblog.txt failed</p>";
+	}
+	return $content;
+}
+add_shortcode ('push_advisor_class_v2', 'push_advisor_class_v2_func');
