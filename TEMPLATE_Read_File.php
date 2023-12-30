@@ -3,17 +3,14 @@
 
 			$wpw1_cwa_student		= $wpdb->get_results($sql);
 			if ($wpw1_cwa_student === FALSE) {
-				$myError			= $wpdb->last_error;
-				$myQuery			= $wpdb->last_query;
-				if ($doDebug) {
-					echo "Reading $studentTableName table failed<br />
-						  wpdb->last_query: $myQuery<br />
-						  wpdb->last_error: $myError<br />";
-				}
-				$errorMsg			= "$jobname reading $studentTableName failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-				sendErrorEmail($errorMsg);
-				$content		.= "Unable to obtain content from $studentTableName<br />";
+				handleWPDBError($jobname,$doDebug);
 			} else {
+				$lastError			= $wpdb->last_error;
+				if ($lastError != '') {
+					handleWPDBError($jobname,$doDebug);
+					$content		.= "Fatal program error. System Admin has been notified";
+					return $content;
+				}
 				$numSRows			= $wpdb->num_rows;
 				if ($doDebug) {
 					$myStr			= $wpdb->last_query;
@@ -165,17 +162,14 @@
 												$inputParams,
 												$inputFormat);
 				if ($insertResult === FALSE) {
-					$myError			= $wpdb->last_error;
-					$myQuery			= $wpdb->last_query;
-					if ($doDebug) {
-						echo "Inserting into $studentTableName table failed<br />
-							  wpdb->last_query: $myQuery<br />
-							  wpdb->last_error: $myError<br />";
-					}
-					$errorMsg			= "$jobname inserting $studentTableName failed while attempting to move to past_student. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-					sendErrorEmail($errorMsg);
-					$content		.= "Unable to insert into $studentTableName<br />";
+					handleWPDBError($jobname,$doDebug);
 				} else {
+					$lastError			= $wpdb->last_error;
+					if ($lastError != '') {
+						handleWPDBError($jobname,$doDebug);
+						$content		.= "Fatal program error. System Admin has been notified";
+						return $content;
+					}
 					$newID			= $wpdb->insert_id;
 					if ($doDebug) {
 						$myStr			= $wpdb->last_query;
@@ -191,17 +185,14 @@
 
 		$wpw1_cwa_advisor	= $wpdb->get_results($sql);
 		if ($wpw1_cwa_advisor === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $advisorTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname Reading $advisorTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
-			$content		.= "Unable to obtain content from $advisorTableName<br />";
+			handleWPDBError($jobname,$doDebug);
 		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
 			$numARows			= $wpdb->num_rows;
 			if ($doDebug) {
 				$myStr			= $wpdb->last_query;
@@ -317,13 +308,14 @@
 											$updateParams,
 											$updateFormat);
 		if ($result === FALSE) {
-			if ($doDebug) {
-				echo "Inserting $advisor_call_sign record failed<br />
-						wpdb->last_query: " . $wpdb->last_query . "<br />
-						<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-			}
-			$errorArray[]			= "05 Inserting $advisor_call_sign into $pastAdvisorTableName failed: " . $wpdb->last_error . "<br />";
+			handleWPDBError($jobname,$doDebug);
 		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
 			$nextID				= $wpdb->insert_id;
 			if ($doDebug) {
 				$myStr			 	= $wpdb->last_query;
@@ -337,16 +329,14 @@
 
 		$wpw1_cwa_advisorclass				= $wpdb->get_results($sql);
 		if ($wpw1_cwa_advisorclass === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $advisorClassTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname Reading $advisorClassTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
+			handleWPDBError($jobname,$doDebug);
 		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
 			$numACRows						= $wpdb->num_rows;
 			if ($doDebug) {
 				$myStr						= $wpdb->last_query;
@@ -479,17 +469,14 @@
 										$inputParams,
 										$inputFormat);
 		if ($insertResult === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Inserting into $advisorClassTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname inserting $advisorClassTableName failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
-			$content		.= "Unable to insert into $advisorClassTableName<br />";
+			handleWPDBError($jobname,$doDebug);
 		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
 			$newID			= $wpdb->insert_id;
 			if ($doDebug) {
 				$myStr			= $wpdb->last_query;
@@ -508,16 +495,14 @@
 															  where call_sign='$student_call_sign' 
 															  order by assessment_date DESC");
 				if ($assessmentResult === FALSE) {
-					$myError			= $wpdb->last_error;
-					$myQuery			= $wpdb->last_query;
-					if ($doDebug) {
-						echo "Reading $audioAssessmentTableName table failed<br />
-							  wpdb->last_query: $myQuery<br />
-							  wpdb->last_error: $myError<br />";
-					}
-					$errorMsg			= "$jobname Reading $audioAssessmentTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-					sendErrorEmail($errorMsg);
+					handleWPDBError($jobname,$doDebug);
 				} else {
+					$lastError			= $wpdb->last_error;
+					if ($lastError != '') {
+						handleWPDBError($jobname,$doDebug);
+						$content		.= "Fatal program error. System Admin has been notified";
+						return $content;
+					}
 					$numASRows				= $wpdb->num_rows;
 					if ($doDebug) {
 						$myStr				= $wpdb->last_query;
@@ -552,16 +537,14 @@
 										$inputParams,
 										$inputFormat);
 		if ($insertResult === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Inserting into $audioAssessmentTableName  table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
+			handleWPDBError($jobname,$doDebug);
+		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
 			}
-			$errorMsg			= "$jobname inserting $audioAssessmentTableName  failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
-			$content		.= "Unable to insert into $audioAssessmentTableName <br />";
 		} else {
 			$newID			= $wpdb->insert_id;
 			if ($doDebug) {
@@ -580,16 +563,14 @@
 	$sql 						= "select * from $catalogTableName where mode='$catalogMode' and semester='$inp_semester'";
 	$result						= $wpdb->get_results($sql);
 	if ($result === FALSE) {
-		$myError			= $wpdb->last_error;
-		$myQuery			= $wpdb->last_query;
-		if ($doDebug) {
-			echo "Reading $catalogTableName table failed<br />
-				  wpdb->last_query: $myQuery<br />
-				  wpdb->last_error: $myError<br />";
-		}
-		$errorMsg			= "$jobname Reading $catalogTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-		sendErrorEmail($errorMsg);
+		handleWPDBError($jobname,$doDebug);
 	} else {
+		$lastError			= $wpdb->last_error;
+		if ($lastError != '') {
+			handleWPDBError($jobname,$doDebug);
+			$content		.= "Fatal program error. System Admin has been notified";
+			return $content;
+		}
 		$numRows				= $wpdb->num_rows;
 		if ($doDebug) {
 			$myStr				= $wpdb->last_query;
@@ -657,17 +638,14 @@
 /// Bad Actors
 		$wpw1_cwa_bad_actor		= $wpdb->get_results($sql);
 		if ($wpw1_cwa_bad_actor === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $bad_actorTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname reading $bad_actorTableName failed.\nSQL: $myQuery\nError: $myError";
-			sendErrorEmail($errorMsg);
-			$content		.= "Unable to obtain content from $bad_actorTableName<br />";
+			handleWPDBError($jobname,$doDebug);
 		} else {
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
 			$numBARows			= $wpdb->num_rows;
 			if ($doDebug) {
 				$myStr			= $wpdb->last_query;
@@ -686,23 +664,21 @@
  
  		$wpw1_cwa_replacement_requests		= $wpdb->get_results($sql);
 		if ($wpw1_cwa_replacement_requests === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $replacementRequests table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname reading $replacementRequests failed.\nSQL: $myQuery\nError: $myError";
-			sendErrorEmail($errorMsg);
-			$content		.= "Unable to obtain content from $replacementRequests<br />";
+			handleWPDBError($jobname,$doDebug);
 		} else {
-			$numBARows			= $wpdb->num_rows;
+			$lastError			= $wpdb->last_error;
+			if ($lastError != '') {
+				handleWPDBError($jobname,$doDebug);
+				$content		.= "Fatal program error. System Admin has been notified";
+				return $content;
+			}
+		} else {
+			$numRows			= $wpdb->num_rows;
 			if ($doDebug) {
 				$myStr			= $wpdb->last_query;
-				echo "ran $myStr<br />and found $numBARows rows<br />";
+				echo "ran $myStr<br />and found $numRows rows<br />";
 			}
-			if ($numBARows > 0) {
+			if ($numRows > 0) {
 				foreach ($wpw1_cwa_replacement_requests as $replacement_requestsRow) {
 					$replacement_id				= $replacement_requestsRow->record_id;
 					$replacement_call_sign		= $replacement_requestsRow->call_sign;
@@ -729,17 +705,14 @@
 												$inputParams,
 												$inputFormat);
 				if ($insertResult === FALSE) {
-					$myError			= $wpdb->last_error;
-					$myQuery			= $wpdb->last_query;
-					if ($doDebug) {
-						echo "Inserting into $replacementRequests table failed<br />
-							  wpdb->last_query: $myQuery<br />
-							  wpdb->last_error: $myError<br />";
-					}
-					$errorMsg			= "$jobname inserting $replacementRequests failed while attempting to move to past_student. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-					sendErrorEmail($errorMsg);
-					$content		.= "Unable to insert into $replacementRequests<br />";
+					handleWPDBError($jobname,$doDebug);
 				} else {
+					$lastError			= $wpdb->last_error;
+					if ($lastError != '') {
+						handleWPDBError($jobname,$doDebug);
+						$content		.= "Fatal program error. System Admin has been notified";
+						return $content;
+					}
 					$newID			= $wpdb->insert_id;
 					if ($doDebug) {
 						$myStr			= $wpdb->last_query;
@@ -750,126 +723,5 @@
  
  
  
- ///// consolidating tables
-
-truncate wpw1_cwa_consolidated_student;
-insert into wpw1_cwa_consolidated_student (
-call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
-country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
-messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
-request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
-response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
-no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
-hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
-student_survey_completion_date, available_class_days, intervention_required, copy_control, 
-first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
-second_class_choice_utc, third_class_choice_utc, date_created, date_updated) 
-select 
-call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
-country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
-messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
-request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
-response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
-no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
-hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
-student_survey_completion_date, available_class_days, intervention_required, copy_control, 
-first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
-second_class_choice_utc, third_class_choice_utc, date_created, date_updated 
-from wpw1_cwa_student;
-insert into wpw1_cwa_consolidated_student (
-call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
-country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
-messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
-request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
-response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
-no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
-hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
-student_survey_completion_date, available_class_days, intervention_required, copy_control, 
-first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
-second_class_choice_utc, third_class_choice_utc, date_created, date_updated) 
-select 
-call_sign, first_name, last_name, email, phone, ph_code, city, state, zip_code, country, 
-country_code, time_zone, timezone_id, timezone_offset, whatsapp_app, signal_app, telegram_app, 
-messenger_app, wpm, youth, age, student_parent, student_parent_email, level, waiting_list, 
-request_date, semester, notes, welcome_date, email_sent_date, email_number, response, 
-response_date, abandoned, student_status, action_log, pre_assigned_advisor, selected_date, 
-no_catalog, hold_override, messaging, assigned_advisor, advisor_select_date, advisor_class_timezone, 
-hold_reason_code, class_priority, assigned_advisor_class, promotable, excluded_advisor, 
-student_survey_completion_date, available_class_days, intervention_required, copy_control, 
-first_class_choice, second_class_choice, third_class_choice, first_class_choice_utc, 
-second_class_choice_utc, third_class_choice_utc, date_created, date_updated 
-from wpw1_cwa_past_student;
-
-truncate wpw1_cwa_consolidated_advisor;
-insert into wpw1_cwa_consolidated_advisor (
-select_sequence, call_sign, first_name, last_name, email, phone, ph_code, 
-text_message, city, state, zip_code, country, country_code, time_zone, timezone_id, 
-timezone_offset, whatsapp_app, signal_app, telegram_app, messenger_app, semester, 
-survey_score, languages, fifo_date, welcome_email_date, verify_email_date, 
-verify_email_number, verify_response, action_log, class_verified, control_code, 
-date_created, date_updated) 
-select 
-select_sequence, call_sign, first_name, last_name, email, phone, ph_code, 
-text_message, city, state, zip_code, country, country_code, time_zone, timezone_id, 
-timezone_offset, whatsapp_app, signal_app, telegram_app, messenger_app, semester, 
-survey_score, languages, fifo_date, welcome_email_date, verify_email_date, 
-verify_email_number, verify_response, action_log, class_verified, control_code, 
-date_created, date_updated 
-from wpw1_cwa_adviisor;
-insert into wpw1_cwa_consolidated_advisor (
-select_sequence, call_sign, first_name, last_name, email, phone, ph_code, 
-text_message, city, state, zip_code, country, country_code, time_zone, timezone_id, 
-timezone_offset, whatsapp_app, signal_app, telegram_app, messenger_app, semester, 
-survey_score, languages, fifo_date, welcome_email_date, verify_email_date, 
-verify_email_number, verify_response, action_log, class_verified, control_code, 
-date_created, date_updated) 
-select 
-select_sequence, call_sign, first_name, last_name, email, phone, ph_code, 
-text_message, city, state, zip_code, country, country_code, time_zone, timezone_id, 
-timezone_offset, whatsapp_app, signal_app, telegram_app, messenger_app, semester, 
-survey_score, languages, fifo_date, welcome_email_date, verify_email_date, 
-verify_email_number, verify_response, action_log, class_verified, control_code, 
-date_created, date_updated 
-from wpw1_cwa_past_adviisor;
-
-truncate wpw1_cwa_consolidated_advisorclass;
-insert into wpw1_cwa_consolidated_advisorclass (
-advisor_call_sign, advisor_first_name, advisor_last_name, advisor_id, sequence, 
-semester, time_zone, timezone_id, timezone_offset, level, class_size, class_schedule_days,
-class_schedule_times, class_schedule_days_utc, class_schedule_times_utc, action_log, 
-class_incomplete, date_created, date_updated, student01, student02, student03, student04, 
-student05, student06, student07, student08, student09, student10, student11, student12, 
-student13, student14, student15, student16, student17, student18, student19, student20, 
-student21, student22, student23, student24, student25, student26, student27, student28, 
-student29, student30, number_students, evaluation_complete, class_comments, copy_control) 
-select 
-advisor_call_sign, advisor_first_name, advisor_last_name, advisor_id, sequence, 
-semester, time_zone, timezone_id, timezone_offset, level, class_size, class_schedule_days,
-class_schedule_times, class_schedule_days_utc, class_schedule_times_utc, action_log, 
-class_incomplete, date_created, date_updated, student01, student02, student03, student04, 
-student05, student06, student07, student08, student09, student10, student11, student12, 
-student13, student14, student15, student16, student17, student18, student19, student20, 
-student21, student22, student23, student24, student25, student26, student27, student28, 
-student29, student30, number_students, evaluation_complete, class_comments, copy_control 
-from wpw1_cwa_advisorclass; 
-insert into wpw1_cwa_consolidated_advisorclass (
-advisor_call_sign, advisor_first_name, advisor_last_name, advisor_id, sequence, 
-semester, time_zone, timezone_id, timezone_offset, level, class_size, class_schedule_days,
-class_schedule_times, class_schedule_days_utc, class_schedule_times_utc, action_log, 
-class_incomplete, date_created, date_updated, student01, student02, student03, student04, 
-student05, student06, student07, student08, student09, student10, student11, student12, 
-student13, student14, student15, student16, student17, student18, student19, student20, 
-student21, student22, student23, student24, student25, student26, student27, student28, 
-student29, student30, number_students, evaluation_complete, class_comments, copy_control) 
-select 
-advisor_call_sign, advisor_first_name, advisor_last_name, advisor_id, sequence, 
-semester, time_zone, timezone_id, timezone_offset, level, class_size, class_schedule_days,
-class_schedule_times, class_schedule_days_utc, class_schedule_times_utc, action_log, 
-class_incomplete, date_created, date_updated, student01, student02, student03, student04, 
-student05, student06, student07, student08, student09, student10, student11, student12, 
-student13, student14, student15, student16, student17, student18, student19, student20, 
-student21, student22, student23, student24, student25, student26, student27, student28, 
-student29, student30, number_students, evaluation_complete, class_comments, copy_control 
-from wpw1_cwa_past_advisorclass; 
 
 
