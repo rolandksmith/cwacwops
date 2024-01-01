@@ -53,6 +53,7 @@ function view_a_student_cw_assessment_v2_func() {
 	$advisorCheck				= FALSE;
 	$versionNumber				= '2';
 	$jobname					= "View a Student CW Assessment V$versionNumber";
+	$token						= '';
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -392,6 +393,17 @@ $testModeOption
 									a number of two-word questions in Morse code and then displays five 
 									options for the answer. The student garners points for each word 
 									correctly selected.</p>";
+									
+					// if there is a reminder, resolve it
+					if ($token != '') {
+						$resolveResult		= resolve_reminder($advisor_call_sign,$token,$testMode,$doDebug);
+						if ($resolveResult === FALSE) {
+							if ($doDebug) {
+								echo "resolve_reminder for $inp_callsign and $token failed<br />";
+							}
+						}
+					}
+
 				}
 			}
 		} else {
