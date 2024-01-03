@@ -484,7 +484,7 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 						<p><a href='$siteURL/cwa-show-advisor-class-assignments/?strpass=2&inp_call_sign=$userName&inp_verified=Y' target='_blank'>Show Advisor Class Assignments</a><br />
 							This program shows upcoming advisor registrations (if any), current class makeup, and 
 							all past students</p>
-						<p><a href='' target='_blank'>Order Morse Code Proficiency Assessments</a> (function coming)<br />
+						<p><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>Order Morse Code Proficiency Assessments</a><br />
 							This program allows the advisor to specify the parameters for the assessment and 
 							which students are to take the assessment.</p>
 						<p><a href='https://cwops.org/cw-academy/cwa-advisor-resources/' target='_blank'>Advisor Resources</a><br />
