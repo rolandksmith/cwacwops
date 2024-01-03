@@ -42,11 +42,11 @@ function badActor_func() {
 	$jobname					= "Bad Actors";
 	$bad_actorTableName			= 'wpw1_cwa_bad_actor';
 	$studentTableName			= 'wpw1_cwa_consolidated_student';
-	$advisorTableName		= 'wpw1_cwa_consolidated_advisor';
+	$advisorTableName			= 'wpw1_cwa_consolidated_advisor';
 	$searchArray				= array($studentTableName,
 										$advisorTableName);
-	$categoryArray				= array('wpw1_cwa_student'=>'Student',
-										'wpw1_cwa_advisor'=>'Advisor');
+	$categoryArray				= array('wpw1_cwa_consolidated_student'=>'Student',
+										'wpw1_cwa_consolidated_advisor'=>'Advisor');
 	
 
 // get the input information

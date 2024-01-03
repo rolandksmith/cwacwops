@@ -172,9 +172,9 @@ function generate_catalog_for_student($inp_data = array('')) {
 			print_r($myArray);
 			echo "</pre><br />";
 		}
-		$date1					= strtotime($myArray[0]);
-		$date2					= strtotime($myArray[1]);
-		$date3					= strtotime($myArray[2]);
+		$date1					= strtotime($myArray[0]);		// semester start
+		$date2					= strtotime($myArray[1]);		// catalog available
+		$date3					= strtotime($myArray[2]);		// students assigned
 		
 		// determine which info to display
 		$currentTime			= strtotime($run_date);
@@ -185,6 +185,8 @@ function generate_catalog_for_student($inp_data = array('')) {
 			$showCatalog		= TRUE;
 		} elseif ($currentTime < $date1 && $currentTime >= $date3) {
 			$showAvail			= TRUE;
+		} elseif ($currentTime > $date1) {		// after Semester Starts
+			$show13Options		= TRUE;
 		} else {
 			$error				= "$run_date of $currentTime doesn't compare to $date1, $date2, or $date3";
 			$doProceed			= FALSE;
