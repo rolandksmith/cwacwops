@@ -6,6 +6,8 @@ function manage_advisor_class_assignments_func() {
 	the students
 	
 	Created 21Nov23 by Roland from show_advisor_class_assignments
+	Modified 3Jan24 by Roland to make the student unassigned if the advisor does not 
+		want the student and does not want a replacement
 	
 */	
 
@@ -454,6 +456,10 @@ td:last-child {
 		 		set the student remove_status to R
 		 		Setup the student action log
 		 		Setup the advisor action log
+		 	if the reason is advisor (advisor does not want the student)
+		 		Set the student remove status to R
+		 		Setup the student action log
+		 		Set up the advisor action log
 		 	if the reason is other
 		 		set the student revmoe_status to R
 		 		setup the student action log
@@ -471,6 +477,11 @@ td:last-child {
 				set the student remove_status to C
 				setup the student action log
 				setup the advisorclass action log
+			If the reason is advisor
+				set the student remove_status to blank (unassigned)
+				Set excljuded advisor 
+				Setup the advisorClass action log
+				Update the student
 			If reason is other
 				set the student remove_status to C
 				setup the student action log
@@ -839,13 +850,13 @@ No replacement requested. ";
 									if ($inp_comment != '') {
 										$myStr				= "Advisor comments: $inp_coment ";
 									}
-									$student_action_log		= "$student_action_log / $actionDate CONFIRM $advisor_call_sign advisor does not want the student. $myStr No replacement requested ";
+									$student_action_log		= "$student_action_log / $actionDate CONFIRM $advisor_call_sign advisor does not want the student. $myStr No replacement requested. Student set to unassigned ";
 									$advisor_action_log		= "$advisor_action_log / $actionDate CONFIRM advisor does not want $student_call_sign. $myStr No replacement requested ";
 									$studentUpdateParams[]	= "action_log|$student_action_log|s";
 									$studentUpdateParams[]	= "excluded_advisor|$student_excluded_advisor|s";
 									$studentUpdateParams[]	= "hold_reason_code|X|s";
 									$advisorUpdateParams[]	= "action_log|$advisor_action_log|s";
-									$student_remove_status	= 'C';
+									$student_remove_status	= '';
 									$removeStudent			= TRUE;
 									$confirmationMsg		= "Student $student_call_sign confirmed as not attending and no replacement was requested.<br />";
 								} else {
