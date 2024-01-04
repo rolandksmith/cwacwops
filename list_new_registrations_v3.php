@@ -11,6 +11,7 @@ function list_new_registrations_v3_func(){
 
 	$doDebug						= FALSE;
 	$testMode						= FALSE;
+	$rkslist						= FALSE;
 	$initializationArray 			= data_initialization_func();
 	$validUser 						= $initializationArray['validUser'];
 
@@ -32,6 +33,7 @@ function list_new_registrations_v3_func(){
 	$semesterTwo		= $initializationArray['semesterTwo'];
 	$semesterThree		= $initializationArray['semesterThree'];
 	$semesterFour		= $initializationArray['semesterFour'];
+	$rkslistArray		= array();
 	
 	ini_set('display_errors','1');
 	error_reporting(E_ALL);	
@@ -758,8 +760,12 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 								}
 								$addTempRecord		= TRUE;
 							}
-
-							
+							if ($verifiedUser && $validFormat && !$signupRecord && $rkslist) {	// get list of email addresses
+								if ($doDebug) {
+									echo "gathering email addresses<br />";
+								}
+								$rkslistArray[]		= $user_email;
+							}
 							if ($sendReminder || $sendRedo) {							
 								if ($doDebug) {
 									echo "Sending email<br />";
@@ -1057,6 +1063,13 @@ and then log in and sign up.<br />73,<br />CW Academy";
 				}
 			}
 			$content			.= "</table>$myCount Errors Displayed<br />Clicking on the email address searches the Display and Update records by email address<br /><br />";
+		}
+		if ($rkslist) {		// print out list of email addresses
+			$content	.= "<h4>Email Addresses Needing Followup</h4>";
+			foreach ($rkslistArray as $thisValue) {
+				$content	.= "$thisValue\n<br />";
+			}
+			$content		.= "<br />";
 		}
 
 		$content	.= "<h4>Counts</h4>
