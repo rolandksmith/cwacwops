@@ -28,7 +28,7 @@ $userName						= "";
 	echo "</pre><br />";
 */	
 	
-	$user_name 					= $current_user->user_login;
+	$user_name 					= trim($current_user->user_login);
 	$user_email					= $current_user->user_email;
 	$user_display_name			= $current_user->display_name;
 	
