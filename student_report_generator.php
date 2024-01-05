@@ -2273,9 +2273,9 @@ where rg_report_name = '$inp_report_name'";
 		if ($doDebug) {
 			echo "Calling function to save the report as Student Report Generator<br />";
 		}
-		$storeResult	= storeReportData_func("Student Report Generator",$content);
+		$storeResult	= storeReportData_v2("Student Report Generator",$content);
 		if ($storeResult !== FALSE) {
-			$content	.= "<br />Report stored in reports table as $storeResult";
+			$content	.= "<br />Report stored in reports table as $storeResult[1]";
 		} else {
 			$content	.= "<br />Storing the report in the reports table failed";
 		}
