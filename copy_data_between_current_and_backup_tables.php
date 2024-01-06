@@ -81,6 +81,7 @@ function copy_data_between_current_and_backup_tables_func($atts) {
 	$copyAdvisorDeleted_to_AdvisorDeleted2				= FALSE;
 	$copyAdvisorDeleted2_to_AdvisorDeleted				= FALSE;
 	$copyAdvisorClassDeleted_to_AdvisorClassDeleted2	= FALSE;	
+	$copyTempData_to_TempData2							= FALSE;
 	$copyAdvisorClassDeleted2_to_AdvisorClassDeleted	= FALSE;
 	$copyStudentDeleted_to_StudentDeleted2				= FALSE;
 	$copyStudentDeleted2_to_StudentDeleted				= FALSE;
@@ -98,6 +99,7 @@ function copy_data_between_current_and_backup_tables_func($atts) {
 	$copyReminders2_to_reminders						= FALSE;
 	$copyEmails_to_emails2								= FALSE;
 	$copyEmails2_to_emails								= FALSE;
+	$copyTempData2_to_TempData							= FALSE;
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -196,14 +198,14 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 <tr><td><b>Batch Backup and Restore</b></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='primary' name='inp_request' value='primary'>
-	<label for='primary'>Advisor, AdvisorClass, and Student to Backup Tables</label></td></tr>
+	<label for='primary'>Advisor, AdvisorClass, Student, TempData to Backup Tables</label></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='allcurrent' name='inp_request' value='allcurrent'>
 	<label for='allcurrent'>All Current Tables to Backup Tables</label></td></tr>
 <tr><td><hr></td></tr>	
 <tr><td>
 	<input type='radio' class='formInputButton' id='backup' name='inp_request' value='backup'>
-	<label for='backup'>Backup Advisor, AdvisorClass, and Student to Current Tables</label></td></tr>
+	<label for='backup'>Backup Advisor, AdvisorClass, Student and TempData to Current Tables</label></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='allbackup' name='inp_request' value='allbackup'>
 	<label for='allbackup'>All Backup Tables to Current Tables</label></td></tr>
@@ -218,6 +220,9 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 <tr><td>
 	<input type='radio' class='formInputButton' id='student' name='inp_request' value='student'>
 	<label for='student'>Consolidated Student table to backup table</label></td></tr>
+<tr><td>
+	<input type='radio' class='formInputButton' id='tempdata' name='inp_request' value='tempdata'>
+	<label for='tempdata'>TempData table to backup table</label></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='advisordeleted' name='inp_request' value='advisordeleted'>
 	<label for='advisordeleted'>Advisor Deleted table to backupo table</label><br /></td></tr>
@@ -262,6 +267,9 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 <tr><td>
 	<input type='radio' class='formInputButton' id='student2' name='inp_request' value='student2'>
 	<label for='student2'>Backup Student table to Current table</label></td></tr>
+<tr><td>
+	<input type='radio' class='formInputButton' id='tempdata2' name='inp_request' value='tempdata2'>
+	<label for='tempdata'>TempData2 table to Current table</label></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='advisordeleted2' name='inp_request' value='advisordeleted2'>
 	<label for='advisordeleted2'>Backup Advisor Deleted table to Currento table</label><br /></td></tr>
@@ -353,6 +361,8 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 			$copyAdvisor2_to_Advisor							= FALSE;
 			$copyAdvisorClass_to_AdvisorClass2					= FALSE;
 			$copyAdvisorClass2_to_AdvisorClass					= FALSE;
+			$copyTempData_to_TempData2							= FALSE;
+			$copyTempData2_to_TempData							= FALSE;
 			$copyEvaluate_to_Evaluate2							= FALSE;
 			$copyEvaluate2_to_Evaluate							= FALSE;
 			$copyAdvisorDeleted_to_AdvisorDeleted2				= FALSE;
@@ -384,6 +394,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$copyStudent_to_Student2							= TRUE;
 				$copyAdvisor_to_Advisor2							= TRUE;
 				$copyAdvisorClass_to_AdvisorClass2					= TRUE;
+				$copyTempData_to_TempData2							= TRUE;
 				$copyEvaluate_to_Evaluate2							= TRUE;
 				$copyAdvisorDeleted_to_AdvisorDeleted2				= TRUE;
 				$copyAdvisorClassDeleted_to_AdvisorClassDeleted2	= TRUE;	
@@ -400,16 +411,19 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$copyStudent_to_Student2							= TRUE;
 				$copyAdvisor_to_Advisor2							= TRUE;
 				$copyAdvisorClass_to_AdvisorClass2					= TRUE;
+				$copyTempData_to_TempData2							= TRUE;
 				$doContinue											= TRUE;
 			} elseif ($inp_request == "backup") {
 				$copyStudent2_to_Student							= TRUE;
 				$copyAdvisor2_to_Advisor							= TRUE;
 				$copyAdvisorClass2_to_AdvisorClass					= TRUE;
+				$copyTempData2_to_TempData							= TRUE;
 				$doContinue											= TRUE;
 			} elseif ($inp_request 		== "allbackup") {
 				$copyStudent2_to_Student							= TRUE;
 				$copyAdvisor2_to_Advisor							= TRUE;
 				$copyAdvisorClass2_to_AdvisorClass					= TRUE;
+				$copyTempData2_to_TempData							= TRUE;
 				$copyEvaluate2_to_Evaluate							= TRUE;
 				$copyAdvisorDeleted2_to_AdvisorDeleted				= TRUE;
 				$copyAdvisorClassDeleted2_to_AdvisorClassDeleted	= TRUE;
@@ -430,6 +444,9 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$doContinue											= TRUE;
 			} elseif ($inp_request		== "student") {
 				$copyStudent_to_Student2							= TRUE;
+				$doContinue											= TRUE;
+			} elseif ($inp_request		== "tempdata") {
+				$copyTempData_to_TempData2							= TRUE;
 				$doContinue											= TRUE;
 			} elseif ($inp_request		== "advisordeleted") {
 				$copyAdvisorDeleted_to_AdvisorDeleted2				= TRUE;
@@ -473,6 +490,9 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$doContinue											= TRUE;
 			} elseif ($inp_request		== "student2") {
 				$copyStudent2_to_Student							= TRUE;
+				$doContinue											= TRUE;
+			} elseif ($inp_request		== "TempData2") {
+				$copyTempData2_to_TempData							= TRUE;
 				$doContinue											= TRUE;
 			} elseif ($inp_request		== "advisordeleted2") {
 				$copyAdvisorDeleted2_to_AdvisorDeleted				= TRUE;
@@ -526,6 +546,12 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$copyArray[]			= "wpw1_cwa_consolidated_student|wpw1_cwa_consolidated_student2";
 				if ($doDebug) {
 					echo "copyStudent_to_Student2 true<br />";
+				}
+			}
+			if ($copyTempData_to_TempData2) {
+				$copyArray[]			= "wpw1_cwa_temp_data|wpw1_cwa_temp_data2";
+				if ($doDebug) {
+					echo "copyTempData_to_TempData2 true<br />";
 				}
 			}
 			if ($copyAdvisorDeleted_to_AdvisorDeleted2) {
@@ -610,6 +636,12 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 				$copyArray[]			= "wpw1_cwa_consolidated_student2|wpw1_cwa_consolidated_student";
 				if ($doDebug) {
 					echo "copyStudent2_to_Student true<br />";
+				}
+			}
+			if ($copyTempData2_to_TempData) {
+				$copyArray[]			= "wpw1_cwa_temp_data2|wpw1_cwa_temp_data";
+				if ($doDebug) {
+					echo "copyTempData2_to_TempData true<br />";
 				}
 			}
 			if ($copyAdvisorDeleted2_to_AdvisorDeleted) {

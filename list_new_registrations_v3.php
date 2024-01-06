@@ -54,6 +54,10 @@ function list_new_registrations_v3_func(){
 	$newRegistrations		= 0;
 	$badUsernameCount		= 0;
 	$signupEmailCount		= 0;
+	$tempDataAdded			= 0;
+	$tempDataDeleted		= 0;
+	$usernamesDeleted		= 0;
+	$newSignup				= 0;
 	$advisorMissingUsername	= 0;
 	$studentMissingUsername	= 0;
 	$userNameArray			= array();
@@ -283,9 +287,9 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 						$doProceed 		= FALSE;
 					}
 					if ($doProceed) {
-						$user_first_name	= '';
-						$user_last_name		= 'N/A';
-						$user_role			= '';
+						$user_first_name			= '';
+						$user_last_name				= 'N/A';
+						$user_role					= '';
 						$user_needs_verification	= FALSE;
 						$unverifiedUser				= FALSE;
 						$userLoginCount++;
@@ -367,6 +371,18 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 						}
 						$allUsersArray[$myStr]['theError']	.= "Username created $user_registered<br />";
 						
+						// if the user_role is blank, then delete the user
+						if ($user_role == '') {
+							if ($doDebug) {
+								echo "user_role of $user_role is invalid. Deleting username<br />";
+							}
+							$allUsersArray[$myStr]['hasError']	.= "Y";
+							$allUsersArray[$myStr]['theError']	.= "user_role invalid. Username deleted<br />";
+							delete_user($user_id);
+							$usernamesDeleted++;
+						}
+						
+						
 						// if user needs verification and more than 3 days ago, delete the
 						// user record and be done with this record
 						if ($user_needs_verification) {
@@ -394,6 +410,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									}
 									$userUnverifiedDeleted++;
 									$allUsersArray[$myStr]['theError']	.= 'Unverified user has been deleted<br />';
+									$usernamesDeleted++;
 								} else {
 									handleWPDBError($jobname,$doDebug);
 									$allUsersArray[$myStr]['hasError']	= 'Y';
@@ -661,13 +678,13 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 							}
 							if ($verifiedUser && $validFormat && $gotTempRecord && !$signupRecord) { // 2
 								if ($doDebug) {
-									echo "YYYYN if date-written more than 10 days old, delete user<br />";
+									echo "YYYYN if date-written more than 3 days old, delete temp record<br />";
 								}
-								if ($tenDaysPlus) {
-									$deleteUser		= TRUE;
-								} else {
-									$allUsersArray[$myStr]['theError']	.= "Reminder email sent on $date_written<br />";
+								if ($threeDaysPlus) {
+									$deleteTemp		= TRUE;
 								}
+								$allUsersArray[$myStr]['hasError']	= 'N';
+
 							}
 							if ($verifiedUser && $validFormat && !$gotTempRecord && $signupRecord) { // 3
 								if ($doDebug) {
@@ -827,6 +844,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 									if ($doDebug) {
 										echo "added $user_login to temp_data<br />";
 									}
+									$tempDataAdded++;
 								}
 							}
 							if ($deleteTemp) {							
@@ -844,6 +862,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 								} else {
 									$allUsersArray[$myStr]['hasError']	= 'Y';
 									$allUsersArray[$myStr]['theError']	.= 'Username record deleted<br />';
+									$tempDataDeleted++;
 								}
 							}	
 						}										
@@ -908,7 +927,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 				}
 			}
 		}
-/*
+
 		// now do students
 		if ($doDebug) {
 			echo "<br /><b>Looking for student anomolies</b><br />";
@@ -950,23 +969,23 @@ and then log in and sign up.<br />73,<br />CW Academy";
 							echo "<b>$student_call_sign No username record</b><br />";
 						}
 						$studentNoUsername++;
-						$allUsersArray[$student_call_sign]	= array('last_name'=>$student_last_name, 
-																	 'first_name'=>$student_first_name, 
-																	 'display_name'=>'', 
-																	 'user_registered'=>'', 
-																	 'user_email'=>$student_email, 
-																	 'id'=>0, 
-																	 'user_role'=>'student', 
-																	 'hasError'=>TRUE, 
-																	 'theError'=>'user_login does not have a username record<br />', 
-																	 'sendEmail'=>'Y', 
-																	 'sendIssue'=>"In order to manage your student information you need to go to <a href='$siteURL/register/'>CW Academy</a> and set up your username and password.<br />");
+//						$allUsersArray[$student_call_sign]	= array('last_name'=>$student_last_name, 
+//																	 'first_name'=>$student_first_name, 
+//																	 'display_name'=>'', 
+//																	 'user_registered'=>'', 
+//																	 'user_email'=>$student_email, 
+//																	 'id'=>0, 
+//																	 'user_role'=>'student', 
+//																	 'hasError'=>TRUE, 
+//																	 'theError'=>'user_login does not have a username record<br />', 
+//																	 'sendEmail'=>'Y', 
+//																	 'sendIssue'=>"In order to manage your student information you need to go to <a href='$siteURL/register/'>CW Academy</a> and set up your username and password.<br />");
 
 					}	
 				}
 			}
 		}
-*/
+
 
 		// read the temp_date table and see if any of those records should be deleted
 		// if the user_login has a signup record, delete the temp_data record
@@ -1012,6 +1031,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 							}
 						} else {					/// signup found. Delete the temp_data record
 							delete_temp_record($temp_callsign,$temp_token);
+							$newSignup++;
 						}
 					}
 				}
@@ -1051,6 +1071,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 						$emailLink		= "<a href='$studentUpdateURL?request_type=email&request_info=$thisEmail&request_table=$studentTableName&strpass=2' target='_blank'>$thisEmail</a>";
 					} else {
 						$thisLink		= $thisUser;
+						$emailLink		= $thisEmail;
 					}
 					$deleteIDLink	= "<a href='$siteURL/cwa-delete-user-info/?inp_type=id&inp_value=$userID&strpass=2' target='_blank'>Delete User</a>";
 					$content		.= "<tr><td style='vertical-align:top;'>$thisRole</td>
@@ -1074,15 +1095,18 @@ and then log in and sign up.<br />73,<br />CW Academy";
 
 		$content	.= "<h4>Counts</h4>
 						$userLoginCount: User Login Records<br />
+						$newRegistrations: New User Registrations in Past 36 Hours<br /><br />
 						$userUnverifiedCount: User Records that are Unverified<br />
 						$userUnverifiedDeleted: Unverified User Records Deleted<br />
-						$newRegistrations: New User Registrations in Past 36 Hours<br />
 						$badUserNameCount: Usernames with invalid format<br />
 						$advisorNoSignup: Advisors with no signup record<br />
 						$studentNoSignup: Students with no signup record<br />
 						$advisorNoUsername: Advisor Records with no Corresponding Username<br />
-						$tempDataDeleted: Users who have responded to signup requests<br />";
-//						$studentNoUsername: Student Records with no Corresponding Username<br />";
+						$newSignup: Users who have responded to signup requests<br />
+						$studentNoUsername: Student Records with no Corresponding Username<br /><br />
+						$usernamesDeleted: Username records deleted<br />
+						$tempDataAdded: TempData records added<br />
+						$tempDataDeleted: TempData records deleted<br />";
 		
 
 		$endingMicroTime = microtime(TRUE);
