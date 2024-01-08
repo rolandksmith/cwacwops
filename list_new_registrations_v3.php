@@ -403,7 +403,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 								}
 							
 								$thisResult	= delete_user($user_id);
-								$thisResult	= TRUE;
+//	$thisResult	= TRUE;
 								if ($thisResult === TRUE) {
 									if ($doDebug) {
 										echo "user_login is deleted<br />";
@@ -787,7 +787,6 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 								if ($doDebug) {
 									echo "Sending email<br />";
 								}
-								$signupEmailCount++;
 								$thisRole		= ucfirst($user_role);
 								if ($user_role == 'student') {
 									$article	= 'a';
@@ -825,7 +824,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 								if ($mailResult !== FALSE) {
 									$allUsersArray[$myStr]['hasError']	= 'Y';
 									$allUsersArray[$myStr]['theError']	.= "Email reminder to signup sent to $user_email at $nowDate<br />";
-							
+									$signupEmailCount++;
 								}
 							}
 							if ($addTempRecord) {
@@ -852,17 +851,25 @@ and then log in and sign up.<br />73,<br />CW Academy";
 									echo "Delete the temp_data";
 								}
 								delete_temp_record($user_login, 'register');
+								$tempDataDeleted++;
 							}
 
 							if ($deleteUser) {
 								$result		= wp_delete_user( $user_id );
 								if ($result === FALSE) {
+									if ($doDebug) {
+										echo "deleting username failed<br />";
+									}
 									$allUsersArray[$myStr]['hasError']	= 'Y';
 									$allUsersArray[$myStr]['theError']	.= 'Deleting username record failed<br />';
 								} else {
+									if ($doDebug) {
+										echo "Deleted username<br />";
+									}
 									$allUsersArray[$myStr]['hasError']	= 'Y';
 									$allUsersArray[$myStr]['theError']	.= 'Username record deleted<br />';
 									$tempDataDeleted++;
+									$usernamesDeleted++;
 								}
 							}	
 						}										
@@ -1031,6 +1038,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 							}
 						} else {					/// signup found. Delete the temp_data record
 							delete_temp_record($temp_callsign,$temp_token);
+							$tempDataDeleted++;
 							$newSignup++;
 						}
 					}
@@ -1104,6 +1112,7 @@ and then log in and sign up.<br />73,<br />CW Academy";
 						$advisorNoUsername: Advisor Records with no Corresponding Username<br />
 						$newSignup: Users who have responded to signup requests<br />
 						$studentNoUsername: Student Records with no Corresponding Username<br /><br />
+						$signupEmailCount: Emails sent<br />
 						$usernamesDeleted: Username records deleted<br />
 						$tempDataAdded: TempData records added<br />
 						$tempDataDeleted: TempData records deleted<br />";
