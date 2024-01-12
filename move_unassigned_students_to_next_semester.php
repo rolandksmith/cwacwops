@@ -19,6 +19,7 @@ function move_unassigned_students_to_next_semester_func() {
  Modified 16Apr23 by Roland to fix action_log
  Modified 13Jul23 by Roland to use conslidated tables
  Modified 11Sep23 by Roland to include student's name and callsign in the email
+ Modified 12Jan24 by Roland to update timezone offset
 */
 
 	global $wpdb;
@@ -450,10 +451,15 @@ td:last-child {
 												<td></td>
 											</tr><tr>
 												<td colspan='7'>$newActionLog</td></tr>";
+												
+							$thisOffset		= getOffsetFromIdentifier($student_timezone_id,$nextSemester,$doDebug=FALSE);
+												
 							$updateParams	= array();
 							$updateFormat	= array();
 							$updateParams['semester']				= $nextSemester;
 							$updateFormat[]							= '%s';
+							$updateParams['timezone_offset']		= $thisOffset;
+							$updateFormat[]							= '%f';
 							$updateParams['class_priority']			= 1;
 							$updateFormat[]							= '%d';
 							$updateParams['action_log']				= $student_action_log;
