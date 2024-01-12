@@ -724,20 +724,20 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									echo "YNNN send redo email, delete username<br >";
 								}
 								$sendRedo		= TRUE;
-								$deleteUser		= TRUE;
+//								$deleteUser		= TRUE;
 							}
 							if (!$verifiedUser && $validFormat && $gotTempRecord && $signupRecord) { // 9
 								if ($doDebug) {
 									echo "NYYY Not possible .. ERROR  … delete temp record<br >";
 								}
-								$deleteTemp			= TRUE;
+//								$deleteTemp			= TRUE;
 							}
 							if (!$verifiedUser && $validFormat && $gotTempRecord && !$signupRecord) { // 10
 								if ($doDebug) {
 									echo "NYYN If date_written more than 3 days old, delete user<br >";
 								}
 								if ($threeDaysPlus) {
-									$deleteUser		= TRUE;
+//									$deleteUser		= TRUE;
 								}
 							}
 							if (!$verifiedUser && $validFormat && !$gotTempRecord && $signupRecord) { // 11
