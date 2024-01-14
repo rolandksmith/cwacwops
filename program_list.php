@@ -200,6 +200,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blank'>Move Student to Different Semester</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=35' target='_blank'>Move Student to a Different Level and Unassign</a>
 			<li><a href='$siteURL/cwa-move-unassigned-students-to-next-semester/' target='_blank'>Move Unassigned Students to Next Semester</a>
+			<li><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=30' target='_blank'>Override Excluded Advisor</a>
 			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Assessment</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=2' target='_blank'>Pre-assign Student to an Advisor</a>
@@ -296,6 +297,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-list-advisors-with-incomplete-evaluations/' target='_blank'>List Advisors With Incomplete Evaluations</a>
 			<li><a href='$siteURL/cwa-list-past-advisors-registration-info/' target='_blank'>List Past Advisors Registration Info</a>
 			<li><a href='siteURL/cwa-manage-advisor-class-assignments/' target='_blank'>Manage Advisor Class Assignments</a>
+			<li><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a>
 			<li><a href='$siteURL/cwa-show-advisor-class-assignments/' target='_blank'>Show Advisor Class Assignments</a>
 			</ul>
 			<h4>Advisor Utilities Programs</h4>
@@ -484,7 +486,7 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 						<p><a href='$siteURL/cwa-show-advisor-class-assignments/?strpass=2&inp_call_sign=$userName&inp_verified=Y' target='_blank'>Show Advisor Class Assignments</a><br />
 							This program shows upcoming advisor registrations (if any), current class makeup, and 
 							all past students</p>
-						<p><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>Order Morse Code Proficiency Assessments</a><br />
+						<p><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a><br />
 							This program allows the advisor to specify the parameters for the assessment and 
 							which students are to take the assessment.</p>
 						<p><a href='https://cwops.org/cw-academy/cwa-advisor-resources/' target='_blank'>Advisor Resources</a><br />
