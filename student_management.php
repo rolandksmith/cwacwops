@@ -349,9 +349,9 @@ td:last-child {
 		$studentTableName			= 'wpw1_cwa_consolidated_student2';
 		$advisorTableName			= 'wpw1_cwa_consolidated_advisor2';
 		$advisorClassTableName		= 'wpw1_cwa_consolidated_advisorclass2';
-//		$pastAdvisorClassTableName	= 'wpw1_cwa_past_advisorclass2';
-//		$pastStudentTableName		= 'wpw1_cwa_past_student2';
+		$newAssessmentTableName		= 'wpw1_cwa_new_assessment_data2';
 		$audioAssessmentTableName	= 'wpw1_cwa_audio_assessment2';
+		$tempDataTableName			= 'wpw1_cwa_temp_data2';
 		if ($doDebug) {
 			echo "Function is under development.<br />";
 		}
@@ -360,9 +360,9 @@ td:last-child {
 		$studentTableName			= 'wpw1_cwa_consolidated_student';
 		$advisorTableName			= 'wpw1_cwa_consolidated_advisor';
 		$advisorClassTableName		= 'wpw1_cwa_consolidated_advisorclass';
-//		$pastAdvisorClassTableName	= 'wpw1_cwa_past_advisorclass';
-//		$pastStudentTableName		= 'wpw1_cwa_past_student';
+		$newAssessmentTableName		= 'wpw1_cwa_new_assessment_data';
 		$audioAssessmentTableName	= 'wpw1_cwa_audio_assessment';
+		$tempDataTableName			= 'wpw1_cwa_temp_data';
 	}
 	
 	if ("1" == $strPass) {
@@ -5837,6 +5837,73 @@ student$strSnum call sign changed from $inp_student_callsign to $inp_new_callsig
 							}
 
 						}
+					}
+				}
+			}
+			// update any new assessment data records
+			$sql 				= "select * from $newAssessmentTableName 
+									where callsign = '$inp_student_callsign'";
+			$assessmentResult	= $wpdb->get_results($sql);
+			if ($assessmentResult === FALSE) {
+				handleWPDBError("$jobname pass 96",$doDebug);
+			} else {
+				$lastError		= $wpdb->last_error;
+				if ($lastError != '') {
+					handleWPDBError("$jobname Pass 96",$doDebug);
+				}
+				$content		.= "Fatal program error. Sys admin has been notified";
+				return $content;
+			}
+			$numRows			= $wpdb->num_rows;
+			if ($doDebug) {
+				echo "ran $sql<br />and retrieved $numRows rows<br />";
+			}
+			if ($numRows > 0) {
+				foreach($assessmentResult as $assessmentRow) {
+					$record_id		= $assessmentRow->record_id;
+					$thisCallsign	= $assessmentRow->callsign;
+					
+					$updateResult	= $wpdb->update($newAssessmentTableName,
+											array('callsign'=>$inp_new_callsign').
+											array('record_id'=>$record_id).
+											array("%s"),
+											array('%d'));
+					if ($updateResult === FALSE) {
+						handleWPDBError("$jobname pass 96",$doDebug);
+					}
+				}
+			}
+			
+			// fix up temp_data
+			$sql 				= "select * from $tempDataTableName 
+									where callsign = '$inp_student_callsign'";
+			$tempResult			= $wpdb->get_results($sql);
+			if ($tempResult === FALSE) {
+				handleWPDBError("$jobname pass 96",$doDebug);
+			} else {
+				$lastError		= $wpdb->last_error;
+				if ($lastError != '') {
+					handleWPDBError("$jobname Pass 96",$doDebug);
+				}
+				$content		.= "Fatal program error. Sys admin has been notified";
+				return $content;
+			}
+			$numRows			= $wpdb->num_rows;
+			if ($doDebug) {
+				echo "ran $sql<br />and retrieved $numRows rows<br />";
+			}
+			if ($numRows > 0) {
+				foreach($tempResult as $tempRow) {
+					$record_id		= $tempRow->record_id;
+					$thisCallsign	= $tempRow->callsign;
+					
+					$updateResult	= $wpdb->update($tempDataTableName,
+											array('callsign'=>$inp_new_callsign').
+											array('record_id'=>$record_id).
+											array("%s"),
+											array('%d'));
+					if ($updateResult === FALSE) {
+						handleWPDBError("$jobname pass 96",$doDebug);
 					}
 				}
 			}
