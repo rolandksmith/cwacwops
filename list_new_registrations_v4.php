@@ -658,8 +658,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if ($signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YYNYY- has signed up, verified, invalid format, tempRegister is set, tempIgnore is set<br />
@@ -667,8 +667,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if ($signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YNYYY- has signed up, unverified, valid format, tempRegister is set, tempIgnore is set<br />
@@ -676,8 +676,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if ($signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YNNYY- has signed up, unverified, invalid format, tempRegister is set, tempIgnore is set<br />
@@ -685,8 +685,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								
 								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
@@ -695,8 +695,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
 										$debugData .= "NYYYYN: no signup record, verified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
@@ -704,8 +704,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
 										$debugData .= "NYNYYY: no signup record, verified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
@@ -713,8 +713,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
 										$debugData .= "NYNYYN: no signup record, verified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
@@ -722,8 +722,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
 										$debugData .= "NNYYYY: no signup record, unverified, valid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
@@ -731,8 +731,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
 										$debugData .= "NNYYYN: no signup record, unverified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
@@ -740,8 +740,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
 										$debugData .= "NNNYYY: no signup record, unverified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
@@ -749,8 +749,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
 										$debugData .= "NNNYYN: no signup record, unverified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
@@ -758,8 +758,8 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
-									delete_tempRegister($user_uppercase,$registerToken);
-									delete_tempIgnore($user_uppercase,$ignoreToken);
+									delete_temp_record($user_uppercase,'register');
+									delete_temp_record($user_uppercase,'ignore');
 								}
 								
 								
@@ -948,7 +948,7 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										$debugData .= "NYYNYN: no signup record, verified, valid format, no tempRegister, tempIgnore is set, and no emailSignup<br />
 										Since tempIgnore is set, no action taken<br />";
 								}
-								
+/*								
 								 if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
 										$debugData .= "NYYYNY: no signup record, verified, valid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
 										Have seen this record before. tempRegister is set, so the ten-day countdown is happening. If countdown 
@@ -970,7 +970,7 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 																						Ten-day timer expires on $tenDayDate<br />";
 									}
 								}
-/*								
+								
 								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
 										$debugData .= "NYYYNN: no signup record, verified, valid format, tempRegister is set, no tempIgnore, no emailSignup<br />
 										Have seen this record before. Ten-day timer is set. If expired, recommend tempIgnore<br />";
@@ -1773,8 +1773,7 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 								<th>Email</th>
 								<th>Errors</th>
 								<th>Ignore</th>
-								<th>Delete ID</th>
-								<th>Code</th></tr>";
+								<th>Delete ID</th>";
 			foreach($allUsersArray as $thisUser => $userData) {
 				if ($allUsersArray[$thisUser]['hasError'] == 'Y') {
 					$thisRole		= $allUsersArray[$thisUser]['user_role'];
@@ -1795,16 +1794,17 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 						$thisLink		= $thisUser;
 						$emailLink		= $thisEmail;
 					}
-					$ignoreLink		= "<a href='$siteURL/cwa-ignore-user-error/?inp_callsign=$thisUser&inp_role=$thisRole' target='_blank'>Ignore Error</a>";
+					$errorString		= $thisCode . $theErrors;
+					
+					$ignoreLink		= "<a href='$siteURL/cwa-manage-temp-data/?inp_callsign=$thisUser&inp_role=$thisRole&inp_action=add&token=ignore&strpass=2' target='_blank'>Ignore Error</a>";
 					$deleteIDLink	= "<a href='$siteURL/cwa-delete-user-info/?inp_type=id&inp_value=$userID&strpass=2' target='_blank'>Delete User</a>";
 					$content		.= "<tr><td style='vertical-align:top;'>$thisRole</td>
 											<td style='vertical-align:top;'>$thisLink</td>
 											<td style='vertical-align:top;'>$thisLastName, $thisFirstName</td>
 											<td style='vertical-align:top;'>$emailLink</td>
-											<td style='vertical-align:top;'>$theErrors</td>
+											<td style='vertical-align:top;'>$errorString</td>
 											<td style='vertical-align:top;'>$ignoreLink</td>
-											<td style='vertical-align:top;'>$deleteIDLink</td>
-											<td style='vertical-align:top;'>$thisCode</td></tr>";
+											<td style='vertical-align:top;'>$deleteIDLink</td>";
 					$myCount++;
 				}
 			}
