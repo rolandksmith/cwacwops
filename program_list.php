@@ -165,6 +165,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-display-chronological-action-log/' target='_blank'>Display Chronological Action Log</a>
 			<li><a href='$siteURL/cwa-display-evaluations-for-an-advisor/' target='_blank'>Display Evaluations for an Advisor</a>
 			<li><a href='$siteURL/cwa-display-initialization-array/' target='_blank'>Display Initialization Array</a>
+			<li><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
 			<li><a href='$siteURL/cwa-display-replacement-requests/' target='_blank'>Display Replacement Requests</a>
 			<li><a href='$siteURL/cwa-display-saved-report/' target='_blank'>Display Saved Report</a>
 			<li><a href='$siteURL/cwa-display-student-evaluation-of-advisors/' target='_blank'>Display Student Evaluation of Advisors</a>
@@ -274,6 +275,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-registration/' target='_blank'>Student Registration (Fake)</a>
 			<li><a href='$siteURL/cwa-advisor-class-history/' target='_blank'>Advisor Class History</a>
 			<li><a href='$siteURL/cwa-show-detailed-history-for-student/' target='_blank'>Show Detailed History for Student</a>
+			<li><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
 			<li><a href='$siteURL/cwa-search-saved-email-by-call-sign/' target='_blank'>Search Saved Email by Call Sign</a>
 			<li><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student CW Assessment V2</a>
 			<li><a href='$siteURL/cwa-list-new-registrations/' target='_blank'>List New Registrations</a>
@@ -481,6 +483,8 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 							request replacement students, check Morse Code Proficency Assessments.</p>
 						<p><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student's Morse Code Assessments</a><br />
 							This program allows the advisor to view one of his student's Morse Code Proficiency Assessments.</p>
+						<p><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
+							Displays recent reminders starting with the most recent reminder. Displays 25 at a time</p>
 						<p><a href='$siteURL/cwa-advisor-registration/' target='_blank'>Sign up for an Advisor Class</a><br />
 							This program provides the ability to sign up for an upcoming semester and specify 
 							what class(es) the advisor wishes to hold, and when those classes would be held. 
