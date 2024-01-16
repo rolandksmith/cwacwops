@@ -197,6 +197,7 @@ if ($userRole == 'administrator') {
 			<li><a href='siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (fake)</a>
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
+			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data/a>
 			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blank'>Move Student to Different Semester</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=35' target='_blank'>Move Student to a Different Level and Unassign</a>
 			<li><a href='$siteURL/cwa-move-unassigned-students-to-next-semester/' target='_blank'>Move Unassigned Students to Next Semester</a>
@@ -422,7 +423,8 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-list-new-registrations/' target='_blank'>List New Registrations</a>
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
-			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Assessment</a>
+			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Asses/a>
+			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blansment</a>
 			<li><a href='$siteURL/cwa-recover-deleted-record/' target='_blank'>Recover Deleted Record</a>
 			<li><a href='siteURL/cwa-remove-item/' target='_blank'>Remove Item</a>
 			<li><a href='$siteURL/cwa-search-audit-log/' target='_blank'>Search Audit Log</a>
