@@ -58,7 +58,7 @@ function list_new_registrations_v4_func(){
 	$userUnverifiedDeleted	= 0;
 	$newRegistrations		= 0;
 	$badUsernameCount		= 0;
-	$signupEmailCount		= 0;
+	$registrationEmailCount		= 0;
 	$registerEmailCount		= 0;
 	$verifyEmailCount		= 0;
 	$tempDataAdded			= 0;
@@ -68,7 +68,7 @@ function list_new_registrations_v4_func(){
 	$advisorMissingUsername	= 0;
 	$studentMissingUsername	= 0;
 	$userNameArray			= array();
-	$signupArray			= array();
+	$registrationArray			= array();
 	$user_needs_verification	= FALSE;
 	$id						= '';
 	$user_login				= '';
@@ -79,11 +79,13 @@ function list_new_registrations_v4_func(){
 	$user_role				= '';
 	$studentNoSignup		= 0;
 	$advisorNoSignup		= 0;
+	$badUsernameList		= "";
 	$advisorNoUsernameArray	= array();
 	$studentNoUsernameArray	= array();
 	$advisorNoUsername		= 0;
 	$studentNoUsername		= 0;
 	$badUserNameCount		= 0;
+	$userUnverifiedList		= '';
 	$bypassArray			= array('ROLAND',
 									'KCGATOR', 
 									'N7AST', 
@@ -91,7 +93,7 @@ function list_new_registrations_v4_func(){
 									'BOBC',
 									'AH7RF',
 									'ah7rf');
-	$signupRecord				= FALSE;		// whether or not there is a signup record with callsign = user_login
+	$registrationRecord				= FALSE;		// whether or not there is a registration record with callsign = user_login
 	$verifiedUser				= FALSE;		// whether or not the user_login record is verified
 	$validFormat				= FALSE;		// whether or not the user_login is a callsign or the user's last name
 	$tempRegister				= FALSE;		// whether or not there is a temp_data register record
@@ -104,9 +106,9 @@ function list_new_registrations_v4_func(){
 	$setTempIgnoreArray			= array();		// whether or not to write a temp_data ignore record
 	$deleteTempRegisterArray	= array();		// whether or not to delete a temp_data register record
 	$deleteTempIgnoreArray		= array();		// whether or not to delete a temp_data ignore record
-	$sendSignupEmailArray		= array();		// whether or not to send a signup reminder email
-	$emailSignup				= FALSE;		// found signup record using email address
-	$signupCallsign				= '';			// Callsign in signup record
+	$sendSignupEmailArray		= array();		// whether or not to send a registration reminder email
+	$emailSignup				= FALSE;		// found registration record using email address
+	$registrationCallsign				= '';			// Callsign in registration record
 	$sendRegisterEmailArray		= array();		// Whether nor not to send email requesting user create a user_login
 	$sendVerifyEmailArray		= array();
 	
@@ -262,7 +264,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 				foreach($result as $resultRow) {
 					$doProceed			= TRUE;
 
-					$signupRecord		= FALSE;		// whether or not there is a signup record with callsign = user_login
+					$registrationRecord		= FALSE;		// whether or not there is a registration record with callsign = user_login
 					$verifiedUser		= FALSE;		// whether or not the user_login record is verified
 					$validFormat		= FALSE;		// whether or not the user_login is a callsign or the user's last name
 					$tempRegister		= FALSE;		// whether or not there is a temp_data register record
@@ -271,8 +273,8 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 					$threeDayPlus		= FALSE;		// whether or not the three day countdown date is less than today
 					$tenDayDate			= '';			// temp_data register date_written plus 10 days
 					$tenDayPlus			= FALSE;		// whether or not temp_data register date_written is less than today
-					$signupCallsign		= '';			// Callsign in signup record
-					$emailSignup		= FALSE;		// whether or not there is a signup record found via email
+					$registrationCallsign		= '';			// Callsign in registration record
+					$emailSignup		= FALSE;		// whether or not there is a registration record found via email
 
 					$user_id			= $resultRow->id;
 					$user_login			= $resultRow->user_login;
@@ -335,7 +337,8 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 								}
 								if ($meta_key == 'wpumuv_needs_verification') {
 									$verifiedUser				= FALSE;
-									$userUnverifiedCount++; 
+									$userUnverifiedCount++;
+									$userUnverifiedList			.= "$user_login, "; 
 								} else {
 									$verifiedUser				= TRUE;
 								}
@@ -441,13 +444,14 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 						
 								if ($badUserName) {
 									$badUserNameCount++;
+									$badUsernameList			.= "$user_login, ";
 								} else {
 									$validFormat				= TRUE;
 								}
 					
 					
-								// see if the user_login has a signup record
-								$signup				= '';
+								// see if the user_login has a registration record
+								$registration				= '';
 								if ($user_role == 'student') {
 									$student_level	= '';
 									$student_semester = '';
@@ -470,13 +474,13 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 												$student_semester	= $studentResultRow->semester;
 												$student_level		= $studentResultRow->level;
 							
-												$signup				= "signed up for $student_level in $student_semester";
-												$signupRecord		= TRUE;
-												$allUsersArray[$user_uppercase]['theError']	.= "User has a student signup for $student_level in $student_semester<br />";
-													$debugData .= "$user_login has a student signup record<br />";
+												$registration				= "signed up for $student_level in $student_semester";
+												$registrationRecord		= TRUE;
+												$allUsersArray[$user_uppercase]['theError']	.= "User has a student registration for $student_level in $student_semester<br />";
+													$debugData .= "$user_login has a student registration record<br />";
 											}
 										} else {
-											// no signup record by user_login. See if there is one using email
+											// no registration record by user_login. See if there is one using email
 											$myStr				= strtolower($user_email);
 											$studentSQL			= "select * from $studentTableName 
 																	where (email='$myStr' or 
@@ -496,16 +500,32 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 												$debugData	.= "ran $studentSQL<br />and retrieved $numSRows rows<br />";
 												if ($numSRows > 0) {
 													foreach($studentResult as $studentResultRow) {
-														$signupCallsign		= $studentResultRow->call_sign;
+														$registrationCallsign		= $studentResultRow->call_sign;
 														$student_semester	= $studentResultRow->semester;
 														$student_level		= $studentResultRow->level;
-echo "user $user_uppercase signupCallsign: $signupCallsign<br />";									
-														$signup				= "signed up for $student_level in $student_semester";
+// echo "user $user_uppercase registrationCallsign: $registrationCallsign<br />";									
+														$registration				= "signed up for $student_level in $student_semester";
 														$emailSignup		= TRUE;
-//														$allUsersArray[$user_uppercase]['theError']	.= "User has a student signup for $student_level in $student_semester callsign $signupCallsign<br />";
-															$debugData	.= "User has a student signup record with callsign $signupCallsign<br />";
+//														$allUsersArray[$user_uppercase]['theError']	.= "User has a student registration for $student_level in $student_semester callsign $registrationCallsign<br />";
+															$debugData	.= "User has a student registration record with callsign $registrationCallsign<br />";
+															
+														// see if the singup callsign has a user_login of a different name
+														$cs1				= strtolower($registrationCallsign);
+														$cs2				= strtoupper($registrationCallsign);
+														$WPLogin			= $wpdb->get_var("select user_login 
+																							from wpw1_users 
+																							where (user_login = '$cs1' or 
+																								user_login = '$cs2')");
+														$numSRows			= $wpdb->num_rows;
+														if ($numRows > 0) {
+															if ($WPLogin == $cs1 || $WPLogin == $cs2) {
+																$allUsersArray[$user_uppercase]['hasError']	= 'Y';
+																$allUsersArray[$user_uppercase]['theError']	.= "User has a separate user_login under $WPLogin<br />
+																												Recommend recondiling both user_login records<br />";
+															}
+														}
 													}
-												} else {			/// no signup record
+												} else {			/// no registration record
 													$studentNoSignup++;
 												}
 											}	
@@ -525,12 +545,12 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 											foreach($advisorResult as $advisorResultRow) {
 												$advisor_semester	= $advisorResultRow->semester;
 							
-												$signup				= "signed up $advisor_semester";
-												$signupRecord		= TRUE;
-												$allUsersArray[$user_uppercase]['theError']	.= "User has an advisor signup in $advisor_semester<br />";
-													$debugData .= "$user_login has an advisor signup record<br />";
+												$registration				= "signed up $advisor_semester";
+												$registrationRecord		= TRUE;
+												$allUsersArray[$user_uppercase]['theError']	.= "User has an advisor registration in $advisor_semester<br />";
+													$debugData .= "$user_login has an advisor registration record<br />";
 											}
-										} else {		// no signup record by user_login. Check by email
+										} else {		// no registration record by user_login. Check by email
 											$myStr			= strtolower($user_email);
 											$advisorSQL		= "select * from $advisorTableName 
 															where (email = '$myStr' or 
@@ -546,12 +566,12 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 													foreach($advisorResult as $advisorResultRow) {
 														$advisor_semester	= $advisorResultRow->semester;
 									
-														$signup				= "signed up $advisor_semester";
-														$allUsersArray[$user_uppercase]['theError']	.= "User has an advisor signup in $advisor_semester callsign $signupCallsign<br />";
+														$registration				= "signed up $advisor_semester";
+														$allUsersArray[$user_uppercase]['theError']	.= "User has an advisor registration in $advisor_semester callsign $registrationCallsign<br />";
 														$emailSignup		= TRUE;
-															$debugData .= "$user_login has an advisor signup record under callsign $signupCallsign<br />";
+															$debugData .= "$user_login has an advisor registration record under callsign $registrationCallsign<br />";
 													}
-												} else {			// no signup record
+												} else {			// no registration record
 													$advisorNoSignup++;
 												}
 											}
@@ -578,13 +598,13 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										}
 									} else { 
 										$update				= $user_login;
-										$signup				= "Unverified User";
+										$registration				= "Unverified User";
 									}
 									$content			.= "<tr><td>$user_role</td>
 																<td>$update</td>
 																<td>$user_last_name, $user_first_name</td>
 																<td><a href='mailto:$user_email' target='_blank'>$user_email</a></td>
-																<td>$signup $thisStr</td></tr>";
+																<td>$registration $thisStr</td></tr>";
 								}
 					
 									// show what we've got so far
@@ -597,11 +617,11 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									} else {
 										$debugData .= "recentRegister: FALSE<br />";
 									}
-									if ($signupRecord) {
-										$debugData .= "signupRecord: TRUE<br />";
+									if ($registrationRecord) {
+										$debugData .= "registrationRecord: TRUE<br />";
 										$codeStr	.= 'Y';
 									} else {
-										$debugData .= "signupRecord: FALSE<br />";
+										$debugData .= "registrationRecord: FALSE<br />";
 										$codeStr	.= 'N';
 									}
 									if ($verifiedUser) {
@@ -632,7 +652,7 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										$debugData .= "tempIgnore: FALSE<br />";
 										$codeStr	.= 'N';
 									}
-									if (!$signupRecord) {
+									if (!$registrationRecord) {
 										if ($emailSignup) {
 											$debugData .= "emailSignup: TRUE<br />";
 											$codeStr	.= 'Y';
@@ -648,142 +668,166 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 							
 							
 								/*	Rules
-									If unverified and no signup record, wait three days
-									If unverified and a signup record, wait ten days
+									If unverified and no registration record, wait three days
+									If unverified and a registration record, wait ten days
 								*/
 								
-								if ($signupRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore) { 
+								if ($registrationRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YYYYY- has signed up, verified, valid format, tempRegister is set, tempIgnore is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if ($signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
+								if ($registrationRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YYNYY- has signed up, verified, invalid format, tempRegister is set, tempIgnore is set<br />
 										Program error. tempRegister and tempIgnore can't be set at the same time. 
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if ($signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore) { 
+								if ($registrationRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YNYYY- has signed up, unverified, valid format, tempRegister is set, tempIgnore is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if ($signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
+								if ($registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore) { 
 										$debugData .= "YNNYY- has signed up, unverified, invalid format, tempRegister is set, tempIgnore is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										Delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
 								
-								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NYYYYY: no signup record, verified, valid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NYYYYY: no registration record, verified, valid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NYYYYN: no signup record, verified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NYYYYN: no registration record, verified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NYNYYY: no signup record, verified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NYNYYY: no registration record, verified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NYNYYN: no signup record, verified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NYNYYN: no registration record, verified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NNYYYY: no signup record, unverified, valid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NNYYYY: no registration record, unverified, valid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NNYYYN: no signup record, unverified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && !$verifiedUser && $validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NNYYYN: no registration record, unverified, valid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NNNYYY: no signup record, unverified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NNNYYY: no registration record, unverified, invalid format, tempRegister is set, tempIgnore is set, emailSignup is set<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NNNYYN: no signup record, unverified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NNNYYN: no registration record, unverified, invalid format, tempRegister is set, tempIgnore is set, no emailSignup<br />
 										Program error. tempRegister and tempIgnore can not be set at the same time. 
 										delete tempRegister. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= 'Program error. Deleting temp_data records<br />';
 									delete_temp_record($user_uppercase,'register');
+									$tempDataDeleted++;
 									delete_temp_record($user_uppercase,'ignore');
+									$tempDataDeleted++;
 								}
 								
 								
 								//////////??????????/////////
 								
 								
-								if ($signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore) {
+								if ($registrationRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore) {
 										$debugData .= "YYYYN- has signed up, verified, valid format, tempRegister is set, no tempIgnore<br />
-										User got user_login and verified but didn't sign up. Has received signup reminder 
+										User got user_login and verified but didn't sign up. Has received registration reminder 
 										email and has now signed up. Delete tempRegister<br />";
 									$allUsersArray[$user_uppercase]['theError']	.= 'Deleting temp_data Register record<br />';
 									$deleteTempRegisterArray[]					= "$user_login&register";
 								}
-								if ($signupRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore) { 
+								if ($registrationRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore) { 
 										$debugData .= "YYYNY- has signed up, verified, valid format, no tempRegister, tempIgnore is set<br />
 										No need anymore for tempIgnore. Delete tempIgnore<br />";
 									$allUsersArray[$user_uppercase]['theError']	.= 'Deleting unnecessary ignore record in temp_data<br />';
 									$deleteTempIgnoreArray[]					= "$user_login&ignore";
 								}
-								if ($signupRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore) {
+								if ($registrationRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore) {
 										$debugData .= "YYYNN- has signed up, verified, valid format, no tempRegister, no tempIgnore<br />
 										No action needed<br />";
 								}
-								if ($signupRecord && $verifiedUser && !$validFormat && $tempRegister && !$tempIgnore) {
+								if ($registrationRecord && $verifiedUser && !$validFormat && $tempRegister && !$tempIgnore) {
 										$debugData .= "YYNYN- has signed up, verified, invalid format, tempRegister is set, no tempIgnore<br />
 										User got a user_login which is invalid and signed up. A tempRegister record was written 
 										to start a ten-day countdown. Check to see if ten days have passed. If so, 
@@ -794,22 +838,22 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										days have passed. Recommend ignoring.<br />';
 									}
 								}
-								if ($signupRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore) { 
+								if ($registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore) { 
 										$debugData .= "YYNNY- has signed up, verified, invalid format, no tempRegister, tempIgnore is set<br />
 										tempIgnore has been set to ignore this error. No action needed<br />";
 								}
-								if ($signupRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore) {
+								if ($registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore) {
 										$debugData .= "YYNNN- as signed up, verified, invalid format, no tempRegister, no tempIgnore<br />
 										User has obtained an invalid user_login and signed up. This is the first time we're 
 										seeing this record. Set tempRegister for a ten-day countdown. Show error.<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Username is invalid<br />
 																					Signed up with invalid user_login<br />
-																					Recommend correcting user_login and signupr callsign<br />
+																					Recommend correcting user_login and registrationr callsign<br />
 																					Set ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
-								if ($signupRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore) {
+								if ($registrationRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore) {
 										$debugData .= "YNYYN- has signed up, unverified, valid format, tempRegister is set, no tempIgnore<br />
 										User signed up before user_logins. Has obtained user_login but not verified. Ten-day 
 										timer has already been set. See if time is up. If so, show message and recommend 
@@ -817,14 +861,16 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User signed up before user_logins were implemented<br />
-																						User signup and user_login have valid format<br />
+																						User_login is not verified<br />
+																						User registration and user_login have valid format<br />
 																						Verify reminder email has been sent<br />
 																						Ten-day timer has expired<br />
 																						Recommend verifying userbr />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User signed up before user_logins were implemented<br />
-																						User signup and user_login have valid format<br />
+																						User_login is not verified<br />
+																						User registration and user_login have valid format<br />
 																						Verify reminder email has been set<br />
 																						Ten-day timer set. Error will continue to be displayed until<br />
 																						$tenDayDate<br />";
@@ -832,54 +878,54 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									}	
 								}
 								
-								if ($signupRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore) { 
+								if ($registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore) { 
 										$debugData .= "YNYNY- has signed up, unverified, valid format, no tempRegister, tempIgnore is set<br />
 										User is unverified and tempIgnore is set. No action taken<br />";
 								}
-								if ($signupRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore) {
+								if ($registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore) {
 										$debugData .= "YNYNN- has signed up, unverified, valid format, no tempRegister, no tempIgnore<br />
 										User signed up before user_logins were implemented. Has since gotten a user_login but 
 										has not verified. Sending verify reminder email. Setting ten-day countdown timer. At that 
 										time will recommend manually verifying if the user has not verified.<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "User signed up before user_logins were implemented<br />
-																					Has signup record<br />
+																					Has registration record<br />
 																					User_login record is unverified<br />
 																					Sent verify reminder email<br />
 																					Set ten-day timer<br />";
 									$setTempRegisterArray[]							= "$user_login&$user_role";
 									$sendVerifyEmailArray[]							= "$user_email&$user_uppercase";
 								}
-								if ($signupRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore) {
+								if ($registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore) {
 										$debugData .= "YNNYN- has signed up, unverified, invalid format, tempRegister is set, no tempIgnore<br />
 										We've seen this record before. The ten-day timer is set. If time has expired, recommend 
 										verifying and ignoring<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= "User has a signup record<br />
+										$allUsersArray[$user_uppercase]['theError']	.= "User has a registration record<br />
 																						User is unverified<br />
-																						Username and signup record callsign is invalid<br />
+																						Username and registration record callsign is invalid<br />
 																						Ten-day time has expired
 																						Recommend verifying and ignoring<br />";
 									
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= "User has a signup record<br />
+										$allUsersArray[$user_uppercase]['theError']	.= "User has a registration record<br />
 																						User is unverified<br />
-																						Username and signup record callsign is invalid<br />
+																						Username and registration record callsign is invalid<br />
 																						Ten-day timer will expire on $tenDayDate<br />";
 										
 									}
 								}
-								if ($signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore) { 
+								if ($registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore) { 
 										$debugData .= "YNNNY- has signed up, unverified, invalid format, no tempRegister, tempIgnore is set<br />
 										tempIgnore is set. No action taken<br />";
 								}
 
-								if ($signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore) {
+								if ($registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore) {
 										$debugData .= "YNNNN- has signed up, unverified, invalid format, no tempRegister, no tempIgnore<br />
-										User has a signup record from before user_logins were implemented. Has created a user_login. 
-										Both the user_login and signup callsign are invalid. We're seeing this record for the 
+										User has a registration record from before user_logins were implemented. Has created a user_login. 
+										Both the user_login and registration callsign are invalid. We're seeing this record for the 
 										first time. Recommend finding correct callsign<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "User has signed up before unsernames were imiplemented<br />
@@ -891,17 +937,17 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 								}
 
 								
-								// when there is no signup record with the callsign = the user_login, there might be a signup 
+								// when there is no registration record with the callsign = the user_login, there might be a registration 
 								// record for the same user. That record is found by the user's email address
 								
-								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) {
-										$debugData .= "NYYYNY: no signup record, verified, valid format, tempRegister is set, no tempIgnore, and has emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) {
+										$debugData .= "NYYYNY: no registration record, verified, valid format, tempRegister is set, no tempIgnore, and has emailSignup<br />
 											 Since tempRegister is set, we've seen this record before and the ten-day countdown was set. 
 											 See if the countdown has expired. If remind to synchronize the user_login and callsign. 
 											 Recommend otherwise to set tempIgnore<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= "User has signup record with callsign of $signupCallsign<br />
+										$allUsersArray[$user_uppercase]['theError']	.= "User has registration record with callsign of $registrationCallsign<br />
 																						Signup callsign has valid format<br />
 																						Has a user_login record<br />
 																						Reminder email has been sent<br />
@@ -910,7 +956,7 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 																						Recommend ignore<br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= "User has signup record with callsign of $signupCallsign<br />
+										$allUsersArray[$user_uppercase]['theError']	.= "User has registration record with callsign of $registrationCallsign<br />
 																						Callsign valid format<br />
 																						Username record exists<br />
 																						Reminder email has been sent<br />
@@ -918,14 +964,14 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									}
 								}
 							
-								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NYYYNN: no signup record, verified, valid format, tempRegister is set, no tempIgnore, and no emailSignup<br />
-										Has a user_login, but no signup record by the user_login. Username has valid format. We've seen this record before. Ten-day 
+								if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NYYYNN: no registration record, verified, valid format, tempRegister is set, no tempIgnore, and no emailSignup<br />
+										Has a user_login, but no registration record by the user_login. Username has valid format. We've seen this record before. Ten-day 
 										is set. If expired, recommend ignore<br />"; 
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
-																						User does not have a signup record<br />
+																						User does not have a registration record<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
@@ -934,29 +980,29 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User hasuser_login record<br />
 																						Callsign valid format<br />
-																						No signup record<br />
+																						No registration record<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expires on $tenDayDate<br />";
 									}
 								}
 
-								if (!$signupRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NYYNYY: no signup record, verified, valid format, no tempRegister, tempIgnore is set, and has emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NYYNYY: no registration record, verified, valid format, no tempRegister, tempIgnore is set, and has emailSignup<br />
 										Have seen this record before and tempIgnore is set. No action needed<br />";
 								}
-								if (!$signupRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) { 
-										$debugData .= "NYYNYN: no signup record, verified, valid format, no tempRegister, tempIgnore is set, and no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) { 
+										$debugData .= "NYYNYN: no registration record, verified, valid format, no tempRegister, tempIgnore is set, and no emailSignup<br />
 										Since tempIgnore is set, no action taken<br />";
 								}
 /*								
-								 if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NYYYNY: no signup record, verified, valid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
+								 if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NYYYNY: no registration record, verified, valid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
 										Have seen this record before. tempRegister is set, so the ten-day countdown is happening. If countdown 
 										has expired, Show final reminder. Recommend tempIgnore<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
-																						User has a signup record with callsign $signupCallsign<br />
+																						User has a registration record with callsign $registrationCallsign<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
@@ -964,20 +1010,20 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 																						Recommend ignore<br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= "User has a signup record with callsign $signupCallsign<br />
+										$allUsersArray[$user_uppercase]['theError']	.= "User has a registration record with callsign $registrationCallsign<br />
 																						Username valid format<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expires on $tenDayDate<br />";
 									}
 								}
 								
-								if (!$signupRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NYYYNN: no signup record, verified, valid format, tempRegister is set, no tempIgnore, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NYYYNN: no registration record, verified, valid format, tempRegister is set, no tempIgnore, no emailSignup<br />
 										Have seen this record before. Ten-day timer is set. If expired, recommend tempIgnore<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
-																						User no signup record<br />
+																						User no registration record<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
@@ -992,17 +1038,17 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									}
 								}
 */
-								if (!$signupRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NYYNYN: no signup record, verified, valid format, no tempRegister, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NYYNYN: no registration record, verified, valid format, no tempRegister, tempIgnore is set, no emailSignup<br />
 										Have seen this record before and tempIgnore is set. No further action<br />";
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NYNYNN: no signup record, verified, invalid format, tempRegister is set, no tempIgnore, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NYNYNN: no registration record, verified, invalid format, tempRegister is set, no tempIgnore, no emailSignup<br />
 										Have seen this record before.Ten-day timer is set. If expired, Recommend setting tempIgnore<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
-																						No signup record<br />
+																						No registration record<br />
 																						Username format is not valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
@@ -1016,76 +1062,76 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 																						Ten-day timer expires on $tenDayDate<br />";
 									}
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NYNNYY: no signup record, verified, invalid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NYNNYY: no registration record, verified, invalid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
 										Have seen this record before. tempIgnore is set. No further action<br />";
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NYNNYN: no signup record, verified, invalid format, no tempRegister, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NYNNYN: no registration record, verified, invalid format, no tempRegister, tempIgnore is set, no emailSignup<br />
 										Have seen this record before. tempIgnore is set. No further action<br />";
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NYNNNY: no signup record, verified, invalid format, no tempRegister, no tempIgnore, emailSignup is set<br />
-										We're seeing this record for the first time. Has unsername but invalid format. Has a signup record 
-										with a callsign $signupCallsign. Recommend syncing up the user_login and callsign. 
+								if (!$registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NYNNNY: no registration record, verified, invalid format, no tempRegister, no tempIgnore, emailSignup is set<br />
+										We're seeing this record for the first time. Has unsername but invalid format. Has a registration record 
+										with a callsign $registrationCallsign. Recommend syncing up the user_login and callsign. 
 										set tempRegister ten-day timer<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is not valid format<br />
-																					User has a signup record with callsign of $signupCallsign<br />
+																					User has a registration record with callsign of $registrationCallsign<br />
 																					Recommend  syncing user_login and callsign<br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 														
 								}
-								if (!$signupRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NYYNNN: no signup record, verified, valid format, no tempRegister, no tempIgnore, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NYYNNN: no registration record, verified, valid format, no tempRegister, no tempIgnore, no emailSignup<br />
 										We're seeing this record for the first time. Has user_login and valid format. No tempRegister, 
-										no tempIgnore, and no signup record. Send signup reminder email. Set
+										no tempIgnore, and no registration record. Send registration reminder email. Set
 										tempRegister ten-day countdown<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is valid format<br />
-																					User does not have a signup record<br />
-																					Sending signup reminder email<br />
+																					User does not have a registration record<br />
+																					Sending registration reminder email<br />
 																					Setting tem-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 									$sendSignupEmailArray[]						= "$user_email&$user_uppercase";
 								}
-								if (!$signupRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && $emailSignup) {
-										$debugData .= "NYYNNY: no signup record, verified, valid format, no tempRegister, no tempIgnore, has emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && $emailSignup) {
+										$debugData .= "NYYNNY: no registration record, verified, valid format, no tempRegister, no tempIgnore, has emailSignup<br />
 										We're seeing this record for the first time. Has user_login and valid format. No tempRegister, 
-										no tempIgnore, but has a signup record with callsign $signupCallsign. Set
-										tempRegister ten-day countdown. Recommend syncing user_login and signup callsign<br />";
+										no tempIgnore, but has a registration record with callsign $registrationCallsign. Set
+										tempRegister ten-day countdown. Recommend syncing user_login and registration callsign<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is valid format<br />
-																					User has a signup record with callsign of $signupCallsign<br />
-																					Recommend syncing user_login and signup callsign<br />
+																					User has a registration record with callsign of $registrationCallsign<br />
+																					Recommend syncing user_login and registration callsign<br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]					 	= "$user_login&$user_role";
 								}
-								if (!$signupRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NYNNNN: no signup record, verified, invalid format, no tempRegister, no tempIgnore, no emailSignup<br />
+								if (!$registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NYNNNN: no registration record, verified, invalid format, no tempRegister, no tempIgnore, no emailSignup<br />
 										We're seeing this record for the first time. Has user_login but invalid format. No tempRegister, 
-										no tempIgnore, and no signup record. Recommend determining if user_login record should be kept. Set
+										no tempIgnore, and no registration record. Recommend determining if user_login record should be kept. Set
 										tempRegister ten-day countdown<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is not valid format<br />
-																					User does not have a signup record<br />
+																					User does not have a registration record<br />
 																					Recommend determining if user_login record should be kept<br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NNYYNY: no signup record, unverified, valid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
+								if (!$registrationRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NNYYNY: no registration record, unverified, valid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
 										Have seen this record before as tempRegister is set. If time expired, recommend verifying. Ptjerwise 
 										Recommend syncing user_login and callsign<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
-																						User has a signup record with a callsign of $signupCallsign<br />
+																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
 																						Ten-day countdown expired on $tenDayDate<br />
 																						Recommend verifying and syncing the user_login and password<br />";
@@ -1093,82 +1139,82 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
-																						User has a signup record with a callsign of $signupCallsign<br />
+																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
 																						Ten-day countdown will expire on $tenDayDate<br />
 																						Recommend contacting user to syncing user_login and callsign<br />";
 									
 									}
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NNYYNN: no signup record, unverified, valid format, tempRegister is set, no tempIgnore, no emailSignup<br />
-										We've seen this record before. unverified valid user_login and no signup record. tempRegister is set. 
+								if (!$registrationRecord && !$verifiedUser && $validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NNYYNN: no registration record, unverified, valid format, tempRegister is set, no tempIgnore, no emailSignup<br />
+										We've seen this record before. unverified valid user_login and no registration record. tempRegister is set. 
 										If three days have expired, recommend deleting user_login record. Otherwise just show the error<br />";
 									if ($threeDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
-																						User has a signup record with a callsign of $signupCallsign<br />
+																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
-																						There is no signup record<br />
+																						There is no registration record<br />
 																						Three-day countdown expired on $threeDayDate<br >
 																						User has not verified. Recommend deleting the user<br />";
 									
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
-																						User has a signup record with a callsign of $signupCallsign<br />
+																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
-																						There is no signup record<br />
+																						There is no registration record<br />
 																						Three-day countdown will expire on $threeDayDate<br >
 																						If user doesn't verify by then, recommend deleting the user<br />";
 									
 									}
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NNYNYY: no signup record, unverified, valid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NNYNYY: no registration record, unverified, valid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
 										Have seen this record before. tempIgnore is set. No further action<br />";
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NNYNYN: no signup record, unverified, valid format, no tempRegister, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NNYNYN: no registration record, unverified, valid format, no tempRegister, tempIgnore is set, no emailSignup<br />
 										We've seen this record before. For some reason tempIgnore is set. No further action.<br />";
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NNYNNY: no signup record, unverified, valid format, no tempRegister, no tempIgnore, emailSignup is set<br />
-										First time seeing this record. Has an unverified but valid user_login and a signup record with a 
+								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NNYNNY: no registration record, unverified, valid format, no tempRegister, no tempIgnore, emailSignup is set<br />
+										First time seeing this record. Has an unverified but valid user_login and a registration record with a 
 										callsign different from the user_login. Set tempRecord for three-day time for user to verify. If not 
 										verified by then, will recommend verifying. Meanwhile, recommend getting user_login and callsign sync'd 
 										up</br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																					Username is not verified<br />
-																					User has a signup record with callsign of $signupCallsign<br />
+																					User has a registration record with callsign of $registrationCallsign<br />
 																					Setting three-day countdown to expire on $threeDayDate<br />
 																					Recommend contacting user and syncing user_login and callsign<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
-								if (!$signupRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NNYNNN: no signup record, unverified, valid format, no tempRegister, no tempIgnore, no emailSignup<br />
-										First time we've seen this record. Username is valid format but unverified. No signup record found. 
+								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NNYNNN: no registration record, unverified, valid format, no tempRegister, no tempIgnore, no emailSignup<br />
+										First time we've seen this record. Username is valid format but unverified. No registration record found. 
 										Recommend contacting user to determine if real. Setting tempRegister for a three-day countdown to 
 										see if he verifies in the meantime.<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
 																					Username is not verified<br />
-																					User has does not have a signup record<br />
+																					User has does not have a registration record<br />
 																					Setting three-day countdown to expire on $threeDayDate<br />
 																					Recommend sending verify email to user<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NNNYNY: no signup record, unverified, invalid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
-										Have seen this record before. User has a signup record with invalid format and has a signup record 
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NNNYNY: no registration record, unverified, invalid format, tempRegister is set, no tempIgnore, emailSignup is set<br />
+										Have seen this record before. User has a registration record with invalid format and has a registration record 
 										under a callsign different from the user_login. tempRegister is set. If three-days has expired, 
-										show error and recommend verifying the user and syncing the user_login and signup callsign<br />";
+										show error and recommend verifying the user and syncing the user_login and registration callsign<br />";
 									if ($threeDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						Username is not verified<br />
-																						User has has a signup record with callsign of $signupCallsign<br />
+																						User has has a registration record with callsign of $registrationCallsign<br />
 																						Three-day countdown expired on $threeDayDate<br />
 																						Recommend verifying the user and syncing the user_login and callsign<br />";
 									
@@ -1176,21 +1222,21 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						Username is not verified<br />
-																						User has has a signup record with callsign of $signupCallsign<br />
+																						User has has a registration record with callsign of $registrationCallsign<br />
 																						Three-day countdown will expire on $threeDayDate<br />
 																						Recommend syncing the user_login and callsign<br />";
 									
 									}
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NNNYNN: no signup record, unverified, invalid format, tempRegister is set, no tempIgnore, no emailSignup<br />
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NNNYNN: no registration record, unverified, invalid format, tempRegister is set, no tempIgnore, no emailSignup<br />
 										Have seen this record before. User has an invalid user_login. tempRegister is set waiting on three-day 
 										countdown. If expired, recommend deleting the user. <br />";
 									if ($threeDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						Username is not verified<br />
-																						User has does not have a signup record<br />
+																						User has does not have a registration record<br />
 																						Three-day countdown expired on $threeDayDate<br />
 																						Recommend deleting the user_login<br />";
 									
@@ -1198,41 +1244,41 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						Username is not verified<br />
-																						User has does not have a signup record<br />
+																						User has does not have a registration record<br />
 																						Three-day countdown will expire on $threeDayDate<br />
 																						If not verified will recommend deleting user_login<br />";
 									
 									}
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
-										$debugData .= "NNNNYY: no signup record, unverified, invalid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && $emailSignup) { 
+										$debugData .= "NNNNYY: no registration record, unverified, invalid format, no tempRegister, tempIgnore is set, emailSignup is set<br />
 										Have seen this record before. temmpIgnore is set. No action taen<br />";
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
-										$debugData .= "NNNNYN: no signup record, unverified, invalid format, no tempRegister, tempIgnore is set, no emailSignup<br />
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && $tempIgnore && !$emailSignup) {
+										$debugData .= "NNNNYN: no registration record, unverified, invalid format, no tempRegister, tempIgnore is set, no emailSignup<br />
 										Have seen this record before. tempIgnore is set. No action taken<br />";
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
-										$debugData .= "NNNNNY: no signup record, unverified, invalid format, no tempRegister, no tempIgnore, emailSignup is set<br />
-										Unverified user with invalid format. Seeing for the first time. Has signup record with callsign $signupCallsign. 
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && $emailSignup) { 
+										$debugData .= "NNNNNY: no registration record, unverified, invalid format, no tempRegister, no tempIgnore, emailSignup is set<br />
+										Unverified user with invalid format. Seeing for the first time. Has registration record with callsign $registrationCallsign. 
 										Recommend syncing username and callsign. Set te-day timer<br />";
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						User is unverified<br />
-																						User has a signup record with callsign $signupCallsign<br />
+																						User has a registration record with callsign $registrationCallsign<br />
 																						Recommend syncing user_login and callsign<br />
 																						Ten-day timer set<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 										
 								}
-								if (!$signupRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
-										$debugData .= "NNNNNN: no signup record, unverified, invalid format, no tempRegister, no tempIgnore, no emailSignup<br />
-										First time with this record. User obtained an invalid user_login and has not validated. No signup record 
+								if (!$registrationRecord && !$verifiedUser && !$validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
+										$debugData .= "NNNNNN: no registration record, unverified, invalid format, no tempRegister, no tempIgnore, no emailSignup<br />
+										First time with this record. User obtained an invalid user_login and has not validated. No registration record 
 										found. Set a three-day timer. If not verified by then, recommend deleting the user<br />";
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																					Username is not verified<br />
-																					User has does not have a signup record<br />
+																					User has does not have a registration record<br />
 																					Three-day countdown will expire on $threeDayDate<br />
 																					If not verified will recommend deleting user_login<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
@@ -1289,7 +1335,7 @@ echo "user $user_uppercase signupCallsign: $signupCallsign<br />";
 																	 'tempIgnoreID'=>0,
 																	 'tempRegisterID'=>0, 
 																	 'hasError'=>'N', 
-																	 'theError'=>"Advisor signup created on $advisorDateCreated<br />");
+																	 'theError'=>"Advisor registration created on $advisorDateCreated<br />");
 	
 	
 							$advisorNoUsername++;
@@ -1617,7 +1663,7 @@ Academy</a> enter your usename and password, and sign up by clicking on the 'Sig
 														'increment'=>0,
 														'testMode'=>$testMode,
 														'doDebug'=>$doDebug));
-			$signupEmailCount++;
+			$registrationEmailCount++;
 		}
  
 		foreach($sendRegisterEmailArray as $thisValue) {
@@ -1813,7 +1859,7 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 
 /*
 		// read the temp_data table and see if any of those records should be deleted
-		// if the user_login has a signup record, delete the temp_data record
+		// if the user_login has a registration record, delete the temp_data record
 		$tempDataDeleted = 0;
 		$tempSql		= "select * from wpw1_cwa_temp_data 
 							where token = 'register' 
@@ -1832,7 +1878,7 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 					$temp_date_written	= $tempResultRow->date_written;
 					
 					$doContinue			= TRUE;
-					// see if there is a signup record
+					// see if there is a registration record
 					if ($temp_data == 'student') {
 						$tempStr		= 'wpw1_cwa_consolidated_student';
 					} elseif ($temp_data == 'advisor') {
@@ -1851,8 +1897,8 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 													or semester = '$semesterFour')";
 						$thisCount			= $wpdb->get_var($thisSQL);
 						if ($thisCount == NULL || $thisCount == 0) {		// no record
-								$debugData .= "no signup record found for temp_data $temp_callsign<br />";
-						} else {					/// signup found. Delete the temp_data record
+								$debugData .= "no registration record found for temp_data $temp_callsign<br />";
+						} else {					/// registration found. Delete the temp_data record
 							delete_temp_record($temp_callsign,$temp_token);
 							$tempDataDeleted++;
 							$newSignup++;
@@ -1867,21 +1913,33 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 		$content	.= "<h4>Counts</h4>
 						$userLoginCount: User Login Records<br />
 						$newRegistrations: New User Registrations in Past 36 Hours<br /><br />
-						$userUnverifiedCount: User Records that are Unverified<br />
-						$badUserNameCount: Usernames with invalid format<br />
-						$advisorNoSignup: Advisors with no signup record<br />
-						$studentNoSignup: Students with no signup record<br />";
+						$userUnverifiedCount: User Records that are Unverified ($userUnverifiedList)<br />
+						$badUserNameCount: Usernames with invalid format ($badUsernameList)<br />
+						$advisorNoSignup: Advisors with no registration record<br />
+						$studentNoSignup: Students with no registration record<br />";
 		if ($advisorNoUsername) {
 			$content	.= "$advisorNoUsername: Advisor Records with no Corresponding Username<br />";
 		}
 		if ($studentNoUsername) {
 			$content	.= "$studentNoUsername: Student Records with no Corresponding Username<br /><br />";
 		}
-		$content	.= "$signupEmailCount: Signup Reminder Emails sent<br />
+		$content	.= "$registrationEmailCount: Signup Reminder Emails sent<br />
 						$registerEmailCount: Register Reminder Emails sent<br />
 						$verifyEmailCount: Verify Reminder Emails set<br />
 						$tempDataAdded: TempData records added<br />
 						$tempDataDeleted: TempData records deleted<br />";
+						
+		$content	.= "<<br />
+<pre>Explanation of the Array Code<br />
+Y Y Y Y Y Y 
+| | | | | |
+| | | | | - No user_login but registration record
+| | | | - - Has a temp_data ignore record
+| | | _ _ _ Has a temp_data register record
+| | _ _ _ _ User_login has a valid format
+| - - - - - User has a verified user_login format
+- - - - - - User has a user_login and a registration record
+</pre><br />";
 		
 
 		$endingMicroTime = microtime(TRUE);
