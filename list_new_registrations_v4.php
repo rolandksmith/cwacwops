@@ -408,7 +408,8 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 							if ($user_role == '') {
 									$debugData .= "user_role of $user_role is invalid.<br />";
 								$allUsersArray[$user_uppercase]['hasError']	.= "Y";
-								$allUsersArray[$user_uppercase]['theError']	.= "user_role invalid. Recommend deleting user_login<br />";
+								$allUsersArray[$user_uppercase]['theError']	.= "user_role invalid. <br />
+																				<b>Recommend deleting user_login<b><br />";
 							}
 						
 						
@@ -521,7 +522,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 															if ($WPLogin == $cs1 || $WPLogin == $cs2) {
 																$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 																$allUsersArray[$user_uppercase]['theError']	.= "User has a separate user_login under $WPLogin<br />
-																												Recommend recondiling both user_login records<br />";
+																												<b>Recommend recondiling both user_login records<b><br />";
 															}
 														}
 													}
@@ -834,8 +835,9 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 										recommend ignoring the error\<br />";
 									if ($tenDayPlus) {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-										$allUsersArray[$user_uppercase]['theError']	.= 'User has invalid user_login. Ten 
-										days have passed. Recommend ignoring.<br />';
+										$allUsersArray[$user_uppercase]['theError']	.= 'User has invalid user_login<br />
+																						Ten days have passed<br />
+																						<b>Recommend ignoring</b><br />';
 									}
 								}
 								if ($registrationRecord && $verifiedUser && !$validFormat && !$tempRegister && $tempIgnore) { 
@@ -849,7 +851,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 									$allUsersArray[$user_uppercase]['theError']	.= "Username is invalid<br />
 																					Signed up with invalid user_login<br />
-																					Recommend correcting user_login and registrationr callsign<br />
+																					<b>Recommend correcting user_login and registrationr callsign</b><br />
 																					Set ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
@@ -865,7 +867,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						User registration and user_login have valid format<br />
 																						Verify reminder email has been sent<br />
 																						Ten-day timer has expired<br />
-																						Recommend verifying userbr />";
+																						<b>Recommend verifying user</b><br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User signed up before user_logins were implemented<br />
@@ -906,7 +908,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						User is unverified<br />
 																						Username and registration record callsign is invalid<br />
 																						Ten-day time has expired
-																						Recommend verifying and ignoring<br />";
+																						<b>Recommend verifying and ignoring</b><br />";
 									
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
@@ -931,7 +933,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$allUsersArray[$user_uppercase]['theError']	.= "User has signed up before unsernames were imiplemented<br />
 																					Username is unverified<br />
 																					Username and callsign format is invalid<br />
-																					Recommend finding correct callsign<br />
+																					<b>Recommend finding correct callsign</v><br />
 																					Ten-day timer set<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
@@ -952,7 +954,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Has a user_login record<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expires on $tenDayDate<br />
-																						Recommend trying to sync user_login and callsign<br />
+																						<b>Recommend trying to sync user_login and callsign</b><br />
 																						Recommend ignore<br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
@@ -975,7 +977,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
-																						Recommend ignore<br />";
+																						<b>Recommend ignore</b><br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User hasuser_login record<br />
@@ -1006,8 +1008,8 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
-																						Recommend trying to synch user_login and callsign<br />
-																						Recommend ignore<br />";
+																						<b>Recommend trying to synch user_login and callsign</b><br />
+																						<b>Recommend ignore</b><br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "User has a registration record with callsign $registrationCallsign<br />
@@ -1027,7 +1029,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username format is valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
-																						Recommend ignore<br />";
+																						<b>Recommend ignore</b><br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
@@ -1052,7 +1054,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username format is not valid<br />
 																						Reminder email has been sent<br />
 																						Ten-day timer expired on $tenDayDate<br />
-																						Recommend ignore<br />";
+																						<b>Recommend ignore</b><br />";
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
 										$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
@@ -1079,7 +1081,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is not valid format<br />
 																					User has a registration record with callsign of $registrationCallsign<br />
-																					Recommend  syncing user_login and callsign<br />
+																					<b>Recommend  syncing user_login and callsign</b><br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 														
@@ -1107,7 +1109,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is valid format<br />
 																					User has a registration record with callsign of $registrationCallsign<br />
-																					Recommend syncing user_login and registration callsign<br />
+																					<b>Recommend syncing user_login and registration callsign</b><br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]					 	= "$user_login&$user_role";
 								}
@@ -1120,7 +1122,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$allUsersArray[$user_uppercase]['theError']	.= "Has user_login record<br />
 																					Username is not valid format<br />
 																					User does not have a registration record<br />
-																					Recommend determining if user_login record should be kept<br />
+																					<b>Recommend determining if user_login record should be kept</b><br />
 																					Setting ten-day timer<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
@@ -1134,7 +1136,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
 																						Ten-day countdown expired on $tenDayDate<br />
-																						Recommend verifying and syncing the user_login and password<br />";
+																						<b>Recommend verifying and syncing the user_login and password</b><br />";
 								
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
@@ -1142,7 +1144,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						User has a registration record with a callsign of $registrationCallsign<br />
 																						User has not verified the user_login<br />
 																						Ten-day countdown will expire on $tenDayDate<br />
-																						Recommend contacting user to syncing user_login and callsign<br />";
+																						<b>Recommend contacting user to syncing user_login and callsign</b><br />";
 									
 									}
 								}
@@ -1189,7 +1191,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																					Username is not verified<br />
 																					User has a registration record with callsign of $registrationCallsign<br />
 																					Setting three-day countdown to expire on $threeDayDate<br />
-																					Recommend contacting user and syncing user_login and callsign<br />";
+																					<b>Recommend contacting user and syncing user_login and callsign</b><br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
 								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
@@ -1202,7 +1204,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																					Username is not verified<br />
 																					User has does not have a registration record<br />
 																					Setting three-day countdown to expire on $threeDayDate<br />
-																					Recommend sending verify email to user<br />";
+																					<b>Recommend sending verify email to user</b><br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
 								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
@@ -1216,7 +1218,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username is not verified<br />
 																						User has has a registration record with callsign of $registrationCallsign<br />
 																						Three-day countdown expired on $threeDayDate<br />
-																						Recommend verifying the user and syncing the user_login and callsign<br />";
+																						<b>Recommend verifying the user and syncing the user_login and callsign</b><br />";
 									
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
@@ -1224,7 +1226,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username is not verified<br />
 																						User has has a registration record with callsign of $registrationCallsign<br />
 																						Three-day countdown will expire on $threeDayDate<br />
-																						Recommend syncing the user_login and callsign<br />";
+																						<b>Recommend syncing the user_login and callsign</b><br />";
 									
 									}
 								}
@@ -1238,7 +1240,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Username is not verified<br />
 																						User has does not have a registration record<br />
 																						Three-day countdown expired on $threeDayDate<br />
-																						Recommend deleting the user_login<br />";
+																						<b>Recommend deleting the user_login</b><br />";
 									
 									} else {
 										$allUsersArray[$user_uppercase]['hasError']	= 'Y';
@@ -1266,7 +1268,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 										$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
 																						User is unverified<br />
 																						User has a registration record with callsign $registrationCallsign<br />
-																						Recommend syncing user_login and callsign<br />
+																						<b>Recommend syncing user_login and callsign</b><br />
 																						Ten-day timer set<br />";
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 										
@@ -1407,7 +1409,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Register email request has been sent<br />
 																						Ten-day countdown timer expired on $tenDayDay1<br />
 																						User has not registerd<br />
-																						Recommend ignoring the error<br />";
+																						<b>Recommend ignoring the error</b><br />";
 								} else {
 									$allUsersArray[$advisor_call_sign]['hasError']	= 'Y';	 
 									$allUsersArray[$advisor_call_sign]['theError']	.= "$advisor_call_sign does not have a user_login record<br />
@@ -1559,7 +1561,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 																						Register email request has been sent<br />
 																						Ten-day countdown timer expired on $tenDayDay1<br />
 																						User has not registerd<br />
-																						Recommend ignoring the error<br />";
+																						<b>Recommend ignoring the error</b><br />";
 								} else {
 									$allUsersArray[$student_call_sign]['hasError']	= 'Y';	 
 									$allUsersArray[$student_call_sign]['theError']	.= "$student_call_sign does not have a user_login record<br />
@@ -1929,7 +1931,7 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 						$tempDataAdded: TempData records added<br />
 						$tempDataDeleted: TempData records deleted<br />";
 						
-		$content	.= "<<br />
+		$content	.= "<br />
 <pre>Explanation of the Array Code<br />
 Y Y Y Y Y Y 
 | | | | | |
