@@ -3,6 +3,7 @@ function show_detailed_history_for_student_func() {
 // Modified 1Oct22 by Roland for new timezone fields
 // Modified 17Apr23 by Roland to fix action_log
 // Modified 14Jul23 by Roland to use consolidated tables
+// Modified 18Jan24 by Roland to show user_login information
 
 	global $wpdb;
 
@@ -141,12 +142,14 @@ td:last-child {
 		$advisorClassTableName		= "wpw1_cwa_consolidated_advisorclass2";
 		$audioAssessmentTableName	= "wpw1_cwa_audio_assessment2";
 		$newAssessmentData			= "wpw1_cwa_new_assessment_data2";
+		$userTableName				= "wpw1_users";
 	} else {
 		$studentTableName			= "wpw1_cwa_consolidated_student";
 		$advisorTableName			= "wpw1_cwa_consolidated_advisor";
 		$advisorClassTableName		= "wpw1_cwa_consolidated_advisorclass";
 		$audioAssessmentTableName	= "wpw1_cwa_audio_assessment";
 		$newAssessmentData			= "wpw1_cwa_new_assessment_data";
+		$userTableName				= "wpw1_users";
 	}
 
 
@@ -171,8 +174,108 @@ td:last-child {
 		if ($doDebug) {
 			echo "at pass 2 with $inp_student<br />";
 		}
-
 		$content		.= "<h3>Show Detailed History for $inp_student</h3>
+							<h4>CW Academy Website Signup Information</h4>
+							<table>";
+
+		// get the user information and display it
+
+		$cs1				= strtoupper($inp_student);
+		$cs2				= strtolower($inp_student);
+		$user_first_name	= '';
+		$user_last_name		= 'N/A';
+		$user_role			= '';
+		$verifiedUser		= "FALSE";
+		$user_login			= "Not Found";
+		$user_registered	= "";
+		
+		$sql				= "SELECT id, 
+									   user_login, 
+									   user_email, 
+									   display_name, 
+									   user_registered 
+								FROM $userTableName
+								where (user_login = '$cs1' or 
+										user_login = '$cs2')"; 
+		$result				= $wpdb->get_results($sql);
+		if ($result === FALSE) {
+			handleWPDBError($jobname,$doDebug);
+		} else {
+			$numRows		= $wpdb->num_rows;
+			if ($doDebug) {
+				echo "ran $sql<br />and retrieved $numRows rows<br />";
+			}
+			if ($numRows > 0) {
+				foreach($result as $resultRow) {
+					$user_id			= $resultRow->id;
+					$user_login			= $resultRow->user_login;
+					$user_email			= $resultRow->user_email;
+					$display_name		= $resultRow->display_name;
+					$user_registered	= $resultRow->user_registered;
+				
+					$metaSQL		= "select meta_key, meta_value 
+										from `wpw1_usermeta` 
+										where user_id = $user_id 
+										and (meta_key = 'first_name' 
+											or meta_key = 'last_name' 
+											or meta_key = 'wpw1_capabilities' 
+											or meta_key = 'wpumuv_needs_verification')";
+					$metaResult		= $wpdb->get_results($metaSQL);
+					if ($metaResult === FALSE) {
+						handleWPDBError($jobname,$doDebug);
+					} else {
+						$numMRows	= $wpdb->num_rows;
+						if ($doDebug) {
+							echo "ran $metaSQL<br />and retrieved $numMRows rows<br />";
+						}
+						foreach($metaResult as $metaResultRow) {
+							$meta_key		= $metaResultRow->meta_key;
+							$meta_value		= $metaResultRow->meta_value;
+					
+							if ($meta_key == 'last_name') {
+								$user_last_name	= $meta_value;
+							}
+							if ($meta_key == 'first_name') {
+								$user_first_name = $meta_value;
+							}
+							if ($meta_key == 'wpw1_capabilities') {
+					
+								$myInt			= strpos($meta_value,'administrator');
+								if ($myInt !== FALSE) {
+									$user_role	= 'aministrator';
+								}
+								$myInt			= strpos($meta_value,'student');
+								if ($myInt !== FALSE) {
+									$user_role	= 'student';
+								}
+								$myInt			= strpos($meta_value,'advisor');
+								if ($myInt !== FALSE) {
+									$user_role	= 'advisor';
+								}
+							}
+							if ($meta_key == 'wpumuv_needs_verification') {
+								$verifiedUser				= "FALSE";
+							} else {
+								$verifiedUser				= "TRUE";
+							}
+						}
+					}
+				}
+			}
+		}
+		$content		.= "<tr><th>User Login Information</th>
+								<th>Name</th>
+								<th>Role</th>
+								<th>Verified</th>
+								<th>Sign Up Date</th></tr>
+							<tr><td>$user_login</td>
+								<td>$user_last_name, $user_first_name</td>
+								<td>$user_role</td>
+								<td>$verifiedUser</td>
+								<td>$user_registered</td></tr>
+							</table>";
+
+		$content		.= "<h4>Student History</h4>
 							<table>
 							<tr><th style='width:40px;'>TZ</th>
 								<th style='width:90px;'>Level</th>
