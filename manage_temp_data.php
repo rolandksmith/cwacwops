@@ -226,7 +226,7 @@ function manage_temp_data_func() {
 
 	} elseif ("2" == $strPass) {
 		if ($doDebug) {
-			echo "<br />at pass $strPass<br />
+			echo "<br />at xpass $strPass<br />
 					inp_callsign: $inp_callsign<br />
 					inp_role: $inp_role<br />
 					token: $token<br />
@@ -252,6 +252,89 @@ function manage_temp_data_func() {
 				$content	.= "Last query: $lastQuery<br />Last error; $lastError<br />";
 			} else {
 				$content	.= "Temp data successfully added for $inp_callsign, $inp_role, $token<br />";
+				///// if this was a register token, see if there is an ignore token. If so, delete it
+				if ($token == 'register') {
+					$recordCount		= $wpdb->get_var("select count(record_id) 
+											from $tempDataTableName 
+											where callsign = '$inp_callsign' 
+											and token = 'ignore'");
+					if ($recordCount > 0) {
+						$readResult			= $wpdb->get_results("select * from $tempDataTableName 
+																	where callsign = '$inp_callsign' 
+																		and token = 'ignore' 
+																		and temp_data = '$inp_role'");
+																		
+																		
+						if ($readResult === FALSE) {
+							handleWPDBError($jobname,$doDebug);
+						} else {
+							$numRows		= $wpdb->num_rows;
+							$lastQuery		= $wpdb->last_query;
+							if ($doDebug) {
+								echo "ran $lastQuery<br />and retrieved $numRows records<br />";
+							}
+							if ($numRows > 0) {
+								foreach($readResult as $readRow) {
+									$tempID				= $readRow->record_id;
+									$tempCallsign		= $readRow->callsign;
+									$tempToken			= $readRow->token;
+									$tempData			= $readRow->temp_data;
+									$tempDateWritten	= $readRow->date_written;
+									
+									if ($temToken == 'ignore') {
+										$deleteResult	= $wpdb->delete($tempDataTableName,
+																		array('record_id'=>$tempID),
+																		array('%d'));
+										if ($deleteResult === FALSE) {
+											handleWPDBError($jobname,$doDebug);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				//// if the token is 'ignore' see if there is a register record. If so, delete it
+				if ($token == 'ignore') {
+					$recordCount		= $wpdb->get_var("select count(record_id) 
+											from $gtempDataTableName 
+											where callsign = '$inp_callsign' 
+											and token = 'register'");
+					if ($recordCount > 0) {
+						$readResult			= $wpdb->get_results("select * from $tempDataTableName 
+																	where callsign = '$inp_callsign' 
+																		and token = 'register' 
+																		and temp_data = '$inp_role'");
+						if ($readResult === FALSE) {
+							handleWPDBError($jobname,$doDebug);
+						} else {
+							$numRows		= $wpdb->num_rows;
+							$lastQuery		= $wpdb->last_query;
+							if ($doDebug) {
+								echo "ran $lastQuery<br />and retrieved $numRows records<br />";
+							}
+							if ($numRows > 0) {
+								foreach($readResult as $readRow) {
+									$tempID				= $readRow->record_id;
+									$tempCallsign		= $readRow->callsign;
+									$tempToken			= $readRow->token;
+									$tempData			= $readRow->temp_data;
+									$tempDateWritten	= $readRow->date_written;
+									
+									if ($temToken == 'register') {
+										$deleteResult	= $wpdb->delete($tempDataTableName,
+																		array('record_id'=>$tempID),
+																		array('%d'));
+										if ($deleteResult === FALSE) {
+											handleWPDBError($jobname,$doDebug);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		} elseif ($inp_action == 'delete') {
 			if ($doDebug) {
