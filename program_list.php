@@ -198,7 +198,7 @@ if ($userRole == 'administrator') {
 			<li><a href='siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (fake)</a>
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
-			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data/a>
+			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data</a>
 			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blank'>Move Student to Different Semester</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=35' target='_blank'>Move Student to a Different Level and Unassign</a>
 			<li><a href='$siteURL/cwa-move-unassigned-students-to-next-semester/' target='_blank'>Move Unassigned Students to Next Semester</a>
@@ -275,6 +275,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-registration/' target='_blank'>Student Registration (Fake)</a>
 			<li><a href='$siteURL/cwa-advisor-class-history/' target='_blank'>Advisor Class History</a>
 			<li><a href='$siteURL/cwa-show-detailed-history-for-student/' target='_blank'>Show Detailed History for Student</a>
+			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data</a>
 			<li><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
 			<li><a href='$siteURL/cwa-search-saved-email-by-call-sign/' target='_blank'>Search Saved Email by Call Sign</a>
 			<li><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student CW Assessment V2</a>
