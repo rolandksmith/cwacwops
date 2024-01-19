@@ -504,7 +504,11 @@ td:last-child {
 					$assessment_notes					= $assessmentRow->assessment_notes;
 					$assessment_program					= $assessmentRow->assessment_program;
 
-					$convertedScore						= $scoreConversion[$assessment_score];
+					if (array_key_exists($assessment_score,$scoreConversion)) {
+						$convertedScore					= $scoreConversion[$assessment_score];
+					} else {
+						$convertedScore					= $assessment_score;
+					}
 					$content							.= "<tr><td style='text-align:center;vertical-align:top;'>$convertedScore</td>
 																<td style='vertical-align:top;'>$assessment_level</td>
 																<td style='vertical-align:top;'>$assessment_assessment_date</td>
