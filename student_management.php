@@ -5642,7 +5642,7 @@ $userName changed call sign from $inp_student_callsign to $inp_new_callsign ";
 							$sql						= "select * from $advisorClassTableName 
 															where advisor_call_sign='$student_assigned_advisor' 
 																and sequence=$student_assigned_advisor_class 
-																and semester='$thisSemester'";
+																and semester='$student_semester'";
 							$wpw1_cwa_advisorclass	= $wpdb->get_results($sql);
 							if ($wpw1_cwa_advisorclass === FALSE) {
 								handleWPDBError("$jobname MGMT 96",$doDebug);
