@@ -2,7 +2,7 @@ function manage_temp_data_func() {
 
 	global $wpdb;
 
-	$doDebug						= TRUE;
+	$doDebug						= FALSE;
 	$testMode						= FALSE;
 	$initializationArray 			= data_initialization_func();
 	$validUser 						= $initializationArray['validUser'];
@@ -49,6 +49,7 @@ function manage_temp_data_func() {
 	$inp_callsign				= '';
 	$inp_role					= '';
 	$token						= '';
+	$inp_temp_data				= '';
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -106,7 +107,21 @@ function manage_temp_data_func() {
 				$tempID	 = $str_value;
 				$tempID	 = filter_var($tempID,FILTER_UNSAFE_RAW);
 			}
+			if ($str_key 		== "inp_temp_data") {
+				$inp_temp_data	 = $str_value;
+				$inp_temp_data	 = filter_var($inp_temp_data,FILTER_UNSAFE_RAW);
+			}
 		}
+	}
+	
+	if ($inp_temp_data == '' && $inp_role == 'student') {
+		$inp_temp_data		= 'student';
+	}
+	if ($inp_temp_data == '' && $inp_role == 'advisor') {
+		$inp_temp_data		= 'advisor';
+	}
+	if ($inp_temp_data == '' && $inp_role == 'administrator') {
+		$inp_temp_data		= 'administrator';
 	}
 	
 	
@@ -204,17 +219,19 @@ function manage_temp_data_func() {
 							<input type='hidden' name='strpass' value='2'>
 							<table style='border-collapse:collapse;'>
 							<tr><td>Action</td>
-								<td><input type='radio' class='formInputButton'name='inp_action' value='add' checked required>Add<br />
-									<input type='radio' class='formInputButton'name='inp_action' value='delete' required>Delete<br />
-									<input type='radio' class='formInputButton'name='inp_action' value='modify' required>Modify</td></tr>
+								<td><input type='radio' class='formInputButton'name='inp_action' value='add' checked>Add<br />
+									<input type='radio' class='formInputButton'name='inp_action' value='delete'>Delete<br />
+									<input type='radio' class='formInputButton'name='inp_action' value='modify'>Modify<br />
+									<input type='radio' class='formInputButton'name='inp_action' value='list'>List</td></tr>
 							<tr><td>Username</td>
-								<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign' required></td></tr>
-							<tr><td>User Role</td>
-								<td><input type='radio' class='formInputButton' name='inp_role' value='student' checked required>Student<br />
-									<input type='radio' class='formInputButton' name='inp_role' value='advisor' required>Advisor<br />
-									<input type='radio' class='formInputButton' name='inp_role' value='administrator' required>Administrator</td></tr>
+								<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign'></td></tr>
+							<tr><td>Temp Data</td>
+								<td><input type='radio' class='formInputButton' name='inp_role' value='student'>Student<br />
+									<input type='radio' class='formInputButton' name='inp_role' value='advisor'>Advisor<br />
+									<input type='radio' class='formInputButton' name='inp_role' value='administrator'>Administrator<br />
+									<input type='text' class='formInputText' name='inp_temp_data' size='50' maxlength='100'></td></tr>
 							<tr><td>Token</td>
-								<td><input type='text' class='formInputText' size='30' maxlength='50' name='token' required></td></tr>
+								<td><input type='text' class='formInputText' size='30' maxlength='50' name='token'></td></tr>
 							
 							$testModeOption
 							<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
@@ -228,7 +245,7 @@ function manage_temp_data_func() {
 		if ($doDebug) {
 			echo "<br />at xpass $strPass<br />
 					inp_callsign: $inp_callsign<br />
-					inp_role: $inp_role<br />
+					inp_temp_data: $inp_temp_data<br />
 					token: $token<br />
 					inp_action: $inp_action<br />";
 		}
@@ -241,17 +258,17 @@ function manage_temp_data_func() {
 			$addResult		= $wpdb->insert($tempDataTableName,
 									array('callsign'=>$inp_callsign,
 										'token'=>$token,
-										'temp_data'=>$inp_role,
+										'temp_data'=>$inp_temp_data,
 										'date_written'=>$nowTime),
 									array('%s','%s','%s','%s'));
 			if ($addResult === FALSE) {
 				handleWPDBError($jobname,$doDebug);
-				$content	.= "Temp data for $inp_callsign, $inp_role, $token could not be inserted";
+				$content	.= "Temp data for $inp_callsign, $inp_temp_data, $token could not be inserted";
 				$lastError	= $wpdb->last_error;
 				$lastQuery	= $wpdb->last_query;
 				$content	.= "Last query: $lastQuery<br />Last error; $lastError<br />";
 			} else {
-				$content	.= "Temp data successfully added for $inp_callsign, $inp_role, $token<br />";
+				$content	.= "Temp data successfully added for $inp_callsign, $inp_temp_data, $token<br />";
 				///// if this was a register token, see if there is an ignore token. If so, delete it
 				if ($token == 'register') {
 					$recordCount		= $wpdb->get_var("select count(record_id) 
@@ -262,7 +279,7 @@ function manage_temp_data_func() {
 						$readResult			= $wpdb->get_results("select * from $tempDataTableName 
 																	where callsign = '$inp_callsign' 
 																		and token = 'ignore' 
-																		and temp_data = '$inp_role'");
+																		and temp_data = '$inp_temp_data'");
 																		
 																		
 						if ($readResult === FALSE) {
@@ -298,14 +315,14 @@ function manage_temp_data_func() {
 				//// if the token is 'ignore' see if there is a register record. If so, delete it
 				if ($token == 'ignore') {
 					$recordCount		= $wpdb->get_var("select count(record_id) 
-											from $gtempDataTableName 
+											from $tempDataTableName 
 											where callsign = '$inp_callsign' 
 											and token = 'register'");
 					if ($recordCount > 0) {
 						$readResult			= $wpdb->get_results("select * from $tempDataTableName 
 																	where callsign = '$inp_callsign' 
 																		and token = 'register' 
-																		and temp_data = '$inp_role'");
+																		and temp_data = '$inp_temp_data'");
 						if ($readResult === FALSE) {
 							handleWPDBError($jobname,$doDebug);
 						} else {
@@ -322,7 +339,7 @@ function manage_temp_data_func() {
 									$tempData			= $readRow->temp_data;
 									$tempDateWritten	= $readRow->date_written;
 									
-									if ($temToken == 'register') {
+									if ($tempToken == 'register') {
 										$deleteResult	= $wpdb->delete($tempDataTableName,
 																		array('record_id'=>$tempID),
 																		array('%d'));
@@ -348,11 +365,11 @@ function manage_temp_data_func() {
 				handleWPDBError($jobname,$doDebug);
 				$content		.= "Unable to delete this record<br />
 									callsign: $inp_callsign<br />
-									token: $inp_token<br />";
+									token: $token<br />";
 			} else {
 				$content		.= "Successfully deleted<br />
 									callsign: $inp_callsign<br />
-									token: $inp_token<br />";
+									token: $token<br />";
 			}
 		} elseif ($inp_action == 'modify') {
 			if ($doDebug) {
@@ -361,7 +378,7 @@ function manage_temp_data_func() {
 			$readResult			= $wpdb->get_results("select * from $tempDataTableName 
 														where callsign = '$inp_callsign' 
 															and token = '$token' 
-															and temp_data = '$inp_role'");
+															and temp_data = '$inp_temp_data'");
 			if ($readResult === FALSE) {
 				handleWPDBError($jobname,$doDebug);
 			} else {
@@ -396,8 +413,141 @@ function manage_temp_data_func() {
 												</form></p>";
 					}
 				} else {
-					$content	.= "No record found in $tempDataTableName for callsign: $inp_callsign, token: $token, temp_data: $inp_role<br />";
+					$content	.= "No record found in $tempDataTableName for callsign: $inp_callsign, token: $token, temp_data: $inp_temp_data<br />";
 				}
+			}
+		} elseif ($inp_action == 'list') {
+			if ($doDebug) {
+				echo "making a list<br />";
+			}
+			$content				.= "<p>Selection Criteria:<br />
+										Callsign: $inp_callsign<br />
+										Temp_data: $inp_temp_data<br />
+										Token: $token<br />";
+										
+			$callsignLogical		= FALSE;	// default is blank
+			$tempDataLogical		= FALSE;	// default is blank
+			$tokenLogical			= FALSE;	// default is blank
+			$prevCallsign			= '';
+			$firstTime				= TRUE;
+			
+			if ($inp_callsign == '') {
+				$callsignLogical	= FALSE;	// default ... any and all
+			} elseif ($inp_callsign == 'all') {
+				$callsignLogical	= FALSE;	// all callsigns
+			} else {
+				$callsignLogical	= TRUE;	// specific callsign
+			}
+			if ($inp_temp_data == '') {
+				$tempDataLogical	= FALSE;	// default ... any and all
+			} elseif ($inp_temp_data == 'all') {
+				$tempDataLogical	= FALSE;	// all tempDatas
+			} else {
+				$tempDataLogical	= TRUE;	// specific tempData
+			}
+			if ($token == '') {
+				$tokenLogical		= FALSE;	// default ... any and all
+			} elseif ($token == 'all') {
+				$tokenLogical		= FALSE;	// all tokens
+			} else {
+				$tokenLogical		= TRUE;	// specific token
+			}
+			
+			if (!$callsignLogical && !$tempDataLogical && !$tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										order by callsign,token,date_written";
+			}
+			if (!$callsignLogical && !$tempDataLogical && $tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where token='$token' 
+										order by callsign,token,date_written";
+			}
+			if (!$callsignLogical && $tempDataLogical && !$tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where temp_data = '$inp_temp_data' 
+										order by callsign,token,date_written";
+			}
+			if (!$callsignLogical && $tempDataLogical && $tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where temp_data = '$inp_temp_data and 
+												token = '$token' 
+										order by callsign,token,date_written";
+			}
+			if ($callsignLogical && !$tempDataLogical && !$tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where callsign = 'inp_callsign' 
+										order by callsign,token,date_written";
+
+			}
+			if ($callsignLogical && $tempDataLogical && !$tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where callsign = '$inp_callsign' and 
+											temp_data = '$inp_temp_data' 
+										order by callsign,token,date_written";
+
+			}
+			if ($callsignLogical && !$tempDataLogical && $tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where callsign = '$inp_callsign ' 
+											and token = '$token' 
+										order by callsign,token,date_written";
+
+			}
+			if ($callsignLogical && $tempDataLogical && $tokenLogical) {
+				$sql				= "select * from $tempDataTableName 
+										where callsign = '$inp_callsign' and
+											temp_data = '$inp_temp_data' and
+											token = '$token' 
+										order by callsign,token,date_written";
+
+			}
+
+			$readResult			= $wpdb->get_results($sql);
+			if ($readResult === FALSE) {
+				handleWPDBError($jobname,$doDebug);
+			} else {
+				$numRows		= $wpdb->num_rows;
+				$lastQuery		= $wpdb->last_query;
+				if ($doDebug) {
+					echo "ran $lastQuery<br />and retrieved $numRows records<br />";
+				}
+				if ($numRows > 0) {
+					if ($doDebug) {
+						echo "ran $sql<br />and retrieved $numRows rows<br />";
+					}
+					$content				.= "<h3>$jobname</h3>
+												<table style='width:auto;'>
+												<tr><th>Callsign</th>
+													<th>Token</th>
+													<th>Data</th>
+													<th>Date</th></tr>";
+					foreach($readResult as $readRow) {
+						$tempID				= $readRow->record_id;
+						$tempCallsign		= $readRow->callsign;
+						$tempToken			= $readRow->token;
+						$tempData			= $readRow->temp_data;
+						$tempDateWritten	= $readRow->date_written;
+						
+						$myStr				= $tempCallsign;
+						if ($tempCallsign == $prevCallsign) {
+							if ($firstTime) {
+								$firstTime 	= FALSE;
+							} else {
+								$myStr		= "$tempCallsign (*)";
+							}
+						}
+						$prevCallsign	= $tempCallsign;
+			
+						$content			.= "<tr><td>$myStr</td>
+													<td>$tempToken</td>
+													<td>$tempData</td>
+													<td>$tempDateWritten</td></tr>";
+					}
+					$content		.= "</table><br /><p>$numRows records displayed<br />";
+				} else {
+					$content		.= "<h3>$jobname</h3><p>No records found matching the criteria</p>";
+				}
+		
 			}
 		} else {
 			$content	.= "No action requested, none taken";
@@ -415,12 +565,10 @@ function manage_temp_data_func() {
 		if ($readResult === FALSE) {
 			handleWPDBError($jobname,$doDebug);
 		} else {
-			$numRows		= $wpdb->num_rows;
-			$lastQuery		= $wpdb->last_query;
-			if ($doDebug) {
-				echo "ran $lastQuery<br />and retrieved $numRows records<br />";
-			}
 			if ($numRows > 0) {
+				if ($doDebug) {
+					echo "ran $lastQuery<br />and retrieved $numRows records<br />";
+				}
 				foreach($readResult as $readRow) {
 					$tempID				= $readRow->record_id;
 					$tempCallsign		= $readRow->callsign;

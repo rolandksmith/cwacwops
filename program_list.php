@@ -40,6 +40,33 @@ function program_list_func() {
 /// get the time that the process started
 	$startingMicroTime			= microtime(TRUE);
 
+
+// get the input information
+	if (isset($_REQUEST)) {
+		foreach($_REQUEST as $str_key => $str_value) {
+			if ($doDebug) {
+				if (!is_array($str_value)) {
+					echo "Key: $str_key | Value: $str_value <br />\n";
+				} else {
+					echo "Key: $str_key (array)<br />\n";
+				}
+			}
+			if ($str_key 		== "validUser") {
+				$validUser		 = $str_value;
+				$validUser		 = filter_var($validUser,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "userName") {
+				$userName		 = $str_value;
+				$userName		 = filter_var($userName,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "userRole") {
+				$userRole		 = $str_value;
+				$userRole		 = filter_var($userRole,FILTER_UNSAFE_RAW);
+			}
+		}
+	}
+
+
 	
 	$content = "<style type='text/css'>
 fieldset {font:'Times New Roman', sans-serif;color:#666;background-image:none;
