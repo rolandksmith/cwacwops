@@ -109,6 +109,7 @@ function list_new_registrations_v4_func(){
 	$deleteTempIgnoreArray		= array();		// whether or not to delete a temp_data ignore record
 	$sendSignupEmailArray		= array();		// whether or not to send a registration reminder email
 	$emailSignup				= FALSE;		// found registration record using email address
+	$validCallsign				= FALSE;		// whether or not the user_login fits a valid callsign format
 	$registrationCallsign				= '';			// Callsign in registration record
 	$sendRegisterEmailArray		= array();		// Whether nor not to send email requesting user create a user_login
 	$sendVerifyEmailArray		= array();
@@ -274,6 +275,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 					$threeDayPlus		= FALSE;		// whether or not the three day countdown date is less than today
 					$tenDayDate			= '';			// temp_data register date_written plus 10 days
 					$tenDayPlus			= FALSE;		// whether or not temp_data register date_written is less than today
+					$validCallsign		= FALSE;		// whether or not the user_login fits a valid callsign format
 					$registrationCallsign		= '';			// Callsign in registration record
 					$emailSignup		= FALSE;		// whether or not there is a registration record found via email
 
@@ -434,6 +436,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 										$testCallsign		= preg_match('/^[a-zA-Z0-9]{1,3}[0-9][a-zA-Z0-9]{0,3}[a-zA-Z]+$/',$user_login);
 										if ($testCallsign == 1) {		// fits the callsign regex
 												$debugData .= "user_login $user_login passed the callsign regex<br />";
+												$validCallsign	= TRUE;
 										} else {							
 												$debugData .= "<b>ERROR</b> user_login $user_login does not fit a callsign pattern<br />";
 											$badUserName		= TRUE;
@@ -1206,28 +1209,55 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 										$debugData .= "NNYNNY: no registration record, unverified, valid format, no tempRegister, no tempIgnore, emailSignup is set<br />
 										First time seeing this record. Has an unverified but valid user_login and a registration record with a 
 										callsign different from the user_login. Set tempRecord for three-day time for user to verify. If not 
-										verified by then, will recommend verifying. Meanwhile, recommend getting user_login and callsign sync'd 
+										verified by then, will recommend verifying. If the user_login fits a valid callsign, send a verify 
+										reminder email. Meanwhile, recommend getting user_login and callsign sync'd 
 										up</br />";
-									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-									$allUsersArray[$user_uppercase]['theError']	.= "User has an invalid user_login<br />
-																					Username is not verified<br />
-																					User has a registration record with callsign of $registrationCallsign<br />
-																					Setting three-day countdown to expire on $threeDayDate<br />
-																					<b>Recommend contacting user and syncing user_login and callsign</b><br />";
+										
+										if ($validCallsign) {
+											$allUsersArray[$user_uppercase]['hasError']	= 'Y';
+											$allUsersArray[$user_uppercase]['theError']	.= "User has an valid user_login that matches callsign format<br />
+																							Username is not verified<br />
+																							User has a registration record with callsign of $registrationCallsign<br />
+																							Setting three-day countdown to expire on $threeDayDate<br />
+																							Sending verify reminder email<br />
+																							<b>Recommend contacting user and syncing user_login and callsign</b><br />";
+											$sendVerifyEmailArray[]						= "$user_email&$user_uppercase";
+										} else {
+											$allUsersArray[$user_uppercase]['hasError']	= 'Y';
+											$allUsersArray[$user_uppercase]['theError']	.= "User has an valid user_login that does not match callsign format<br />
+																							Username is not verified<br />
+																							User has a registration record with callsign of $registrationCallsign<br />
+																							Setting three-day countdown to expire on $threeDayDate<br />
+																							<b>Recommend contacting user to determine correct callsign and syncing user_login and callsign</b><br />";
+										}
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
 								if (!$registrationRecord && !$verifiedUser && $validFormat && !$tempRegister && !$tempIgnore && !$emailSignup) {
 										$debugData .= "NNYNNN: no registration record, unverified, valid format, no tempRegister, no tempIgnore, no emailSignup<br />
 										First time we've seen this record. Username is valid format but unverified. No registration record found. 
+										if user_login fits the callsign format, send a verify reminder email 
 										Recommend contacting user to determine if real. Setting tempRegister for a three-day countdown to 
 										see if he verifies in the meantime.<br />";
-									$allUsersArray[$user_uppercase]['hasError']	= 'Y';
-									$allUsersArray[$user_uppercase]['theError']	.= "User has a valid user_login<br />
-																					Username is not verified<br />
-																					User has does not have a registration record<br />
-																					Setting three-day countdown to expire on $threeDayDate when 
-																					the recommendation will be to delete the user<br />
-																					<b>Recommend determining if the user is real</b><br />";
+										
+										if ($validCallsign) {
+											$allUsersArray[$user_uppercase]['hasError']	= 'Y';
+											$allUsersArray[$user_uppercase]['theError']	.= "User has an valid user_login that matches callsign format<br />
+																							Username is not verified<br />
+																							User has does not have a registration record<br />
+																							Setting three-day countdown to expire on $threeDayDate when 
+																							the recommendation will be to delete the user<br />
+																							Sending verify reminder email<br />
+																							<b>Recommend determining if the user is real</b><br />";
+											$sendVerifyEmailArray[]						= "$user_email&$user_uppercase";
+										} else {
+											$allUsersArray[$user_uppercase]['hasError']	= 'Y';
+											$allUsersArray[$user_uppercase]['theError']	.= "User has an valid user_login that does not match callsign format<br />
+																							Username is not verified<br />
+																							User has does not have a registration record<br />
+																							Setting three-day countdown to expire on $threeDayDate when 
+																							the recommendation will be to delete the user<br />
+																							<b>Recommend determining if the user is real and getting the actual callsign</b><br />";
+										}
 									$setTempRegisterArray[]						= "$user_login&$user_role";
 								}
 								if (!$registrationRecord && !$verifiedUser && !$validFormat && $tempRegister && !$tempIgnore && $emailSignup) { 
@@ -1748,15 +1778,18 @@ if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Ac
 			$theSubject	 	= "CW Academy -- Please Verify your Username and Password for CW Academy";
 			$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
 <p>You have obtained a username and password for the CW Academy 
-								website, however, you have not verified that information. After
-								creating yourusername and password, CW Academy has sent you 
-								an email with a link to verify that you were the person that 
-								created the username and password.</p>
-								<p>Please find that email and click on the link. If you can't 
-								find the email, go to < href='https://cwa.cwops.org/program_list/'>CW Academy</a> 
-								and enter your username and password. The program will send 
-								you another email with a link to verify your username and password.</p>
-								<br />73,<br />CW Academy";
+website, however, you have not verified that information. After
+creating yourusername and password, CW Academy has sent you 
+an email with a link to verify that you were the person that 
+created the username and password.</p>
+<p>Please find that email and click on the link. If you can't 
+find the email, go to < href='https://cwa.cwops.org/program_list/'>CW Academy</a> 
+and enter your username and password. The program will send 
+you another email with a link to verify your username and password.</p>
+<p><b>NOTE: </b>Setting up your username and password DOES NOT automatically 
+sign you up for a class. After verifying your username, you will need to log in 
+to the CW Academy website and sign up for a class.</p>
+<br />73,<br />CW Academy";
 
 			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$user_email,
 														'theSubject'=>$theSubject,
