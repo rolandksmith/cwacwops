@@ -205,9 +205,11 @@ function manage_temp_data_func() {
 		}
 		$extMode					= 'tm';
 		$tempDataTableName			= "wpw1_cwa_temp_data2";
+		$userTableName				= "wpw1_users";
 	} else {
 		$extMode					= 'pd';
 		$tempDataTableName			= "wpw1_cwa_temp_data";
+		$userTableName				= "wpw1_users";
 	}
 
 
@@ -222,7 +224,8 @@ function manage_temp_data_func() {
 								<td><input type='radio' class='formInputButton'name='inp_action' value='add' checked>Add<br />
 									<input type='radio' class='formInputButton'name='inp_action' value='delete'>Delete<br />
 									<input type='radio' class='formInputButton'name='inp_action' value='modify'>Modify<br />
-									<input type='radio' class='formInputButton'name='inp_action' value='list'>List</td></tr>
+									<input type='radio' class='formInputButton'name='inp_action' value='list'>List<br />
+									<input type='radio' class='formInputButton'name='inp_action' value='verify'>Verify Usernames</td></tr>
 							<tr><td>Username</td>
 								<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign'></td></tr>
 							<tr><td>Temp Data</td>
@@ -507,10 +510,6 @@ function manage_temp_data_func() {
 				handleWPDBError($jobname,$doDebug);
 			} else {
 				$numRows		= $wpdb->num_rows;
-				$lastQuery		= $wpdb->last_query;
-				if ($doDebug) {
-					echo "ran $lastQuery<br />and retrieved $numRows records<br />";
-				}
 				if ($numRows > 0) {
 					if ($doDebug) {
 						echo "ran $sql<br />and retrieved $numRows rows<br />";
@@ -530,11 +529,9 @@ function manage_temp_data_func() {
 						
 						$myStr				= $tempCallsign;
 						if ($tempCallsign == $prevCallsign) {
-							if ($firstTime) {
-								$firstTime 	= FALSE;
-							} else {
-								$myStr		= "$tempCallsign (*)";
-							}
+							$myStr		= "$tempCallsign (*)";
+						} else {
+							$myStr		= $tempCallsign;
 						}
 						$prevCallsign	= $tempCallsign;
 			
@@ -549,6 +546,70 @@ function manage_temp_data_func() {
 				}
 		
 			}
+		} elseif ($inp_action == 'verify') {			/// verify tempCallsign against user_login
+			$sql				= "select * from $tempDataTableName 
+									where token = 'tracking' 
+									order by callsign";
+			$readResult			= $wpdb->get_results($sql);
+			if ($readResult === FALSE) {
+				handleWPDBError($jobname,$doDebug);
+			} else {
+				$numRows		= $wpdb->num_rows;
+				if ($numRows > 0) {
+					if ($doDebug) {
+						echo "ran $sql<br />and retrieved $numRows rows<br />";
+					}
+					$content				.= "<h4>Temp Data Records with No User Login</h4>
+												<table style='width:auto;'>
+												<tr><th>Callsign</th>
+													<th>Token</th>
+													<th>Data</th>
+													<th>Date</th>
+													<th>Delete?</th></tr>";
+					$prevCallsign			= '';
+					foreach($readResult as $readRow) {
+						$tempID				= $readRow->record_id;
+						$tempCallsign		= $readRow->callsign;
+						$tempToken			= $readRow->token;
+						$tempData			= $readRow->temp_data;
+						$tempDateWritten	= $readRow->date_written;
+						
+						if ($tempCallsign != $prevCallsign) {
+							$prevCallsign	= $tempCallsign;
+							$myStr1			= strtoupper($tempCallsign);
+							$myStr2			= strtolower($tempCallsign);
+							
+							$userSQL		= "select * from $userTableName
+												where (user_login = '$myStr1' or 
+														user_login = '$myStr2')";
+							$userResult		= $wpdb->get_results($userSQL);
+							if ($userResult === FALSE) {
+								handleWPDBError($jobname,$doDebug);
+							} else {
+								$numURows		= $wpdb->num_rows;
+								if ($doDebug) {
+									echo "ran $userSQL<br />and retrieved $numURows rows<br />";
+								}
+								if ($numRows == 0) {		// no record for this callsign
+									$deleteIDLink		= "<a href='$theURL?tempID=&tempID&strpass=10' target='_blank'>Delete Temp ID</a>";
+								
+									$content			.= "<tr><td>$myStr</td>
+																<td>$tempToken</td>
+																<td>$tempData</td>
+																<td>$tempDateWritten</td>
+																<td>$deleteIDLink</td></tr>";
+								
+								}
+							}
+						}
+					}
+					$content			.= "</table>";
+				} else {
+					$content			.= "<h3>$jobname</h3><p>No records found in $tempDataTableName<br />";
+				}
+			}
+						
+						
 		} else {
 			$content	.= "No action requested, none taken";
 		}
@@ -623,7 +684,22 @@ function manage_temp_data_func() {
 									<p>No record found to update. Program error</p>";
 			}
 		}
-					
+	} elseif ("10" == $strPass) {		/// delete a temp data record	
+		if ($doDebug) {
+			echo "<br />at pass $strPass to delete record $tempID<br />";
+		}
+		$deleteResult		= $wpdb->delete($tempDataTableName,
+											array('record_id'=>$tempID),
+											array('%d'));
+		if ($deleteResult === FALSE) {
+			handleWPDBError($jobname,$doDebug);
+		} else {
+			if ($deleteResult == 0) {
+				$content	.= "<h3>$jobname</h3><p>No record found for ID $tempID to delete</p>";
+			} else {
+				$content	.= "<h3>$jobname</h3> Deleted $tempResult rows for ID $tempID</p>";
+			}
+		}
 
 	}
 	$thisTime 		= date('Y-m-d H:i:s');
