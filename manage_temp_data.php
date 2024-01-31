@@ -455,53 +455,58 @@ function manage_temp_data_func() {
 			} else {
 				$tokenLogical		= TRUE;	// specific token
 			}
-			
+			$callsignLower			= strtolower($inp_callsign);
+			$callsignUpper			= strtoupper($inp_callsign);
 			if (!$callsignLogical && !$tempDataLogical && !$tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 			}
 			if (!$callsignLogical && !$tempDataLogical && $tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
 										where token='$token' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 			}
 			if (!$callsignLogical && $tempDataLogical && !$tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
 										where temp_data = '$inp_temp_data' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 			}
 			if (!$callsignLogical && $tempDataLogical && $tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
 										where temp_data = '$inp_temp_data and 
 												token = '$token' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 			}
 			if ($callsignLogical && !$tempDataLogical && !$tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
-										where callsign = 'inp_callsign' 
-										order by callsign,token,date_written";
+										where (callsign = '$callsignLower' or 
+										       callsign = '$callsignUpper')  
+										order by callsign, date_written, token";
 
 			}
 			if ($callsignLogical && $tempDataLogical && !$tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
-										where callsign = '$inp_callsign' and 
+										where (callsign = '$callsignLower' or
+												callsign = '$callsignUpper) and 
 											temp_data = '$inp_temp_data' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 
 			}
 			if ($callsignLogical && !$tempDataLogical && $tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
-										where callsign = '$inp_callsign ' 
+										where (callsign = '$callsignLower' or 
+										       callsign = '$callsignUpper')  
 											and token = '$token' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 
 			}
 			if ($callsignLogical && $tempDataLogical && $tokenLogical) {
 				$sql				= "select * from $tempDataTableName 
-										where callsign = '$inp_callsign' and
+										where (callsign = '$callsignLower or 
+										        callsign = '$callsignUpper') and
 											temp_data = '$inp_temp_data' and
 											token = '$token' 
-										order by callsign,token,date_written";
+										order by callsign, date_written, token";
 
 			}
 
@@ -534,6 +539,10 @@ function manage_temp_data_func() {
 							$myStr		= $tempCallsign;
 						}
 						$prevCallsign	= $tempCallsign;
+						
+						if (strlen($tempData) > 30) {
+							$tempData	= base64_decode($tempData);
+						}
 			
 						$content			.= "<tr><td>$myStr</td>
 													<td>$tempToken</td>

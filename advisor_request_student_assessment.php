@@ -20,6 +20,8 @@ function advisor_request_student_assessment_func() {
 	$validUser 						= $initializationArray['validUser'];
 	$userName						= $initializationArray['userName'];
 	$userRole						= $initializationArray['userRole'];
+	$holdUser						= $userName;
+	$holdRole						= $userRole;
 	if ($userRole != 'administrator') {				// turn off debug and testmode
 		$doDebug					= FALSE;
 		$testMode					= FALSE;
@@ -165,6 +167,10 @@ function advisor_request_student_assessment_func() {
 			if ($str_key 			== "nextClass") {
 				$nextClass		 = $str_value;
 				$nextClass		 = strtoupper(filter_var($nextClass,FILTER_UNSAFE_RAW));
+			}
+			if ($str_key 			== "advisorCallSign") {
+				$advisorCallSign		 = $str_value;
+				$advisorCallSign		 = strtoupper(filter_var($advisorCallSign,FILTER_UNSAFE_RAW));
 			}
 			if ($str_key 			== "advisorCallSign") {
 				$advisorCallSign		 = $str_value;
@@ -901,10 +907,10 @@ available to your advisor. To start the assessment, please click $url.";
 		$didIntermediate		= FALSE;
 		$bestResultAdvanced		= 0;
 		$didAdvanced			= FALSE;
-		$retVal			= displayAssessment('',$token,$doDebug);
+		$retVal					= displayAssessment('',$token,$doDebug);
 		if ($retVal[0] === FALSE) {
 			if ($doDebug) {
-				echo "displayAssessment returned FALSE. Called with $inp_callsign, $inp_token<br />";
+				echo "displayAssessment returned FALSE. Called with $inp_callsign, $token<br />";
 			}
 			$content	.= "No data to display.<br />Reason: $retVal[1]";
 		} else {
@@ -1064,8 +1070,25 @@ has completed the requested Morse code assessment. Please log into
 				}
 			}
 		}
+	
+	
+	
+	} elseif ("15" == $strPass) {
+		if ($doDebug) {
+			echo "<br />At pass $strPass -- order up evaluations for an advisor<br />";
+		}
 		
-		
+		$content	.= "<h3>$jobname</h3>
+						<p>Enter the advisor's callsign you wish to emulate/p>
+						<form method='post' action='$theURL' 
+						name='advisor_emulation_form' ENCTYPE='multipart/form-data'>
+						<input type='hidden' name='strpass' value='1'>
+						<table>
+						<tr><td>Advisor Callsign</td>
+							<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign' autofocus></td></tr>
+						$testModeOption
+						<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr>
+						</table></form>";
 	}
 	$thisTime 		= date('Y-m-d H:i:s');
 	$content 		.= "<br /><br /><p>Prepared at $thisTime</p>";

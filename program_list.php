@@ -3,7 +3,7 @@ function program_list_func() {
 
 	global $wpdb;
 
-	$doDebug						= FALSE;
+	$doDebug						= TRUE;
 	$testMode						= FALSE;
 	$initializationArray = data_initialization_func();
 	if ($doDebug) {
@@ -43,6 +43,7 @@ function program_list_func() {
 
 // get the input information
 	if (isset($_REQUEST)) {
+echo "<br />REQUEST is set<br />";
 		foreach($_REQUEST as $str_key => $str_value) {
 			if ($doDebug) {
 				if (!is_array($str_value)) {
@@ -163,6 +164,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-advisor-class-report/' target='_blank'>Advisor Class Report</a>
 			<li><a href='$siteURL/cwa-advisor-play-cw-audio-clips/' target='_blank'>Advisor Play CW Audio Clips</a>
 			<li><a href='$siteURL/cwa-advisor-registration/' target='_blank'>Advisor Registration</a>
+			<li><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a>
 			<li><a href='$siteURL/cwa-advisor-report-generator/' target='_blank'>Advisor Report Generator</a>
 			<li><a href='$siteURL/cwa-advisor-statistics/' target='_blank'>Advisor Statistics</a>
 			<li><a href='$siteURL/cwa-advisor-verification-of-student/' target='_blank'>Advisor Verification of Student</a>
@@ -199,6 +201,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-display-student-history/' target='_blank'>Display Student History</a>
 			<li><a href='$siteURL/cwa-display-and-update-advisor-information/' target='_blank'>Display and Update Advisor Information</a>
 			<li><a href='$siteURL/cwa-display-and-update-student-information/' target='_blank'>Display and Update Student Information</a>
+			<li><a href='$siteURL/cwa-display-users-program-list/' target='_blank'>Display Users Program List (FAKE)<a>
 			<li><a href='$siteURL/cwa-end-of-semester-student-assessment/' target='_blank'>End of Semester Student Assessment</a>
 			<li><a href='$siteURL/end-of-semester-student-self-assessment/' target='_blank'>End of Semester Student Self Assessment</a>
 			<li><a href='$siteURL/cwa-evaluate-student/' target='_blank'>Evaluate Student</a>
@@ -298,6 +301,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-push-advisor-class/' target='_blank'>Push Advisor Class</a><br /><br />
 			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a>
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart-v2/' target='_blank'>Student and Advisor Color Chart V2</a><br /><br />
+			<li><a href='$siteURL/cwa-display-users-program-list/' target='_blank'>Display Users Program List (FAKE)<a>
 			<li><a href='siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (Fake)</a>
 			<li><a href='$siteURL/cwa-student-registration/' target='_blank'>Student Registration (Fake)</a>
 			<li><a href='$siteURL/cwa-advisor-class-history/' target='_blank'>Advisor Class History</a>
@@ -313,6 +317,7 @@ if ($userRole == 'administrator') {
 			<h4>Advisor Reporting Programs</h4>
 			<ul>
 			<li><a href='$siteURL/cwa-advisor-class-report/' target='_blank'>Advisor Class Report</a>
+			<li><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a>
 			<li><a href='$siteURL/cwa-advisor-play-cw-audio-clips/' target='_blank'>Advisor Play CW Audio Clips</a>
 			<li><a href='$siteURL/cwa-advisor-statistics/' target='_blank'>Advisor Statistics</a>
 			<li><a href='$siteURL/cwa-detailed-history-for-an-advisor/' target='_blank'>Detailed History for an Advisor</a>
