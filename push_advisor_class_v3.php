@@ -423,15 +423,15 @@ td:last-child {
 						$advisor_last_name	= $advisorRow->last_name;
 						
 						$email_to_advisor 	= "To: $advisor_last_name, $advisor_first_name ($advisorCallSign):
-												$inp_msg
-												<p>The makeup of your class has changed. Please log into 
-												<a href='$siteURL/login'>CW Academy</p> and follow the instructions 
-												under Actions Required.</p>
-												<p>Thanks for your service as an advisor!<br />
-												CW Academy</p>
-												<p><span style='color:red;font-size:14pt;'><b>Do not reply to this email as the address is not monitored. 
-												<br />Please refer to the appropriate person at <a href='https://cwops.org/cwa-class-resolution/'>CWA Class 
-												Resolution</a> for assistance.</b></span><br /></p>";
+$inp_msg
+<p>The makeup of your class has changed. Please log into 
+<a href='$siteURL/login'>CW Academy</p> and follow the instructions 
+under Actions Required.</p>
+<p>Thanks for your service as an advisor!<br />
+CW Academy</p>
+<p><span style='color:red;font-size:14pt;'><b>Do not reply to this email as the address is not monitored. 
+<br />Please refer to the appropriate person at <a href='https://cwops.org/cwa-class-resolution/'>CWA Class 
+Resolution</a> for assistance.</b></span><br /></p>";
 						if ($testMode) {
 							$mailCode				= 5;
 							$email_to				= 'rolandksmith@gmail.com';
