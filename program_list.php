@@ -3,7 +3,7 @@ function program_list_func() {
 
 	global $wpdb;
 
-	$doDebug						= TRUE;
+	$doDebug						= FALSE;
 	$testMode						= FALSE;
 	$initializationArray = data_initialization_func();
 	if ($doDebug) {
@@ -43,7 +43,7 @@ function program_list_func() {
 
 // get the input information
 	if (isset($_REQUEST)) {
-echo "<br />REQUEST is set<br />";
+// echo "<br />REQUEST is set<br />";
 		foreach($_REQUEST as $str_key => $str_value) {
 			if ($doDebug) {
 				if (!is_array($str_value)) {
