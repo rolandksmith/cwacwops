@@ -17,6 +17,7 @@ function send_mid_term_verification_email_func() {
  	Modified 27Oct22 by Roland for the new timezone table formats
  	Modified 17Apr23 by Roland to fix action_log
  	Modified 14Jul23 by Roland to use consolidated tables
+ 	Modified 31Jan24 by Roland to use reminders
 */
 
 	global $wpdb;
@@ -210,7 +211,7 @@ inp_verbose: $inp_verbose<br />";
 		}
 		$currentSemester		= $initializationArray['currentSemester'];
 		$content				.= "<h3>Sending Mid-term Verification Emails</h3>";
-// get all the advisor records for this semester
+		// get all the advisor records for this semester
 		$sql					= "select * from $advisorTableName 
 									where semester='$currentSemester' 
 									and survey_score != '6'";
@@ -319,10 +320,8 @@ inp_verbose: $inp_verbose<br />";
 the students participating in their class(es). This is an important step in peparing to close out the 
 semester.</p>
 <p><table style='border:4px solid red;'><tr><td>Please Click 
-<a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode'>
-HERE</a> to verify the current makeup of your class(es). A web page will be displayed showing each 
-of your students for you to select whether or not that student is in your class as well as allow 
-you to identify any additional students.</td></tr></table></p>
+<a href='$siteURL/program-list/'>Advisor Portal</a> to log into the CW Academy website. 
+Then click on the action to verify your students</p>
 <p>If you have questions or concerns, do not reply to this email as the address is not monitored. 
 Instead reach out to <a href='https://cwops.org/cwa-class-resolution/' target='_blank'>CWA Class Resolution</a> and select the 
 appropriate person.</p> 
@@ -360,6 +359,39 @@ email sent to the advisor ";
 									echo "Successfully updated $advisorTableName record at $advisor_ID<br />";
 								}
 							}
+							// add the reminder for the advisor
+							$effective_date		 	= date('Y-m-d H:i:s');
+							$closeStr				= strtotime("+5 days");
+							$close_date				= date('Y-m-d H:i:s', $closeStr);
+							$token					= mt_rand();
+							$email_text				= "<p></p>";
+							$reminder_text			= "<p><b>:Mid-term Student Verification</b> 
+														<p>Please click 
+														<a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode'&token=$token>
+														HERE</a> to verify the current makeup of your class(es). A web page will be displayed showing each 
+														of your students for you to select whether or not that student is in your class as well as allow 
+														you to identify any additional students.</p>";
+							$inputParams		= array("effective_date|$effective_date|s",
+														"close_date|$close_date|s",
+														"resolved_date||s",
+														"send_reminder|N|s",
+														"send_once|N|s",
+														"call_sign|$advisor_call_sign|s",
+														"role||s",
+														"email_text||s",
+														"reminder_text|$reminder_text|s",
+														"resolved||s",
+														"token||s");
+							$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
+							if ($insertResult[0] === FALSE) {
+								if ($doDebug) {
+									echo "inserting reminder failed: $insertResult[1]<br />";
+								}
+								$content		.= "Inserting reminder failed: $insertResult[1]<br />";
+							} else {
+								$content		.= "Reminder successfully added<br />";
+							}
+
 						}
 					}
 				}
