@@ -771,7 +771,7 @@ a username and password, read the email that will be sent to you, verify your us
 log in to the CW Academy website. To set up your username and password, click 
 <a href='https://cwa.cwops.org/register/'>HERE</a></p>";
 						} else {
-							$theContent		.= "<p>Please log into the CW Acadmey website by 
+							$theContent		.= "<p>Please log into the CW Academy website by 
 clicking <a href='https://cwa.cwops.org/program-list/'>HERE</a> and follow the instructions that 
 will be displayed there.</p>";
 						}
