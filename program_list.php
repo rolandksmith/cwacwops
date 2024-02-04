@@ -225,7 +225,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-management/?strpass=7' target='_blank'>List Students Needing Intervention</a>
 			<li><a href='$siteURL/cwa-list-students-for-a-semester/' target='_blank'>List Students for a Semester</a>
 			<li><a href='$siteURL/cwa-maintenance-mode/' target='_blank'>Maintenance Mode</a>
-			<li><a href='siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (fake)</a>
+			<li><a href='$siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (fake)</a>
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
 			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data</a>
@@ -302,7 +302,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a>
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart-v2/' target='_blank'>Student and Advisor Color Chart V2</a><br /><br />
 			<li><a href='$siteURL/cwa-display-users-program-list/' target='_blank'>Display Users Program List (FAKE)<a>
-			<li><a href='siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (Fake)</a>
+			<li><a href='$siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (Fake)</a>
 			<li><a href='$siteURL/cwa-student-registration/' target='_blank'>Student Registration (Fake)</a>
 			<li><a href='$siteURL/cwa-advisor-class-history/' target='_blank'>Advisor Class History</a>
 			<li><a href='$siteURL/cwa-show-detailed-history-for-student/' target='_blank'>Show Detailed History for Student</a>
@@ -332,7 +332,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-list-advisors-with-s-students/' target='_blank'>List Advisors With S Students</a>
 			<li><a href='$siteURL/cwa-list-advisors-with-incomplete-evaluations/' target='_blank'>List Advisors With Incomplete Evaluations</a>
 			<li><a href='$siteURL/cwa-list-past-advisors-registration-info/' target='_blank'>List Past Advisors Registration Info</a>
-			<li><a href='siteURL/cwa-manage-advisor-class-assignments/' target='_blank'>Manage Advisor Class Assignments</a>
+			<li><a href='$siteURL/cwa-manage-advisor-class-assignments/' target='_blank'>Manage Advisor Class Assignments</a>
 			<li><a href='$siteURL/cwa-advisor-request-student-assessment/' target='_blank'>Order Morse Code Proficiency Assessments</a>
 			<li><a href='$siteURL/cwa-show-advisor-class-assignments/' target='_blank'>Show Advisor Class Assignments</a>
 			</ul>
@@ -511,7 +511,7 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 	
 	}
 	$content		.= "<h4>Advisor Programs</h4>
-						<p><a href='siteURL/cwa-manage-advisor-class?strpass=5&inp_call_sign=$userName' target='_blank'>Manage Advisor Class</a><br />
+						<p><a href='$siteURL/cwa-manage-advisor-class/?strpass=5&inp_call_sign=$userName' target='_blank'>Manage Advisor Class</a><br />
 							This program displays the current class makeup and allows the advisor to specify student's status,
 							request replacement students, check Morse Code Proficency Assessments.</p>
 						<p><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student's Morse Code Assessments</a><br />
