@@ -251,8 +251,8 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-management/?strpass=25' target='_blank'>Resolve Student Hold</a>
 			<li><a href='siteURL/cwa-search-audio-assessment-log/' target='_blank'>Search Audio Assessment Log</a>
 			<li><a href='$siteURL/cwa-search-audit-log/' target='_blank'>Search Audit Log</a>
-			<li><a href='$siteURL/cwa-search-joblog/' target='_blank'>Search Joblog</a>
 			<li><a href='$siteURL/cwa-search-saved-email-by-call-sign/' target='_blank'>Search Saved Email by Call Sign</a>
+			<li><a href='$siteURL/cwa-search-sent-email-by-callsign-or-email/' target='_blank'>Search Sent Email by Callsign or Email</a>
 			<li><a href='$siteURL/cwa-search-tracking-data/' target='_blank'>Search Tracking Data</a>
 			<li><a href='$siteURL/cwa-select-students-for-end-of-semester-assessment/' target='_blank'>Select Students for End of Semester Assessment</a>
 			<li><a href='$siteURL/cwa-send-advisor-email-to-view-student-evaluations/' target='_blank'>Send Advisor Email to View Student Evaluations</a>
@@ -308,7 +308,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-show-detailed-history-for-student/' target='_blank'>Show Detailed History for Student</a>
 			<li><a href='siteURL/cwa-manage-temp-data/' target='_blank'>Manage Temp Data</a>
 			<li><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
-			<li><a href='$siteURL/cwa-search-saved-email-by-call-sign/' target='_blank'>Search Saved Email by Call Sign</a>
+			<li><a href='$siteURL/cwa-search-sent-email-by-callsign-or-email/' target='_blank'>Search Sent Email by Callsign or Email</a>
 			<li><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student CW Assessment V2</a>
 			<li><a href='$siteURL/cwa-list-new-registrations/' target='_blank'>List New Registrations</a>
 			<li><a href='$siteURL/cwa-delete_user_info/' target='_blank'>Delete User Info</a>
@@ -464,7 +464,7 @@ if ($userRole == 'administrator') {
 			<li><a href='siteURL/cwa-remove-item/' target='_blank'>Remove Item</a>
 			<li><a href='$siteURL/cwa-search-audit-log/' target='_blank'>Search Audit Log</a>
 			<li><a href='$siteURL/cwa-search-joblog/' target='_blank'>Search Joblog</a>
-			<li><a href='$siteURL/cwa-search-saved-email-by-call-sign/' target='_blank'>Search Saved Email by Call Sign</a>
+			<li><a href='$siteURL/cwa-search-sent-email-by-callsign-or-email/' target='_blank'>Search Sent Email by Callsign or Email</a>
 			<li><a href='$siteURL/cwa-search-tracking-data/' target='_blank'>Search Tracking Data</a>
 			<li><a href='siteURL/cwa-send-an-email/' target='_blank'>Send an Email</a>
 			<li><a href='$siteURL/cwa-show-saved-email/' target='_blank'>Show Saved Email</a>
