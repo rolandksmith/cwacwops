@@ -604,8 +604,8 @@ td:last-child {
 											<input type='radio' class='formInputButton' name='inp_wpm' value='35'> 35cpm";
 					$eff_params			= "<input type='radio' class='formInputButton' name='inp_eff' value='20'> 20wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='25'> 25wpm Effective<br />
-											<input type='radio' class='formInputButton' class='formInputButton' name='inp_eff' value='30'> 30wpm Effective<br />
-											<input type='radio' class='formInputButton' class='formInputButton' name='inp_eff' value='35'> 35wpm Effective<br />";
+											<input type='radio' class='formInputButton' name='inp_eff' value='30'> 30wpm Effective<br />
+											<input type='radio' class='formInputButton' name='inp_eff' value='35'> 35wpm Effective<br />";
 					$freq_params		= "<input type='hidden' class='formInputButton' name='inp_freq' value='450,550,600,700'>";
 					$questions_params	= "<input type='radio' class='formInputButton' name='inp_questions' value='3'>3 Questions<br />
 										   <input type='radio' class='formInputButton' name='inp_questions' value='5'> 5 Questions<br />
@@ -824,7 +824,7 @@ will be displayed there.</p>";
 						}
  
 						// format and store the reminder for the student
-						
+						$myStr				= '0';
 						if ($inp_callsigns != '' && $inp_callsigns > 0) {
 							$myStr			= $inp_callsigns . "($inp_makeup)";
 						}
