@@ -282,6 +282,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-update-unassigned-student-information/' target='_blank'>Update Unassigned Student Information</a>
 			<li><a href='$siteURL/cwa-verify-advisor-class/' target='_blank'>Verify Advisor Class</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=85' target='_blank'>Verify One or More Students</a>
+			<li><a href='$siteURL/cwa-verify-temp-data/' target='_blank'>Verify Temp Data</a>
 			<li><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student CW Assessment V2</a>
 			</ul>
 
@@ -470,6 +471,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-show-saved-email/' target='_blank'>Show Saved Email</a>
 			<li><a href='$siteURL/utility-show-offsets-for-a-country-or-zip-code/' target='_blank'>UTILITY Show Offsets for a Country or Zip Code</a>
 			<li><a href='$siteURL/utility-calculate-utc/' target='_blank'>UTILITY: Calculate UTC</a>
+			<li><a href='$siteURL/cwa-verify-temp-data/' target='_blank'>Verify Temp Data</a>
 			</ul>
 			</td>
 			</tr>
