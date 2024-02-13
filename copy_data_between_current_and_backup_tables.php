@@ -491,7 +491,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 			} elseif ($inp_request		== "student2") {
 				$copyStudent2_to_Student							= TRUE;
 				$doContinue											= TRUE;
-			} elseif ($inp_request		== "TempData2") {
+			} elseif ($inp_request		== "tempdata2") {
 				$copyTempData2_to_TempData							= TRUE;
 				$doContinue											= TRUE;
 			} elseif ($inp_request		== "advisordeleted2") {
