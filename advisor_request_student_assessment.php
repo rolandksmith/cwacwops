@@ -74,7 +74,7 @@ function advisor_request_student_assessment_func() {
 	$inp_questions				= '';
 	$inp_words					= '';
 	$inp_chars					= '';
-	$inp_callsigns				= '';
+	$inp_cscount				= '';
 	$inp_makeup					= '';
 	$inp_answers				= '';
 	$inp_vocab					= '';
@@ -84,6 +84,8 @@ function advisor_request_student_assessment_func() {
 	$advisor_first_name			= '';
 	$advisor_last_name			= '';
 	$advisorClassCount			= 0;
+	$advisorEmail				= '';
+	$incl_advisor				= 'N';
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -128,9 +130,9 @@ function advisor_request_student_assessment_func() {
 				$inp_chars		 = $str_value;
 				$inp_chars		 = filter_var($inp_chars,FILTER_UNSAFE_RAW);
 			}
-			if ($str_key 		== "inp_callsigns") {
-				$inp_callsigns		 = $str_value;
-				$inp_callsigns		 = filter_var($inp_callsigns,FILTER_UNSAFE_RAW);
+			if ($str_key 		== "inp_cscount") {
+				$inp_cscount		 = $str_value;
+				$inp_cscount		 = filter_var($inp_cscount,FILTER_UNSAFE_RAW);
 			}
 			if ($str_key 		== "inp_makeup") {
 				$inp_makeup		 = $str_value;
@@ -160,9 +162,13 @@ function advisor_request_student_assessment_func() {
 				$inp_callsign		 = $str_value;
 				$inp_callsign		 = strtoupper(filter_var($inp_callsign,FILTER_UNSAFE_RAW));
 			}
+			if ($str_key 			== "incl_advisor") {
+				$incl_advisor		 = $str_value;
+				$incl_advisor		 = strtoupper(filter_var($incl_advisor,FILTER_UNSAFE_RAW));
+			}
 			if ($str_key 			== "token") {
-				$token		 = $str_value;
-				$token		 = strtoupper(filter_var($token,FILTER_UNSAFE_RAW));
+				$token				 = $str_value;
+				$token		 		= strtoupper(filter_var($token,FILTER_UNSAFE_RAW));
 			}
 			if ($str_key 			== "nextClass") {
 				$nextClass		 = $str_value;
@@ -327,7 +333,7 @@ td:last-child {
 			if ($numARows > 0) {
 				$content			.= "<h3>$jobname</h3>
 										<p>Indicate which of your students should do the 
-										Morse code assessment. Then indicate what the 
+										Morse code assessment. Then select the 
 										parameters for the assessment</p>
 										<p>If you have more than one class, after you make the 
 										selections for the first class and send the assessment 
@@ -384,7 +390,7 @@ td:last-child {
 					if ($advisorClassCount == 0) {
 						$content		.= "<b>ERROR</b> There are no class records for advisor $inp_callsign";
 					} else {
-						$strtopass		= "inp_callsign=$inp_callsign&advisor_first_name=$advisor_first_name&advisor_last_name=$advisor_last_name&advisorClassCount=$advisorClassCount";
+						$strtopass		= "inp_callsign=$inp_callsign&advisor_first_name=$advisor_first_name&advisor_last_name=$advisor_last_name&advisorClassCount=$advisorClassCount&advisorEmail=$advisor_email";
 						$enstr			= base64_encode($strtopass);
 						$strPass		= "2";
 						$nextClass		= 1;
@@ -553,7 +559,7 @@ td:last-child {
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='1'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='3'>";
-					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_callsigns' value='0'>No Callsigns";
+					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value=''>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
 					$vocab_params		= "<input type='hidden' name='inp_vocab' value='threek'>";
@@ -571,10 +577,10 @@ td:last-child {
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='2'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='4'>";
-					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_callsigns' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='1'>1 Callsign<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='0'>2 Callsigns";
-					$makeup_params		= "<input type='hidden' name='inp_makeup' value='(3-4)'>";
+					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
+					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-4'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
 					$vocab_params		= "<input type='hidden' name='inp_vocab' value='threek'>";
 				} elseif($advisorClass_level == 'Intermediate') {
@@ -591,9 +597,9 @@ td:last-child {
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='2'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='4'>";
-					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_callsigns' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='1'>1 Callsign<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='0'>2 Callsigns";
+					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-5'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
 					$vocab_params		= "<input type='hidden' name='inp_vocab' value='threek'>";
@@ -612,9 +618,9 @@ td:last-child {
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='3'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='5'>";
-					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_callsigns' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='1'>1 Callsign<br />
-										   <input type='radio' class='formInputButton' name='inp_callsigns' value='0'>2 Callsigns";
+					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-5'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='7'>";
 					$vocab_params		= "<input type='hidden' name='inp_vocab' value='threek'>";
@@ -635,8 +641,12 @@ td:last-child {
 								$answers_params
 								$vocab_params
 								<table>
-								<tr><td style='vertical-align:top;'>Select Student for Evaluation<br />
-												$studentList</td>
+								<tr><td style='vertical-align:top;'>Select Students for Evaluation<br />
+												$studentList
+												<br />Include Advisor?<br />
+												<input type='radio' class='formInputButton' name='incl_advisor' value='N' checked> No<br />
+												<input type='radio' class='formInputButton' name='incl_advisor' value='Y'> Yes</td>
+												</td>
 									<td style='vertical-align:top;'>Select Speed Parameters<br /><br />
 										Characters per Minute:<br />
 										$wpm_params<br /><br />
@@ -662,6 +672,10 @@ td:last-child {
 		if ($doDebug) {
 			echo "Arrived at pass $strPass<br />";
 		}
+		if ($incl_advisor == 'Y') {
+			$inp_students[]			= 'advisor';
+		}
+		
 		if ($doDebug) {
 			echo "inp_students<br /><pre>";
 			print_r($inp_students);
@@ -669,217 +683,243 @@ td:last-child {
 		}
 		
 		foreach($inp_students as $thisID) {
-		
-
-			$sql					= "select * from $studentTableName 
-										where student_id = $thisID";
-			$wpw1_cwa_student		= $wpdb->get_results($sql);
-			if ($wpw1_cwa_student === FALSE) {
-				handleWPDBError($jobname,$doDebug);
+			if ($doDebug) {
+				echo "<br />Processing inp_students ... thisID: $thisID<br />";
+			}
+			if ($thisID == 'advisor') {
+				$student_first_name		= $advisor_first_name;
+				$student_last_name		= $advisor_last_name;
+				$student_call_sign		= $inp_callsign;
+				$student_level			= "--";
+				$student_email			= $advisorEmail;
+				$haveData				= TRUE;
+				$haveUsername			= TRUE;						
 			} else {
-				$lastError			= $wpdb->last_error;
-				if ($lastError != '') {
+
+				$sql					= "select * from $studentTableName 
+											where student_id = $thisID";
+				$wpw1_cwa_student		= $wpdb->get_results($sql);
+				if ($wpw1_cwa_student === FALSE) {
 					handleWPDBError($jobname,$doDebug);
-					$content		.= "Fatal program error. System Admin has been notified";
-					return $content;
-				}
-				$numSRows			= $wpdb->num_rows;
-				if ($doDebug) {
-					$myStr			= $wpdb->last_query;
-					echo "ran $myStr<br />and found $numSRows rows<br />";
-				}
-				if ($numSRows > 0) {
-					foreach ($wpw1_cwa_student as $studentRow) {
-						$student_ID								= $studentRow->student_id;
-						$student_call_sign						= strtoupper($studentRow->call_sign);
-						$student_first_name						= $studentRow->first_name;
-						$student_last_name						= stripslashes($studentRow->last_name);
-						$student_email  						= strtolower(strtolower($studentRow->email));
-						$student_phone  						= $studentRow->phone;
-						$student_ph_code						= $studentRow->ph_code;
-						$student_city  							= $studentRow->city;
-						$student_state  						= $studentRow->state;
-						$student_zip_code  						= $studentRow->zip_code;
-						$student_country  						= $studentRow->country;
-						$student_country_code					= $studentRow->country_code;
-						$student_time_zone  					= $studentRow->time_zone;
-						$student_timezone_id					= $studentRow->timezone_id;
-						$student_timezone_offset				= $studentRow->timezone_offset;
-						$student_whatsapp						= $studentRow->whatsapp_app;
-						$student_signal							= $studentRow->signal_app;
-						$student_telegram						= $studentRow->telegram_app;
-						$student_messenger						= $studentRow->messenger_app;					
-						$student_wpm 	 						= $studentRow->wpm;
-						$student_youth  						= $studentRow->youth;
-						$student_age  							= $studentRow->age;
-						$student_student_parent 				= $studentRow->student_parent;
-						$student_student_parent_email  			= strtolower($studentRow->student_parent_email);
-						$student_level  						= $studentRow->level;
-						$student_waiting_list 					= $studentRow->waiting_list;
-						$student_request_date  					= $studentRow->request_date;
-						$student_semester						= $studentRow->semester;
-						$student_notes  						= $studentRow->notes;
-						$student_welcome_date  					= $studentRow->welcome_date;
-						$student_email_sent_date  				= $studentRow->email_sent_date;
-						$student_email_number  					= $studentRow->email_number;
-						$student_response  						= strtoupper($studentRow->response);
-						$student_response_date  				= $studentRow->response_date;
-						$student_abandoned  					= $studentRow->abandoned;
-						$student_student_status  				= strtoupper($studentRow->student_status);
-						$student_action_log  					= $studentRow->action_log;
-						$student_pre_assigned_advisor  			= $studentRow->pre_assigned_advisor;
-						$student_selected_date  				= $studentRow->selected_date;
-						$student_no_catalog			 			= $studentRow->no_catalog;
-						$student_hold_override  				= $studentRow->hold_override;
-						$student_messaging  					= $studentRow->messaging;
-						$student_assigned_advisor  				= $studentRow->assigned_advisor;
-						$student_advisor_select_date  			= $studentRow->advisor_select_date;
-						$student_advisor_class_timezone 		= $studentRow->advisor_class_timezone;
-						$student_hold_reason_code  				= $studentRow->hold_reason_code;
-						$student_class_priority  				= $studentRow->class_priority;
-						$student_assigned_advisor_class 		= $studentRow->assigned_advisor_class;
-						$student_promotable  					= $studentRow->promotable;
-						$student_excluded_advisor  				= $studentRow->excluded_advisor;
-						$student_student_survey_completion_date	= $studentRow->student_survey_completion_date;
-						$student_available_class_days  			= $studentRow->available_class_days;
-						$student_intervention_required  		= $studentRow->intervention_required;
-						$student_copy_control  					= $studentRow->copy_control;
-						$student_first_class_choice  			= $studentRow->first_class_choice;
-						$student_second_class_choice  			= $studentRow->second_class_choice;
-						$student_third_class_choice  			= $studentRow->third_class_choice;
-						$student_first_class_choice_utc  		= $studentRow->first_class_choice_utc;
-						$student_second_class_choice_utc  		= $studentRow->second_class_choice_utc;
-						$student_third_class_choice_utc  		= $studentRow->third_class_choice_utc;
-						$student_catalog_options				= $studentRow->catalog_options;
-						$student_flexible						= $studentRow->flexible;
-						$student_date_created 					= $studentRow->date_created;
-						$student_date_updated			  		= $studentRow->date_updated;
-
-						$student_last_name 						= no_magic_quotes($student_last_name);
-						$student_excluded_advisor_array			= explode("|",$student_excluded_advisor);
-						
-						// determine if the student has a username record
-
-						$haveUsername		= FALSE;						
-						$sql				= "SELECT id
-												FROM `wpw1_users` 
-												where user_login like '$student_call_sign'";
-						$result				= $wpdb->get_results($sql);
-						if ($result === FALSE) {
-							handleWPDBError($jobname,$doDebug);
-						} else {
-							$numRows		= $wpdb->num_rows;
-							if ($doDebug) {
-								echo "ran $sql<br />and retrieved $numRows rows<br />";
+				} else {
+					$lastError			= $wpdb->last_error;
+					if ($lastError != '') {
+						handleWPDBError($jobname,$doDebug);
+						$content		.= "Fatal program error. System Admin has been notified";
+						return $content;
+					}
+					$numSRows			= $wpdb->num_rows;
+					if ($doDebug) {
+						$myStr			= $wpdb->last_query;
+						echo "ran $myStr<br />and found $numSRows rows<br />";
+					}
+					if ($numSRows > 0) {
+						foreach ($wpw1_cwa_student as $studentRow) {
+							$student_ID								= $studentRow->student_id;
+							$student_call_sign						= strtoupper($studentRow->call_sign);
+							$student_first_name						= $studentRow->first_name;
+							$student_last_name						= stripslashes($studentRow->last_name);
+							$student_email  						= strtolower(strtolower($studentRow->email));
+							$student_phone  						= $studentRow->phone;
+							$student_ph_code						= $studentRow->ph_code;
+							$student_city  							= $studentRow->city;
+							$student_state  						= $studentRow->state;
+							$student_zip_code  						= $studentRow->zip_code;
+							$student_country  						= $studentRow->country;
+							$student_country_code					= $studentRow->country_code;
+							$student_time_zone  					= $studentRow->time_zone;
+							$student_timezone_id					= $studentRow->timezone_id;
+							$student_timezone_offset				= $studentRow->timezone_offset;
+							$student_whatsapp						= $studentRow->whatsapp_app;
+							$student_signal							= $studentRow->signal_app;
+							$student_telegram						= $studentRow->telegram_app;
+							$student_messenger						= $studentRow->messenger_app;					
+							$student_wpm 	 						= $studentRow->wpm;
+							$student_youth  						= $studentRow->youth;
+							$student_age  							= $studentRow->age;
+							$student_student_parent 				= $studentRow->student_parent;
+							$student_student_parent_email  			= strtolower($studentRow->student_parent_email);
+							$student_level  						= $studentRow->level;
+							$student_waiting_list 					= $studentRow->waiting_list;
+							$student_request_date  					= $studentRow->request_date;
+							$student_semester						= $studentRow->semester;
+							$student_notes  						= $studentRow->notes;
+							$student_welcome_date  					= $studentRow->welcome_date;
+							$student_email_sent_date  				= $studentRow->email_sent_date;
+							$student_email_number  					= $studentRow->email_number;
+							$student_response  						= strtoupper($studentRow->response);
+							$student_response_date  				= $studentRow->response_date;
+							$student_abandoned  					= $studentRow->abandoned;
+							$student_student_status  				= strtoupper($studentRow->student_status);
+							$student_action_log  					= $studentRow->action_log;
+							$student_pre_assigned_advisor  			= $studentRow->pre_assigned_advisor;
+							$student_selected_date  				= $studentRow->selected_date;
+							$student_no_catalog			 			= $studentRow->no_catalog;
+							$student_hold_override  				= $studentRow->hold_override;
+							$student_messaging  					= $studentRow->messaging;
+							$student_assigned_advisor  				= $studentRow->assigned_advisor;
+							$student_advisor_select_date  			= $studentRow->advisor_select_date;
+							$student_advisor_class_timezone 		= $studentRow->advisor_class_timezone;
+							$student_hold_reason_code  				= $studentRow->hold_reason_code;
+							$student_class_priority  				= $studentRow->class_priority;
+							$student_assigned_advisor_class 		= $studentRow->assigned_advisor_class;
+							$student_promotable  					= $studentRow->promotable;
+							$student_excluded_advisor  				= $studentRow->excluded_advisor;
+							$student_student_survey_completion_date	= $studentRow->student_survey_completion_date;
+							$student_available_class_days  			= $studentRow->available_class_days;
+							$student_intervention_required  		= $studentRow->intervention_required;
+							$student_copy_control  					= $studentRow->copy_control;
+							$student_first_class_choice  			= $studentRow->first_class_choice;
+							$student_second_class_choice  			= $studentRow->second_class_choice;
+							$student_third_class_choice  			= $studentRow->third_class_choice;
+							$student_first_class_choice_utc  		= $studentRow->first_class_choice_utc;
+							$student_second_class_choice_utc  		= $studentRow->second_class_choice_utc;
+							$student_third_class_choice_utc  		= $studentRow->third_class_choice_utc;
+							$student_catalog_options				= $studentRow->catalog_options;
+							$student_flexible						= $studentRow->flexible;
+							$student_date_created 					= $studentRow->date_created;
+							$student_date_updated			  		= $studentRow->date_updated;
+	
+							$student_last_name 						= no_magic_quotes($student_last_name);
+							$student_excluded_advisor_array			= explode("|",$student_excluded_advisor);
+							
+							// determine if the student has a username record
+	
+							$haveData			= TRUE;
+							$haveUsername		= FALSE;						
+							$sql				= "SELECT id
+													FROM `wpw1_users` 
+													where user_login like '$student_call_sign'";
+							$result				= $wpdb->get_results($sql);
+							if ($result === FALSE) {
+								handleWPDBError($jobname,$doDebug);
+							} else {
+								$numRows		= $wpdb->num_rows;
+								if ($doDebug) {
+									echo "ran $sql<br />and retrieved $numRows rows<br />";
+								}
+								if ($numRows > 0) {
+									$haveUsername	= TRUE;
+								}
 							}
-							if ($numRows > 0) {
-								$haveUsername	= TRUE;
-							}
-						}
-						
-						// format and send the email to the student
-						$theSubject			= "CW Academy Request for You";
-						$theContent			= "To: $student_last_name, $student_first_name ($student_call_sign):
-<p>Your $student_level Level class advisor $advisor_first_name $advisor_last_name ($inp_callsign) has requested 
-that you do a Morse code proficiency assessment.</p>";
-						if (!$haveUsername) {
-							$theContent		.= "<p>Since you signed up for you $student_level Level 
-class, CW Academy has implemented additional user data security measures. You will need to set up 
-a username and password, read the email that will be sent to you, verify your username, and then 
-log in to the CW Academy website. To set up your username and password, click 
-<a href='https://cwa.cwops.org/register/'>HERE</a></p>";
-						} else {
-							$theContent		.= "<p>Please log into the CW Academy website by 
-clicking <a href='https://cwa.cwops.org/program-list/'>HERE</a> and follow the instructions that 
-will be displayed there.</p>";
-						}
-						$theContent		.= "<p>73,<br />CW Academy</p>";
-						if ($testMode) {
-							$theSubject	= "TESTMODE $theSubject";
-							$myTo		= "rolandksmith@gmail.com";
-							$mailCode	= '2';
-						} else {
-							$myTo		= $student_email;
-							$mailCode	= '13';
-						}
-						$mailResult		= emailFromCWA_v2(array('theRecipient'=>$myTo,
-																	'theSubject'=>$theSubject,
-																	'theContent'=>$theContent,
-																	'theCc'=>'',
-																	'theAttachment'=>'',
-																	'mailCode'=>$mailCode,
-																	'jobname'=>$jobname,
-																	'increment'=>0,
-																	'testMode'=>$testMode,
-																	'doDebug'=>$doDebug));
-						if ($mailResult === FALSE) {
-							if ($doDebug) {
-								echo "sending the email to $myTo failed<br />";
-								sendErrorEmail("$jobname sending email to $myTo failed");
-							}
-						} else {
-							if ($doDebug) {
-								echo "email sent<br />";
-							}
-						}
- 
-						// format and store the reminder for the student
-						$myStr				= '0';
-						if ($inp_callsigns != '' && $inp_callsigns > 0) {
-							$myStr			= $inp_callsigns . "($inp_makeup)";
-						}
-						
-						$thisCallsign		= $student_call_sign;		// person doing the assessment
-						$thiswpm			= $inp_wpm;					// word per minute
-						$thiseff			= $inp_eff;					// effective speed
-						$thisFreq			= $inp_freq;				// list of frequencies 400 - 700
-						$thisQuestions		= $inp_questions;			// number of questions 
-						$thisWords			= $inp_words;				// number of words per question
-						$thisCharacters		= $inp_chars;				// max characters per word 3,4,5,6
-						$thisCallsigns		= $myStr;					// how many callsigns to include 2(2-5)
-						$thisAnswers		= $inp_answers;				// how many answers to display
-						$thisLevel			= $student_level;			// level of the exam
-						$token				= mt_rand();				// token to identify this activity
-						$thisVocab			= "threek";					// either threek or original
-						$thisInfor			= "Advisor Request";		// reason for the assessment
-
-						$url 		= "<a href='https://cw-assessment.vercel.app?mode=specific&callsign=$thisCallsign&cpm=$thiswpm&eff=$thiseff&freq=$thisFreq&questions=$thisQuestions&words=$thisWords&characters=$thisCharacters&callsigns=$thisCallsigns&answers=$thisAnswers&level=$thisLevel&token=$token&vocab=$thisVocab&infor=$thisInfor";
-						$myStr		= "$siteURL/cwa-advisor-request-student-assessment/?strpass=10&inp_callsign=$student_call_sign&token=$token";
-						$returnurl	= urlencode($myStr);
-						$url		= "$url" . "&returnurl=$returnurl'>Perform Assessment</a>";
-						
-						$reminder_text		= "<b>Morse Code Assessment</b> Your advisor $inp_callsign 
-requests that you do a Morse code proficiency assessment. The assessment program will give you five 
-questions in Morse code and then display a set of multiple choice answers to chose from. When you 
-complete the assessment, the program will display your results and will also make the results 
-available to your advisor. To start the assessment, please click $url.";
-						$effective_date		 	= date('Y-m-d H:i:s');
-						$closeStr				= strtotime("+5 days");
-						$close_date				= date('Y-m-d H:i:s', $closeStr);
-						$inputParams		= array("effective_date|$effective_date|s",
-													"close_date|$close_date|s",
-													"resolved_date||s",
-													"send_reminder|N|s",
-													"send_once|N|s",
-													"call_sign|$student_call_sign|s",
-													"role||s",
-													"email_text||s",
-													"reminder_text|$reminder_text|s",
-													"resolved||s",
-													"token|$token|s");
-						$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
-						if ($insertResult[0] === FALSE) {
-							if ($doDebug) {
-								echo "inserting reminder failed: $insertResult[1]<br />";
-							}
-							$content		.= "Inserting reminder failed: $insertResult[1]<br />";
-						} else {
-							$content		.= "Reminder successfully added<br />";
 						}
 					}
 				}
 			}
+			if ($doDebug) {
+				if ($haveData) {
+					echo "haveData is TRUE. Sending email and setting reminder<br />";
+				} else {
+					echo "haveData is FALSE. No email and no reminder<br />";
+				}
+				if ($haveUsername) {
+					echo "haveUsername is TRUE<br />";
+				} else {
+					echo "haveUsername is FALSE<br />";
+				}
+			}	
+			if ($haveData) {	
+											
+				// format and send the email to the student
+				$theSubject			= "CW Academy Request for You";
+				$theContent			= "To: $student_last_name, $student_first_name ($student_call_sign):
+<p>Your $student_level Level class advisor $advisor_first_name $advisor_last_name ($inp_callsign) has requested 
+that you do a Morse code proficiency assessment.</p>";
+				if (!$haveUsername) {
+					$theContent		.= "<p>Since you signed up for you $student_level Level 
+class, CW Academy has implemented additional user data security measures. You will need to set up 
+a username and password, read the email that will be sent to you, verify your username, and then 
+log in to the CW Academy website. To set up your username and password, click 
+<a href='https://cwa.cwops.org/register/'>HERE</a></p>";
+				} else {
+					$theContent		.= "<p>Please log into the CW Academy website by 
+clicking <a href='https://cwa.cwops.org/program-list/'>HERE</a> and follow the instructions that 
+will be displayed there.</p>";
+				}
+				$theContent		.= "<p>73,<br />CW Academy</p>";
+				if ($testMode) {
+					$theSubject	= "TESTMODE $theSubject";
+					$myTo		= "rolandksmith@gmail.com";
+					$mailCode	= '2';
+				} else {
+					$myTo		= $student_email;
+					$mailCode	= '13';
+				}
+				$mailResult		= emailFromCWA_v2(array('theRecipient'=>$myTo,
+															'theSubject'=>$theSubject,
+															'theContent'=>$theContent,
+															'theCc'=>'',
+															'theAttachment'=>'',
+															'mailCode'=>$mailCode,
+															'jobname'=>$jobname,
+															'increment'=>0,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug));
+				if ($mailResult === FALSE) {
+					if ($doDebug) {
+						echo "sending the email to $myTo failed<br />";
+						sendErrorEmail("$jobname sending email to $myTo failed");
+					}
+				} else {
+					if ($doDebug) {
+						echo "email sent<br />";
+					}
+				}
 
+				// format and store the reminder for the student
+				$myStr				= '0';
+				if ($inp_cscount != '' && $inp_cscount > 0) {
+					$myStr			= $inp_cscount . "($inp_makeup)";
+				}
+				
+				$thisCallsign		= $student_call_sign;		// person doing the assessment
+				$thiswpm			= $inp_wpm;					// word per minute
+				$thiseff			= $inp_eff;					// effective speed
+				$thisFreq			= $inp_freq;				// list of frequencies 400 - 700
+				$thisQuestions		= $inp_questions;			// number of questions 
+				$thisWords			= $inp_words;				// number of words per question
+				$thisCharacters		= $inp_chars;				// max characters per word 3,4,5,6
+				$thisCallsigns		= $myStr;					// how many callsigns to include 2(2-5)
+				$thisAnswers		= $inp_answers;				// how many answers to display
+				$thisLevel			= $student_level;			// level of the exam
+				$token				= mt_rand();				// token to identify this activity
+				$thisVocab			= "threek";					// either threek or original
+				$thisInfor			= "Advisor Request";		// reason for the assessment
+
+				$url 		= "<a href='https://cw-assessment.vercel.app?mode=specific&callsign=$thisCallsign&cpm=$thiswpm&eff=$thiseff&freq=$thisFreq&questions=$thisQuestions&words=$thisWords&characters=$thisCharacters&callsigns=$thisCallsigns&answers=$thisAnswers&level=$thisLevel&token=$token&vocab=$thisVocab&infor=$thisInfor";
+				$myStr		= "$siteURL/cwa-advisor-request-student-assessment/?strpass=10&inp_callsign=$student_call_sign&token=$token";
+				$returnurl	= urlencode($myStr);
+				$url		= "$url" . "&returnurl=$returnurl'>Perform Assessment</a>";
+				
+				$reminder_text		= "<b>Morse Code Assessment</b> Your advisor $inp_callsign 
+requests that you do a Morse code proficiency assessment. The assessment program will give you five 
+questions in Morse code and then display a set of multiple choice answers to chose from. When you 
+complete the assessment, the program will display your results and will also make the results 
+available to your advisor. To start the assessment, please click $url.";
+				$effective_date		 	= date('Y-m-d H:i:s');
+				$closeStr				= strtotime("+5 days");
+				$close_date				= date('Y-m-d H:i:s', $closeStr);
+				$inputParams		= array("effective_date|$effective_date|s",
+											"close_date|$close_date|s",
+											"resolved_date||s",
+											"send_reminder|N|s",
+											"send_once|N|s",
+											"call_sign|$student_call_sign|s",
+											"role||s",
+											"email_text||s",
+											"reminder_text|$reminder_text|s",
+											"resolved||s",
+											"token|$token|s");
+				$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
+				if ($insertResult[0] === FALSE) {
+					if ($doDebug) {
+						echo "inserting reminder failed: $insertResult[1]<br />";
+					}
+					$content		.= "Inserting reminder failed: $insertResult[1]<br />";
+				} else {
+					$content		.= "Reminder successfully added<br />";
+				}
+			}
 		}
 		if ($nextClass <= $advisorClassCount) {
 			$content		.= "<h4>Next Class</h4>
