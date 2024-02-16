@@ -48,10 +48,6 @@ function verify_temp_data_func() {
 	$deleteCount		= 0;
 	$currentDate		= date('Y-m-d H:i:s');
 	
-//	CHECK THIS!								//////////////////////
-	if ($validUser == "N") {
-		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
-	}
 
 	if (!in_array($userName,$validTestmode) && $doDebug) {	// turn off doDebug if not a testmode user
 		$doDebug			= FALSE;
