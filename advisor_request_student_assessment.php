@@ -547,38 +547,38 @@ td:last-child {
 				// buildclass selection
 				if ($advisorClass_level == 'Beginner') {
 					$wpm_params			= "<input type='radio' class='formInputButton' name='inp_wpm' value='15'> 15cpm<br />
-											<input type='radio' class='formInputButton' name='inp_wpm' value='18'> 18cpm<br />
+											<input type='radio' class='formInputButton' name='inp_wpm' value='18' checked> 18cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='20'> 20cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='25'> 25cpm";
 					$eff_params			= "<input type='radio' class='formInputButton' name='inp_eff' value='4'> 4wpm Effective<br />
-											<input type='radio' class='formInputButton' name='inp_eff' value='6'> 6wpm Effective<br />
+											<input type='radio' class='formInputButton' name='inp_eff' value='6' checked> 6wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='8'> 8wpm Effective";
 					$freq_params		= "<input type='hidden' name='inp_freq' value='450,550,600,700'>";
 					$questions_params	= "<input type='radio' class='formInputButton' name='inp_questions' value='3'>3 Questions<br />
-										   <input type='radio' class='formInputButton' name='inp_questions' value='5'> 5 Questions<br />
+										   <input type='radio' class='formInputButton' name='inp_questions' value='5' checked> 5 Questions<br />
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='1'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='3'>";
-					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns";
+					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0' checked>No Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value=''>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
 					$vocab_params		= "<input type='hidden' name='inp_vocab' value='threek'>";
 				} elseif ($advisorClass_level == 'Fundamental') {
 					$wpm_params			= "<input type='radio' class='formInputButton' name='inp_wpm' value='18'> 18cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='20'> 20cpm<br />
-											<input type='radio' class='formInputButton' name='inp_wpm' value='25'> 25cpm";
+											<input type='radio' class='formInputButton' name='inp_wpm' value='25' checked> 25cpm";
 					$eff_params			= "<input type='radio' class='formInputButton' name='inp_eff' value='6'> 6wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='8'> 8wpm Effective<br />
-											<input type='radio' class='formInputButton' name='inp_eff' value='10'> 10wpm Effective<br />
+											<input type='radio' class='formInputButton' name='inp_eff' value='10' checked> 10wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='12'> 12wpm Effective";
 					$freq_params		= "<input type='hidden' name='inp_freq' value='450,550,600,700'>";
 					$questions_params	= "<input type='radio' class='formInputButton' name='inp_questions' value='3'>3 Questions<br />
-										   <input type='radio' class='formInputButton' name='inp_questions' value='5'> 5 Questions<br />
+										   <input type='radio' class='formInputButton' name='inp_questions' value='5' checked> 5 Questions<br />
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='2'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='4'>";
 					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1' checked>1 Callsign<br />
 										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-4'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
@@ -586,19 +586,19 @@ td:last-child {
 				} elseif($advisorClass_level == 'Intermediate') {
 					$wpm_params			= "<input type='radio' class='formInputButton' name='inp_wpm' value='18'> 18cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='20'> 20cpm<br />
-											<input type='radio' class='formInputButton' name='inp_wpm' value='25'> 25cpm";
+											<input type='radio' class='formInputButton' name='inp_wpm' value='25' vhrvkrf> 25cpm";
 					$eff_params			= "<input type='radio' class='formInputButton' name='inp_eff' value='13'> 13wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='15'> 15wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='18'> 18wpm Effective<br />
-											<input type='radio' class='formInputButton' name='inp_eff' value='18'> 20wpm Effective";
+											<input type='radio' class='formInputButton' name='inp_eff' value='18' checked> 20wpm Effective";
 					$freq_params		= "<input type='hidden' name='inp_freq' value='450,550,600,700'>";
 					$questions_params	= "<input type='radio' class='formInputButton' name='inp_questions' value='3'>3 Questions<br />
-										   <input type='radio' class='formInputButton' name='inp_questions' value='5'> 5 Questions<br />
+										   <input type='radio' class='formInputButton' name='inp_questions' value='5' checked> 5 Questions<br />
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='2'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='4'>";
 					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1' checked>1 Callsign<br />
 										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-5'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='5'>";
@@ -606,20 +606,20 @@ td:last-child {
 				} elseif ($advisorClass_level == 'Advanced') {
 					$wpm_params			= "<input type='radio' class='formInputButton' name='inp_wpm' value='20'> 20cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='25'> 25cpm<br />
-											<input type='radio' class='formInputButton' name='inp_wpm' value='30'> 30cpm<br />
+											<input type='radio' class='formInputButton' name='inp_wpm' value='30' checked> 30cpm<br />
 											<input type='radio' class='formInputButton' name='inp_wpm' value='35'> 35cpm";
 					$eff_params			= "<input type='radio' class='formInputButton' name='inp_eff' value='20'> 20wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='25'> 25wpm Effective<br />
-											<input type='radio' class='formInputButton' name='inp_eff' value='30'> 30wpm Effective<br />
+											<input type='radio' class='formInputButton' name='inp_eff' value='30' checked> 30wpm Effective<br />
 											<input type='radio' class='formInputButton' name='inp_eff' value='35'> 35wpm Effective<br />";
 					$freq_params		= "<input type='hidden' class='formInputButton' name='inp_freq' value='450,550,600,700'>";
 					$questions_params	= "<input type='radio' class='formInputButton' name='inp_questions' value='3'>3 Questions<br />
-										   <input type='radio' class='formInputButton' name='inp_questions' value='5'> 5 Questions<br />
+										   <input type='radio' class='formInputButton' name='inp_questions' value='5' checked> 5 Questions<br />
 										   <input type='radio' class='formInputButton' name='inp_questions' value='7'> 7 Questions";
 					$words_params		= "<input type='hidden' name='inp_words' value='3'>";
 					$characters_params	= "<input type='hidden' name='inp_chars' value='5'>";
 					$callsigns_params	= "<input type='radio' class='formInputButton' name='inp_cscount' value='0'>No Callsigns<br />
-										   <input type='radio' class='formInputButton' name='inp_cscount' value='1'>1 Callsign<br />
+										   <input type='radio' class='formInputButton' name='inp_cscount' value='1' checked>1 Callsign<br />
 										   <input type='radio' class='formInputButton' name='inp_cscount' value='2'>2 Callsigns";
 					$makeup_params		= "<input type='hidden' name='inp_makeup' value='3-5'>";
 					$answers_params		= "<input type='hidden' name='inp_answers' value='7'>";
@@ -648,7 +648,7 @@ td:last-child {
 												<input type='radio' class='formInputButton' name='incl_advisor' value='Y'> Yes</td>
 												</td>
 									<td style='vertical-align:top;'>Select Speed Parameters<br /><br />
-										Characters per Minute:<br />
+										Character Speed in words per Minute:<br />
 										$wpm_params<br /><br />
 										Effective (Farnsworth) Speed:<br />
 										$eff_params</td>
@@ -659,6 +659,26 @@ td:last-child {
 										$callsigns_params</td></tr>
 								<tr><td colspan='3'><input class='formInputButton' type='submit' value='Submit' /></td></tr>
 								</table></form>";
+				if ($advisorClass_level == 'Beginner') {
+					$content	.= "<p>You can change the speed and number of questions parameters. Callsigns are not 
+									available for Beginner Level students. The questions will consist of 2-3 character 
+									words or abbreviations.</p>";
+				} elseif ($advisorClass_level == 'Fundamental') {
+					$content	.= "<p>You can change the speed and questions parameters. If any callsigns are selected, 
+									they will be included in the number of questions selected. Questions will consist of 
+									2-3 character words or abbreviations. Each question will be either a callsign (if 
+									callsigns were selected) or two words or abbreviations.<p>";
+				} elseif ($advisorClass_level == 'Intermediate') {
+					$content	.= "<p>You can change the speed and questions parameters. If any callsigns are selected, 
+									they will be included in the number of questions selected. Questions will consist of 
+									2-4 character words or abbreviations. Each question will be either a callsign (if 
+									callsigns were selected) or two words or abbreviations.<p>";
+				} elseif ($advisorClass_level == 'Advanced') {
+					$content	.= "<p>You can change the speed and questions parameters. If any callsigns are selected, 
+									they will be included in the number of questions selected. Questions will consist of 
+									2-5 character words or abbreviations. Each question will be either a callsign (if 
+									callsigns were selected) or two words or abbreviations.<p>";
+				}
 			} else {
 				$content	.= "No advisor record found for $inp_callsign";
 			}
@@ -892,8 +912,11 @@ will be displayed there.</p>";
 				$url		= "$url" . "&returnurl=$returnurl'>Perform Assessment</a>";
 				
 				$reminder_text		= "<b>Morse Code Assessment</b> Your advisor $inp_callsign 
-requests that you do a Morse code proficiency assessment. The assessment program will give you five 
-questions in Morse code and then display a set of multiple choice answers to chose from. When you 
+requests that you do a Morse code proficiency assessment. The assessment program will give you $thisQuestions 
+questions in Morse code and then display a set of multiple choice answers to chose from. The questions will 
+consist of $thisWords words. Each word will have 2-$thisCharacters characters, some of which may be abbreviations 
+ot random characters. After 
+starting the assessment, the program will show some generic information about the process. When you 
 complete the assessment, the program will display your results and will also make the results 
 available to your advisor. To start the assessment, please click $url.";
 				$effective_date		 	= date('Y-m-d H:i:s');
