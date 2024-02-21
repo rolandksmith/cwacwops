@@ -226,8 +226,9 @@ function advisor_registration_v3_func() {
 					}
 					if ($thisArray[0] == 'semester') {
 						$allowSignup	= TRUE;
+						$inp_semester	= $thisArray[1];
 						if ($doDebug) {
-							echo "allowSignup is TRUE<br />";
+							echo "allowSignup is TRUE<br />inp_semester set to $inp_semester<br />";
 						}
 					}
 				}
@@ -913,15 +914,7 @@ function getAdvisorInfoToDisplay($inp_callsign,$inp_semester,$noUpdate) {
 												order by sequence";
 				$cwa_advisorclass			= $wpdb->get_results($sql);
 				if ($cwa_advisorclass === FALSE) {
-					$myError			= $wpdb->last_error;
-					$myQuery			= $wpdb->last_query;
-					if ($doDebug) {
-						echo "Reading $advisorClassTableName table failed<br />
-							  wpdb->last_query: $myQuery<br />
-							  wpdb->last_error: $myError<br />";
-					}
-					$errorMsg			= "$jobname Reading $advisorClassTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-					sendErrorEmail($errorMsg);
+					handleWPDBError($jobname,$doDebug);
 				} else {
 					$numACRows				= $wpdb->num_rows;
 					if ($doDebug) {
@@ -967,7 +960,7 @@ function getAdvisorInfoToDisplay($inp_callsign,$inp_semester,$noUpdate) {
 								$thisIncomplete = "<td></td></tr>";
 							}
 							$result			.= "<td></td></tr></table>
-												<br />times<b>Class $advisorClass_sequence:</b>
+												<br /><b>Class $advisorClass_sequence:</b>
 												<table style='width:900px;'>
 												<tr><td style='vertical-align:top;width:300px;'><b>Sequence</b><br />
 														$advisorClass_sequence</td>
@@ -1196,7 +1189,7 @@ td:last-child {
 
 	if ("2" == $strPass) {
 		if ($doDebug) {
-			echo "At pass 2 with callsign: $inp_callsign<br />";
+			echo "At pass $strPass with callsign: $inp_callsign and inp_semester: $inp_semester<br />";
 		}
 		$userName					= $inp_callsign;		
 		
@@ -1209,22 +1202,13 @@ td:last-child {
 		// if so, go into modify mode. Otherwise, see if the advisor can signup
 		$sql					= "select * from $advisorTableName 
 									where call_sign='$inp_callsign' 
-									and (semester = '$currentSemester' 
-									or semester = '$nextSemester' 
+									and (semester = '$nextSemester' 
 									or semester = '$semesterTwo' 
 									or semester = '$semesterThree' 
 									or Semester = '$semesterFour')";
 		$cwa_advisor			= $wpdb->get_results($sql);
 		if ($cwa_advisor === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $advisorTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname Reading $advisorTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
+			handleWPDBError($jobname,$doDebug);
 		} else {
 			$numARows									= $wpdb->num_rows;
 			if ($doDebug) {
