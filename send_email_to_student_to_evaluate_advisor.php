@@ -22,6 +22,7 @@ function send_email_to_student_to_evaluate_advisor_func() {
  	Modified 17Apr23 by Roland to fix action_log
  	Modified 16June23 by Roland to use current tables rather than past tables
  	Modified 14Jul23 by Roland to use consolidated tables
+ 	Modified 2Mar24 by Roland to use send reminder email to the students
  *
 */
 
@@ -192,8 +193,14 @@ td:last-child {
 <p>Reads advisorClass table for the recent semester and formulates an email 
 to each student in the class asking the student to do an evaluation 
 of the class advisor and the curriculum.</p>
-<p>The email contains a link to the web page $siteURL/cw-academy-student-evaluation-of-advisor/
+<p>The email contains a link to the CW Academy web page Student Portal which will have 
+the reminder giving the student the link to do the actual evaluation.</p>
+
+
+$siteURL/cw-academy-student-evaluation-of-advisor/
 which has the evaluation form.</p>
+
+
 <p>The function will send an email to each student in the semester which can be anywhere 
 from 300 - 800 emails. The function will time out trying to send that many emails, so 
 the function writes a date/time to the student.student_survey_completion_date for 
@@ -422,7 +429,7 @@ $testModeOption
 																	  Advisor: $advisorName ($advisorClass_advisor_callsign)<br /><br />";
 													}
 													$my_message		= '';
-													$my_subject 	= "Thank You for Participating in your CW Academy Class";
+													$my_subject 	= "CW Academy -- Request to Evaluate Your Recent Class, Curriculum, and Advisor";
 													if ($testMode) {		// no emails to students!
 														$my_to		= "kcgator@gmail.com";
 														$mailCode	= 2;
@@ -433,12 +440,14 @@ $testModeOption
 														$my_to		= $student_email;
 														$mailCode	= 15;
 													}
+													$currentDate	= date('Y-m-d H:i:s');
+													$expireDate		= date('M d, Y', strtotime($currentDate . ' +5 days'));
 													$my_message 	.= "<p>To: $student_last_name, $student_first_name ($student_call_sign):</p>
 <p>Thank you for your participating in the $advisorClass_level CW Acadamy class with advisor $advisorName ($advisorClass_advisor_callsign). As the semester is concluding, 
 the CW Academy would like your opinion on the class, curriculum, and your advisor.</p>
 <p>The survey will take just a few minutes and your input will help CW Academy continue to innovate and improve.</p>
-<table style='border:4px solid red;'><tr><td><p>Please go to <a href='$evaluateAdvisorURL?inp_student=$student_call_sign&strpass=2&extMode=$extMode' target='_blank'>Student Evaluation of Advisor</a> 
-to fill out the survey.<p></td></tr></table>
+<table style='border:4px solid red;'><tr><td><p>Please go to <a href='$siteURL/program-list/'>CW Academy</a> and fill out the survey linked in the Reminder 
+at the top of your Student Portal. <b>NOTE: </b>The link to the survey will expire on $expireDate</p></td></tr></table>
 <p>Do not reply to this email as the mailbox is not monitored.</p>
 <p>Thanks and 73,<br />
 CW Academy</p>";
@@ -458,6 +467,36 @@ CW Academy</p>";
 														$content .= "A survey request email was sent to $my_to ($student_call_sign).<br />";
 														$emailsSent++;
 														$myInt--;
+														
+														// set up the reminder
+														$effective_date		 	= date('Y-m-d H:i:s');
+														$closeStr				= strtotime("+5 days");
+														$close_date				= date('Y-m-d H:i:s', $closeStr);
+														$token					= mt_rand();
+														$email_text				= "<p></p>";
+														$reminder_text			= "<p><b>Evaluate Class, Curriculum, and Advisor:</b> CW Academy is asking you to 
+																					fill out a survey form evaluating your class, the curriculum, and the 
+																					advisor. To fill out the survey, please click 
+																					<a href='$evaluateAdvisorURL?inp_student=$student_call_sign&strpass=2&extMode=$extMode&token=$token' target='_blank'>Student Evaluation of Advisor</a>.
+																					The link to the survey will on after $expireDate.</p>";
+														$inputParams		= array("effective_date|$effective_date|s",
+																					"close_date|$close_date|s",
+																					"resolved_date||s",
+																					"send_reminder||s",
+																					"send_once|Y|s",
+																					"call_sign|$student_call_sign|s",
+																					"role||s",
+																					"email_text|$email_text|s",
+																					"reminder_text|$reminder_text|s",
+																					"resolved||s",
+																					"token|$token|s");
+														$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
+														if ($insertResult[0] === FALSE) {
+															handleWPDBError($jobname,$doDebug);
+														} else {
+															$content		.= "Reminder successfully added<br />";
+														}
+
 														$student_action_log	= "$student_action_log / $myDate ADVISOREVAL Email sent to student requesting advisor evaluation ";
 														$studentUpdateData		= array('tableName'=>$studentTableName,
 																						'inp_method'=>'update',
