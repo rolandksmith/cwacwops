@@ -6,6 +6,7 @@ function list_new_registrations_v4_func(){
 	Modified 8Jan24 by Roland to add ability to ignore errors and no longer automatically 
 		some users
 	Modified 20Jan24 by Roland to record tracking data in temp_data
+	Modified 2Mar24 by Roland to only send missing signup email if no past or future studeht/advisor record found
 	
 */
 
@@ -461,12 +462,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 									$student_level	= '';
 									$student_semester = '';
 									$studentSQL		= "select * from $studentTableName 
-														where call_sign = '$user_uppercase'
-														and (semester = '$currentSemester' 
-															or semester = '$nextSemester' 
-															or semester = '$semesterTwo' 
-															or semester = '$semesterThree' 
-															or semester = '$semesterFour') 
+													 	where call_sign = '$user_uppercase'
 														order by date_created DESC 
 														limit 1";
 									$studentResult	= $wpdb->get_results($studentSQL);
@@ -490,11 +486,6 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 											$studentSQL			= "select * from $studentTableName 
 																	where (email='$myStr' or 
 																		   email='$user_email')
-																	and (semester = '$currentSemester' 
-																		or semester = '$nextSemester' 
-																		or semester = '$semesterTwo' 
-																		or semester = '$semesterThree' 
-																		or semester = '$semesterFour') 
 																	order by date_created DESC 
 																	limit 1";
 											$studentResult	= $wpdb->get_results($studentSQL);
@@ -1706,7 +1697,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 			$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
 <p>You recently obtained a username and password for the 
 CW Academy website, but did not sign for a class. Obtaining a CW Academy username and password does 
-not automatically sign you up for $article $user_role class. Please go to <a href='$siteURL/progran_list/'>CW 
+not automatically sign you up for $article $user_role class. Please go to <a href='$siteURL/program-list/'>CW 
 Academy</a> enter your usename and password, and sign up by clicking on the 'Sign up' button.<br />73,<br />CW Academy";
 			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
 														'theSubject'=>$theSubject,
@@ -1742,11 +1733,11 @@ Academy</a> enter your usename and password, and sign up by clicking on the 'Sig
 <p>Since you signed up to $textStr, CW Academy has implemented a new 
 user management system which will further isolate your personal information from the Internet. In order 
 to have access to the CW Academy website, you will need to obtain a username and a password.</p>
-<p>Please go to the <a href='https://cwa.cwops.org/program_list/'>CW Academy</a> and set up 
+<p>Please go to the <a href='https://cwa.cwops.org/program-list/'>CW Academy</a> and set up 
 your username and password. <b>NOTE!</b> Your username MUST be your amateur radio callsign, or, 
 if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Academy";
 
-			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$user_email,
+			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
 														'theSubject'=>$theSubject,
 														'theContent'=>$theContent,
 														'theCc'=>'',
@@ -1783,7 +1774,7 @@ creating yourusername and password, CW Academy has sent you
 an email with a link to verify that you were the person that 
 created the username and password.</p>
 <p>Please find that email and click on the link. If you can't 
-find the email, go to < href='https://cwa.cwops.org/program_list/'>CW Academy</a> 
+find the email, go to < href='https://cwa.cwops.org/program-list/'>CW Academy</a> 
 and enter your username and password. The program will send 
 you another email with a link to verify your username and password.</p>
 <p><b>NOTE: </b>Setting up your username and password DOES NOT automatically 
@@ -1791,7 +1782,7 @@ sign you up for a class. After verifying your username, you will need to log in
 to the CW Academy website and sign up for a class.</p>
 <br />73,<br />CW Academy";
 
-			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$user_email,
+			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
 														'theSubject'=>$theSubject,
 														'theContent'=>$theContent,
 														'theCc'=>'',
@@ -1876,6 +1867,7 @@ to the CW Academy website and sign up for a class.</p>
 								<th>Name</th>
 								<th>Email</th>
 								<th>Errors</th>
+								<th>Edit User</th>
 								<th>Ignore</th>
 								<th>Delete ID</th>";
 			foreach($allUsersArray as $thisUser => $userData) {
@@ -1899,7 +1891,8 @@ to the CW Academy website and sign up for a class.</p>
 						$emailLink		= $thisEmail;
 					}
 					$errorString		= $thisCode . $theErrors;
-					
+
+					$editLink		= "<a href='$siteURL/wp-admin/users.php?s=$thisUser' target='_blank'>$thisUser</a>";				
 					$ignoreLink		= "<a href='$siteURL/cwa-manage-temp-data/?inp_callsign=$thisUser&inp_role=$thisRole&inp_action=add&token=ignore&strpass=2' target='_blank'>Ignore Error</a>";
 					$deleteIDLink	= "<a href='$siteURL/cwa-delete-user-info/?inp_type=id&inp_value=$userID&strpass=2' target='_blank'>Delete User</a>";
 					$content		.= "<tr><td style='vertical-align:top;'>$thisRole</td>
@@ -1907,6 +1900,7 @@ to the CW Academy website and sign up for a class.</p>
 											<td style='vertical-align:top;'>$thisLastName, $thisFirstName</td>
 											<td style='vertical-align:top;'>$emailLink</td>
 											<td style='vertical-align:top;'>$errorString</td>
+											<td style='vertical-align:top;'>$editLink</td>
 											<td style='vertical-align:top;'>$ignoreLink</td>
 											<td style='vertical-align:top;'>$deleteIDLink</td>";
 					$myCount++;
