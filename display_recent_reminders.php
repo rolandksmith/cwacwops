@@ -19,14 +19,15 @@ function display_recent_reminders_func() {
 		echo "</pre><br />";
 	}
 	$userName			= $initializationArray['userName'];
+	$userRole			= $initializationArray['userRole'];
 	$currentTimestamp	= $initializationArray['currentTimestamp'];
 	$validTestmode		= $initializationArray['validTestmode'];
 	$siteURL			= $initializationArray['siteurl'];
 	
 //	CHECK THIS!								//////////////////////
-	if ($validUser == "N") {
-		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
-	}
+//	if ($validUser == "N") {
+//		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
+//	}
 
 //	ini_set('memory_limit','256M');
 //	ini_set('max_execution_time',0);
@@ -94,6 +95,10 @@ function display_recent_reminders_func() {
 			if ($str_key == "offset") {
 				$offset = $str_value;
 				$offset = filter_var($offset,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key == "totalRecords") {
+				$totalRecords = $str_value;
+				$totalRecords = filter_var($totalRecords,FILTER_UNSAFE_RAW);
 			}
 		}
 	}
@@ -187,38 +192,51 @@ td:last-child {
 
 
 	if ("1" == $strPass) {
-		$userNameUC		= strtoupper($userName);
-		$content 		.= "<h3>$jobname</h3>
-							<p>Displays reminders for the user starting with the newest 
-							reminder. Displays 25 reminders at a time</p>
-							<form method='post' action='$theURL' 
-							name='selection_form' ENCTYPE='multipart/form-data'>
-							<input type='hidden' name='strpass' value='2'>
-							<table style='border-collapse:collapse;'>
-							<tr><td>Advisor Callsign</td>
-								<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign' value='$userNameUC'></td></tr>
-							$testModeOption
-							<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
-							</form></p>";
-	
-
+		if ($userRole == 'administrator') {
+			$userNameUC		= strtoupper($userName);
+			$content 		.= "<h3>$jobname (Administrator Role)</h3>
+								<p>Displays reminders for the user starting with the newest 
+								reminder. Displays 25 reminders at a time</p>
+								<form method='post' action='$theURL' 
+								name='selection_form' ENCTYPE='multipart/form-data'>
+								<input type='hidden' name='strpass' value='2'>
+								<table style='border-collapse:collapse;'>
+								<tr><td>Advisor Callsign</td>
+									<td><input type='text' class='formInputText' size='15' maxlength='30' name='inp_callsign' value='$userNameUC'></td></tr>
+								$testModeOption
+								<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
+								</form></p>";
+		} else {
+			$inp_callsign	= $userName;
+			$strPass		= "2";
+			$inp_mode		= 'Production';
+			$inp_verbose	= 'N';
+		}	
+	}
 ///// Pass 2 -- do the work
 
 
-	} elseif ("2" == $strPass) {
+	if ("2" == $strPass) {
 		if ($doDebug) {
-			echo "<br />at pass 2 with inp_callsign of $inp_callsign and offset of $offset<br />";
+			echo "<br />at pass 2 with inp_callsign of $inp_callsign and offset of $offset and totalRecords of $totalRecords<br />";
 		}
 		
 		if ($offset == 0) {			/// first time through get total number of reminders
 			$totalRecords		= $wpdb->get_var("select count(record_id) 
 													from wpw1_cwa_reminders 
 													where call_sign = '$inp_callsign'");
+			if ($doDebug) {
+				echo "retrieved a total records count of $totalRecords<br />";
+			}
 		}
-		
-		$content		.= "<h3>$jobname</h3>
+		$thisOffset		= $offset + 1;
+		$thisSet		= $offset + 25;
+		if ($thisSet > $totalRecords) {
+			$thisSet	= $totalRecords;
+		}
+		$content		.= "<h3>$jobname for $inp_callsign</h3>
 							<table style='width:1200px;'>
-							<legend>Recent Reminders</legend>
+							<legend>Records $thisOffset to $thisSet of $totalRecords records</legend>
 							<fieldset>
 							<tr><th>Callsign</th>
 								<th>Role</th>
@@ -267,8 +285,11 @@ td:last-child {
 					$content		.= "<form method='post' action='$theURL' 
 										name='menu_form' ENCTYPE='multipart/form-data'>
 										<input type='hidden' name='strpass' value='2'>
+										<input ty[e='hidden' name='inp_callsign' value='$inp_callsign'>
+										<input type='hidden' name='inp_mode' value='$inp_mode'>
+										<input type='hidden' name='inp_verbose' value='$inp_verbose'>
 										<input type='hidden' name='offset' value='$offset'>
-										<input type='hidden' mane='totalRecords' value='$totalRecords'>	
+										<input type='hidden' name='totalRecords' value='$totalRecords'>	
 										<tr><td><input class='formInputButton' type='submit' value='Next 25 Reminders' /></td></tr>
 										</fieldset>
 										</table></form>";
