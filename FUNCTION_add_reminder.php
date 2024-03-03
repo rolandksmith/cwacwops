@@ -40,7 +40,7 @@ function add_reminder($inp_data=array(),$testMode=FALSE,$doDebug=FALSE) {
 		$advisorTableName		= 'wpw1_cwa_consolidated_advisor';
 		$studentTableName		= 'wpw1_cwa_consolidated_student';
 	}
-// $doDebug = TRUE;	
+ $doDebug = TRUE;	
 	if ($doDebug) {
 		echo "<br /><b>Add Reminder inp_data:</b><br /><pre>";
 		print_r($inp_data);
