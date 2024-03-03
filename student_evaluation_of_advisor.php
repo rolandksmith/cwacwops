@@ -3,6 +3,7 @@ function student_evaluation_of_advisor_func() {
 /*
 
 	Modified 15Jul23 by Roland to use consolidated tables
+	Modified 3Mar24 by Roland to be started from a reminder
 
 */
 
@@ -58,8 +59,10 @@ function student_evaluation_of_advisor_func() {
 	$inp_comments				= '';
 	$inp_semester				= '';
 	$inp_lcwo					= '';
+	$token						= '';
 	$extMode					= '';
 	$theURL						= "$siteURL/cwa-student-evaluation-of-advisor/";
+	$jobname					= "Student Evaluation of Advisor";
 	
 	
 	
@@ -81,13 +84,13 @@ function student_evaluation_of_advisor_func() {
 				$inp_student	 = strtoupper($str_value);
 				$inp_student	 = filter_var($inp_student,FILTER_UNSAFE_RAW);
 			}
-			if ($str_key 		== "inp_id") {
-				$inp_id			 = $str_value;
-				$inp_id			 = filter_var($inp_id,FILTER_UNSAFE_RAW);
-			}
 			if($str_key == 'inp_advisor_name') {
 				$inp_advisor_name		= $str_value;
 				$inp_advisor_name		= filter_var($inp_advisor_name,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "token") {
+				$token			 = $str_value;
+				$token			 = filter_var($token,FILTER_UNSAFE_RAW);
 			}
 			if($str_key == 'inp_advisor_id') {
 				$inp_advisor_id		= $str_value;
@@ -278,7 +281,7 @@ td:last-child {
 		if ($validUser == "N") {
 			return "YOU'RE NOT AUTHORIZED!<br />Goodby";
 		} else {
-			$content 		.= "<h3>Student Evaluation of Advisor</h3>
+			$content 		.= "<h3>$jobname</h3>
 								<p>This function is normally run through a link in an email sent to the student 
 								asking the student to evaluation their class and advisor.</p>
 								<p>Click Submit to Start the Process</p>
@@ -295,6 +298,9 @@ td:last-child {
 
 
 	} elseif ("2" == $strPass) {
+		if ($doDebug) {
+			echo "<br />at $strPass pass with inp_student: $inp_student and token: $token<br />";
+		}
 		// get the student record from student
 		$currentSemester	= $initializationArray['currentSemester'];
 		$prevSemester		= $initializationArray['prevSemester'];
@@ -424,18 +430,12 @@ td:last-child {
 									and semester='$currentSemester'";
 				$wpw1_cwa_advisor			= $wpdb->get_results($sql);
 				if ($wpw1_cwa_advisor == FALSE) {
-					if ($doDebug) {
-						echo "Reading $pastAdvisorTableName table<br />
-							  wpdb->last_query: " . $wpdb->last_query . "<br />
-							  <b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-					}
-					$myStr			= $wpdb->last_error;
-					sendErrorMessage("student_evaluation_ofadvisor reading $pastAdvisorTableName for $student_assigned_advisor yielded error $myStr");
+					handleWPDBError($jobname,$doDebug);
 				} else {
 					$numPARows		= $wpdb->num_rows;
 					if ($doDebug) { 
 						$myStr		= $wpdb->last_query;
-						echo "ran $myStr<br />and found $numPARows rows in $pastAdvisorTableName<br />";
+						echo "ran $myStr<br />and found $numPARows rows in $advisorTableName<br />";
 					}
 					if ($numPARows > 0) {
 						foreach ($wpw1_cwa_advisor as $advisorRow) {
@@ -461,6 +461,7 @@ td:last-child {
 											<input type='hidden' name='inp_advisor_id' value='$advisor_ID'>
 											<input type='hidden' name='inp_advisor_name' value='$advisor_last_name, $advisor_first_name'>
 											<input type='hidden' name='inp_student' value='$inp_student'>
+											<input type='hidden' name='token' value='$token'>
 											<input type='hidden' name='inp_semester' value='$currentSemester'>
 											<input type='hidden' name='inp_advisor' value='$advisor_call_sign '>
 											<input type='hidden' name='inp_level' value='$student_level'>
@@ -601,11 +602,11 @@ td:last-child {
 		
 	} elseif ("3" == $strPass) {
 		if ($doDebug) {
-			echo "at pass 3<br />";
+			echo "at pass $strPass with inp_student: $inp_student and token: $token<br />";
 		}
-		if ($userName == '') {
+//		if ($userName == '') {
 			$userName	= $inp_student;
-		}
+//		}
 		
 		$updateParams 	= array("survey_id|$inp_id|s",
 								"anonymous|$inp_student|s",
@@ -669,6 +670,20 @@ td:last-child {
 					echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
 				}
 			}
+			// resolve the reminder, if there is one
+			if ($token != '') {
+				$resolveResult				= resolve_reminder($inp_student,$token,$testMode,$doDebug);
+				if ($resolveResult === FALSE) {
+					if ($doDebug) {
+						echo "resolve_reminder for $inp_callsign and $token failed<br />";
+					}
+				} else {
+					if ($doDebug) {
+						echo "reminder has been resolved<br />";
+					}
+				}
+			}
+			
 
 			$content			.= "<h3>Student Evaluation Has Been Accepted</h3>
 									<p>Your evaluation information has been saved. A week or so after the 
@@ -696,7 +711,7 @@ td:last-child {
 	if ($testMode) {
 		$thisStr		= 'Testmode';
 	}
-	$result			= write_joblog_func("Student Evaluation of Advisor|$nowDate|$nowTime|$userName|Time|$thisStr|$strPass: $elapsedTime");
+	$result			= write_joblog_func("$jobname|$nowDate|$nowTime|$userName|Time|$thisStr|$strPass: $elapsedTime");
 	if ($result == 'FAIL') {
 		$content	.= "<p>writing to joblog.txt failed</p>";
 	}
