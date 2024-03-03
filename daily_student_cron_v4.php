@@ -87,6 +87,7 @@ function daily_student_cron_v4_func() {
 	Modified 12Nov23 by Roland to notify Roland when a duplicate student callsign is found
 	Modified 17Nov23 by Roland to store actions in the reminders table
 	Modified 25Dec23 by Roland to store the debug log correctly. Version upgraded to 4
+	Modified 26Feb24 by Roland to add additional counts
  
 */
 
@@ -94,7 +95,7 @@ function daily_student_cron_v4_func() {
 
 	$doDebug				= FALSE;
 	$doDebugLog				= TRUE;
-	$testMode				= TRUE;
+	$testMode				= FALSE;
 	$verifyMode				= FALSE;
 	$replaceMode			= FALSE;
 	$debugContent			= '';
@@ -284,6 +285,7 @@ function daily_student_cron_v4_func() {
 	$replaceArrayIntermediate	= array();
 	$replaceArrayAdvanced		= array();
 	$deleteParam				= array();
+	$semesterCountArray			= array();
 	$arrayLevels				= array('fundamental','Fundamental','FUNDAMENTAL',
 										'beginner','Beginner','BEGINNER',
 										'intermediate','Intermediate','INTERMEDIATE',
@@ -538,6 +540,14 @@ td {padding:5px;font-size:small;}
 					validEmailPeriod: $validEmailPeriod<br />
 					validReplacementPeriod: $validReplacementPeriod</p>";
 		}
+		$validSemesters				= array();
+		if ($currentSemester != 'Not in Session') {
+			$validSemesters[]		= $currentSemester;
+		}
+		$validSemesters[]			= $nextSemester;
+		$validSemesters[]			= $semesterTwo;
+		$validSemesters[]			= $semesterThree;
+		$validSemesters[]			= $semesterFour;
 
 		//// get the class catalog and make it ready to check class choices
 		if ($doDebugLog) {
@@ -1438,6 +1448,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 		$myDate = date('Y-m-d', $currentTimestamp);
 		$myCount				= 0;
 		$prevCallSign			= "";
+		$prevSemester			= "";
 		$addReminder			= FALSE;
 		$close_date				= '';
 
@@ -1537,11 +1548,12 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 
 					$debugLog .= "<br />Processing $student_call_sign<br />";
 					
-					if ($student_call_sign == $prevCallSign) {		/// duplicate!!
+					if ($student_call_sign == $prevCallSign && $student_semester == $prevSemester) {		/// duplicate!!
 						// notify Roland, don't process the duplicate
 						sendErrorEmail("Student Cron: callsign $student_call_sign has a duplicate");
 					} else {
 						$prevCallSign			= $student_call_sign;
+						$prevSemester			= $student_semester;
 						$recordsProcessed++;
 					
 						if ($student_intervention_required  == 'H') {
@@ -2597,7 +2609,7 @@ had a student status of V and is on hold waiting for a possible reassignment. Wh
 																$debugLog .= "<br />Checking possible replacement: $myValue<br />";
 															}
 															$myArray = explode("|",$myValue);
-															$thisSequence		= $myArray[0];
+															$student_sequence		= $myArray[0];
 															$thisCallSign 		= $myArray[1];
 															$firstTime 			= $myArray[2];
 															$firstDays 			= $myArray[3];
@@ -3058,17 +3070,104 @@ assignment that meet the criteria for your class.<p>";
 									$updateResult	= updateStudent($updateData);
 								
 									if ($updateResult[0] === FALSE) {
-										$myError	= $wpdb->last_error;
-										$mySql		= $wpdb->last_query;
-										$errorMsg	= "$jobname Processing $student_call_sign in $studentTableName failed. Reason: $updateResult[1]<br />SQL: $mySql<br />Error: $myError<br />";
-										if ($doDebugLog) {
-											echo $errorMsg;
-										}
-										sendErrorEmail($errorMsg);
-										$content		.= "Unable to update content in $studentTableName<br />";
+										handleWPDBError($jobname,$doDebug);
 									} else {
-										if ($doDebugLog) {
-											$debugLog .= "$student_call_sign record in $studentTableName successfully updated<br />";
+										if ($doDebug) {
+											echo "$student_call_sign record in $studentTableName successfully updated<br />";
+										}
+										
+										// reread student record to do the counts
+										$sql		= "select * from $studentTableName 
+														where student_id = $student_ID";
+										
+										$wpw1_cwa_student		= $wpdb->get_results($sql);
+										if ($wpw1_cwa_student === FALSE) {
+											$myError			= $wpdb->last_error;
+											$myQuery			= $wpdb->last_query;
+											if ($doDebug) {
+												echo "Reading $studentTableName table failed<br />
+													  wpdb->last_query: $myQuery<br />
+													  wpdb->last_error: $myError<br />";
+											}
+											$errorMsg			= "Daily Student Cron (B) reading $studentTableName failed. <p>SQL: $myQuery</p><p> Error: $myError</p>r";
+											sendErrorEmail($errorMsg);
+										} else {
+											$numSRows			= $wpdb->num_rows;
+											if ($doDebug) {
+												$myStr			= $wpdb->last_query;
+												echo "ran $myStr<br />and found $numSRows rows<br />";
+											}
+											$studentRecordsFound 	= $numSRows;
+											if ($numSRows > 0) {
+												foreach ($wpw1_cwa_student as $studentRow) {
+													$student_ID								= $studentRow->student_id;
+													$student_call_sign						= strtoupper($studentRow->call_sign);
+													$student_first_name						= $studentRow->first_name;
+													$student_last_name						= stripslashes($studentRow->last_name);
+													$student_email  						= strtolower(strtolower($studentRow->email));
+													$student_phone  						= $studentRow->phone;
+													$student_ph_code						= $studentRow->ph_code;
+													$student_city  							= $studentRow->city;
+													$student_state  						= $studentRow->state;
+													$student_zip_code  						= $studentRow->zip_code;
+													$student_country  						= $studentRow->country;
+													$student_country_code					= $studentRow->country_code;
+													$student_time_zone  					= $studentRow->time_zone;
+													$student_timezone_id					= $studentRow->timezone_id;
+													$student_timezone_offset				= $studentRow->timezone_offset;
+													$student_whatsapp						= $studentRow->whatsapp_app;
+													$student_signal							= $studentRow->signal_app;
+													$student_telegram						= $studentRow->telegram_app;
+													$student_messenger						= $studentRow->messenger_app;					
+													$student_wpm 	 						= $studentRow->wpm;
+													$student_youth  						= $studentRow->youth;
+													$student_age  							= $studentRow->age;
+													$student_student_parent 				= $studentRow->student_parent;
+													$student_student_parent_email  			= strtolower($studentRow->student_parent_email);
+													$student_level  						= trim($studentRow->level);
+													$student_waiting_list 					= $studentRow->waiting_list;
+													$student_request_date  					= $studentRow->request_date;
+													$student_semester						= $studentRow->semester;
+													$student_notes  						= $studentRow->notes;
+													$student_welcome_date  					= $studentRow->welcome_date;
+													$student_email_sent_date  				= $studentRow->email_sent_date;
+													$student_email_number  					= $studentRow->email_number;
+													$student_response  						= strtoupper($studentRow->response);
+													$student_response_date  				= $studentRow->response_date;
+													$student_abandoned  					= $studentRow->abandoned;
+													$student_student_status  				= strtoupper($studentRow->student_status);
+													$student_action_log  					= $studentRow->action_log;
+													$student_pre_assigned_advisor  			= $studentRow->pre_assigned_advisor;
+													$student_selected_date  				= $studentRow->selected_date;
+													$student_no_catalog			 			= $studentRow->no_catalog;
+													$student_hold_override  				= $studentRow->hold_override;
+													$student_messaging  					= $studentRow->messaging;
+													$student_assigned_advisor  				= $studentRow->assigned_advisor;
+													$student_advisor_select_date  			= $studentRow->advisor_select_date;
+													$student_advisor_class_timezone 		= $studentRow->advisor_class_timezone;
+													$student_hold_reason_code  				= $studentRow->hold_reason_code;
+													$student_class_priority  				= $studentRow->class_priority;
+													$student_assigned_advisor_class 		= $studentRow->assigned_advisor_class;
+													$student_promotable  					= $studentRow->promotable;
+													$student_excluded_advisor  				= $studentRow->excluded_advisor;
+													$student_student_survey_completion_date	= $studentRow->student_survey_completion_date;
+													$student_available_class_days  			= $studentRow->available_class_days;
+													$student_intervention_required  		= $studentRow->intervention_required;
+													$student_copy_control  					= $studentRow->copy_control;
+													$student_first_class_choice  			= $studentRow->first_class_choice;
+													$student_second_class_choice  			= $studentRow->second_class_choice;
+													$student_third_class_choice  			= $studentRow->third_class_choice;
+													$student_first_class_choice_utc  		= $studentRow->first_class_choice_utc;
+													$student_second_class_choice_utc  		= $studentRow->second_class_choice_utc;
+													$student_third_class_choice_utc  		= $studentRow->third_class_choice_utc;
+													$student_catalog_options				= $studentRow->catalog_options;
+													$student_flexible						= $studentRow->flexible;
+													$student_date_created 					= $studentRow->date_created;
+													$student_date_updated			  		= $studentRow->date_updated;
+												}
+											} else {
+												sendErrorEmail("$jobname rereading student record for student_id $student_ID ($student_call_sign) failed");
+											}
 										}
 									}
 								}
@@ -3080,6 +3179,31 @@ assignment that meet the criteria for your class.<p>";
 							}
 						}
 					}					
+					// update counts for this student record
+					if (!array_key_exists($student_semester,$semesterCountArray)) {
+						$semesterCountArray[$student_semester]['total']			= 0;
+						$semesterCountArray[$student_semester]['dropped']		= 0;
+						$semesterCountArray[$student_semester]['replaced']		= 0;
+						$semesterCountArray[$student_semester]['verified']		= 0;
+						$semesterCountArray[$student_semester]['assigned']		= 0;
+						$semesterCountArray[$student_semester]['unassigned']	= 0;
+					}
+					$semesterCountArray[$student_semester]['total']++;
+					if ($student_email_number == 4 && $student_response == '') {
+						$semesterCountArray[$student_semester]['dropped']++;
+					}
+					if ($student_student_status == 'R' || $student_student_status == 'C' || $student_student_status == 'V') {
+						$semesterCountArray[$student_semester]['replaced']++;
+					}
+					if ($student_response == 'Y') {
+						$semesterCountArray[$student_semester]['verified']++;
+					}
+					if ($student_response == 'Y' && $student_student_status == 'Y') {
+						$semesterCountArray[$student_semester]['assigned']++;
+					}
+					if ($student_response == 'Y' && $student_student_status == '') {
+						$semesterCountArray[$student_semester]['unassigned']++;
+					}
 				}				// end of the student foreach		((((this is true))))
 				if ($doDebugLog) {
 					$debugLog .= "STUDENT end of student process<br />";
@@ -3089,6 +3213,7 @@ assignment that meet the criteria for your class.<p>";
 				$content	.= "No records found in the $studentTableName table<br />";
 			}
 		}
+
 
 ///// all processing done. Prepare totals	
 		$content		.= "<h4>Processing Complete. Preparing Totals</h4>";
@@ -3134,7 +3259,28 @@ assignment that meet the criteria for your class.<p>";
 						<tr><td style='text-align:right;'>$replacedCount</td><td>Replacement requests were able to be fulfilled.</td></tr>
 						<tr><td style='text-align:right;'>$notReplacedCount</td><td>Replacment requests were NOT able to be fulfilled.</td></tr>
 						<tr><td colspan='2'><hr></td></tr>
-						</table><br />";
+						<tr><th colspan='2'><b>Semester Totals</b></td></tr>";
+
+		foreach($validSemesters as $thisSemester) {
+			if (array_key_exists($thisSemester,$semesterCountArray)) {
+				if ($semesterCountArray[$thisSemester]['total'] > 0) {
+					$myInt_total		= $semesterCountArray[$thisSemester]['total'];
+					$myInt_dropped		= $semesterCountArray[$thisSemester]['dropped'];
+					$myInt_replaced		= $semesterCountArray[$thisSemester]['replaced'];
+					$myInt_verified		= $semesterCountArray[$thisSemester]['verified'];
+					$myInt_assigned		= $semesterCountArray[$thisSemester]['assigned'];
+					$myInt_unassigned	= $semesterCountArray[$thisSemester]['unassigned'];
+					$content	.= "<tr><td colspan='2'>$thisSemester</td></tr>
+									<tr><td style='text-align:right;'>$myInt_total</td><td>Total Registrations</td></tr>
+									<tr><td style='text-align:right;'>$myInt_dropped</td><td>Regitrations dropped</tr>
+									<tr><td style='text-align:right;'>$myInt_replaced</td><td>Replacements</td></tr>
+									<tr><td style='text-align:right;'>$myInt_verified</td><td>Verified Registrations</td></tr>
+									<tr><td style='text-align:right;'>$myInt_assigned</td><td>Students assigned</td></tr>
+									<tr><td style='text-align:right;'>$myInt_unassigned</td><td>Unassigned students</td></tr>";
+				}
+			}
+		}
+		$content	.= "</table><br />";
 
 		if (count($errorArray) > 0) {
 			$content	.= "<h4>Errors:</h4>";
@@ -3151,7 +3297,7 @@ assignment that meet the criteria for your class.<p>";
 				$storeResult	= storeReportData_v2("$jobname DEBUG",$content);
 			}
 			if ($storeResult !== FALSE) {
-				$content	.= "<br />Debug report stored in reports table as $storeResult";
+				$content	.= "<br />Debug report stored in reports table as $storeResult[1]";
 			} else {
 				$debugLog .= "<br />Storing the report in the reports table failed";
 			}
@@ -3176,7 +3322,7 @@ assignment that meet the criteria for your class.<p>";
 		}
 
 		// store the report in the reports table
-		$storeResult	= storeReportData_v2('$jobname',$content,$testMode,$doDebug);
+		$storeResult	= storeReportData_v2($jobname,$content,$testMode,$doDebug);
 		if ($storeResult[0] === FALSE) {
 			if ($doDebugLog) {
 				$debugLog .= "storing report failed. $storeResult[1]<br />";
