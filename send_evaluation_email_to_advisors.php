@@ -58,6 +58,7 @@ function send_evaluation_email_to_advisors_func() {
 	$theURL				= "$siteURL/cwa-send-evaluation-email-to-advisors/";
 	$evaluateStudentURL	= "$siteURL/cwa-evaluate-student/";
 	$jobname			= 'Send Evaluation Email to Advisors';
+	$gotAdditionalAdvisors	= FALSE;
 
 
 // get the input information
@@ -71,6 +72,12 @@ function send_evaluation_email_to_advisors_func() {
 			}
 			if ($str_key 		== "additionaltext") {
 				$additionaltext		 = $str_value;
+			}
+			if ($str_key 		== "additionaladvisors") {
+				$additionaladvisors		 = strtoupper($str_value);
+				if ($additionaladvisors != '') {
+					$gotAdditionalAdvisors	= TRUE;
+				}
 			}
 			if ($str_key 		== "inp_verbose") {
 				$inp_verbose	 = $str_value;
@@ -189,6 +196,8 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 <table>
 <tr><td>Enter any additional text to be included in the advisor email</td>
 	<td><textarea class='formInputText' name='additionaltext' rows='5' cols='50'></textarea></td></tr>
+<tr><td>Enter any specific advisor who should receive this email separated by commas</td>
+	<td><textarea class='formInputText' name='additionaladvisors' rows='5' cols='50'></textarea></td></tr>
 $testModeOption
 <tr><td colspan='2'><input class='formInputButton' type='submit' value='Next' /></tr></td></table>
 </form></p>";
@@ -204,9 +213,14 @@ $testModeOption
 		}
 
 		$content .= "<h3>Send EvaluationEmail to Advisors</h3>";
+		if ($gotAdditionalAdvisors && $additionaladvisors != '') {
+			$additionalAdvisorsArray	= explode(",",$additionaladvisors);		
+			$content	.= "<p>Processing only $additionaladvisors</p>";
+		}
 		// Access the advisor TABLE and cycle through the records for currentSemester
 		
-		$sql				= "select a.advisor_call_sign, 
+		$sql				= "select a.advisorclass_id, 
+									  a.advisor_call_sign, 
 									  a.evaluation_complete, 
 									  a.number_students, 
 									  b.last_name, 
@@ -234,6 +248,7 @@ $testModeOption
 			}
 			if ($numACRows > 0) {
 				foreach ($wpw1_cwa_advisorclass as $advisorClassRow) {
+					$advisorClass_id					= $advisorClassRow->advisorclass_id;
 					$advisorClass_advisor_callsign 		= $advisorClassRow->advisor_call_sign;
 					$class_number_students				= $advisorClassRow->number_students;
 					$class_evaluation_complete 			= $advisorClassRow->evaluation_complete;
@@ -245,21 +260,46 @@ $testModeOption
 					if ($doDebug) {
 						echo "<br />Processing $advisorClassTableName table record for advisor $advisorClass_advisor_callsign<br />";
 					}
-				
-					if (($class_evaluation_complete == '' || $class_evaluation_complete == 'N') && $class_number_students > 0){
-						if ($doDebug) {
-							echo "&nbsp;&nbsp;&nbsp;Advisor will get an email<br />";
-						}					
-						$advisorArrayValue		= "$advisorClass_advisor_callsign|$advisor_email|$advisor_first_name|$advisor_last_name|$advisor_phone";
-						if (!in_array($advisorArrayValue,$advisorArray)) {
-							$advisorArray[]		= $advisorArrayValue;
-							if ($doDebug) {
-								echo "&nbsp;&nbsp;&nbsp;Adding $advisorClass_advisor_callsign ,$advisor_email,$advisor_first_name,$advisor_last_name,$advisor_phone to advisorArray<br />";
+					
+					$doContinue							= TRUE;
+					if ($gotAdditionalAdvisors){
+						$doContinue						= FALSE;
+						if (in_array($advisorClass_advisor_callsign,$additionalAdvisorsArray)) {
+							$doContinue					= TRUE;
+							$class_evaluation_complete	= '';
+							$classUpdateData		= array('tableName'=>$advisorClassTableName,
+															'inp_method'=>'update',
+															'inp_data'=>array('evaluation_complete'=>''),
+															'inp_format'=>array('%s'),
+															'jobname'=>$jobname,
+															'inp_id'=>$advisorClass_id,
+															'inp_callsign'=>$advisorClass_advisor_callsign,
+															'inp_semester'=>$theSemester,
+															'inp_who'=>$userName,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug);
+							$updateResult	= updateClass($classUpdateData);
+							if ($updateResult[0] === FALSE) {
+								handleWPDBError($jobname,$doDebug);
 							}
 						}
-					} else {
-						if ($doDebug) {
-							echo "AdvisorClass record bypassed as evaluations are complete or no students. class_evaluation_complete = $class_evaluation_complete | class_number_students = $class_number_students<br />";
+					}
+					if ($doContinue) {	
+						if (($class_evaluation_complete == '' || $class_evaluation_complete == 'N') && $class_number_students > 0){
+							if ($doDebug) {
+								echo "&nbsp;&nbsp;&nbsp;Advisor will get an email<br />";
+							}					
+							$advisorArrayValue		= "$advisorClass_advisor_callsign|$advisor_email|$advisor_first_name|$advisor_last_name|$advisor_phone";
+							if (!in_array($advisorArrayValue,$advisorArray)) {
+								$advisorArray[]		= $advisorArrayValue;
+								if ($doDebug) {
+									echo "&nbsp;&nbsp;&nbsp;Adding $advisorClass_advisor_callsign ,$advisor_email,$advisor_first_name,$advisor_last_name,$advisor_phone to advisorArray<br />";
+								}
+							}
+						} else {
+							if ($doDebug) {
+								echo "AdvisorClass record bypassed as evaluations are complete or no students. class_evaluation_complete = $class_evaluation_complete | class_number_students = $class_number_students<br />";
+							}
 						}
 					}
 				}
@@ -340,27 +380,30 @@ Resolution</a> for assistance.</span></p></td></tr></table>";
 				echo "</pre><br />";
 			}
 			// add reminder
+			if ($doDebug) {
+				echo "preparing to add reminder<br />";
+			}
 			$token			= mt_rand();
 			$reminder_text	= "<p>Please enter the promotability information for your students, that is,  
 is the Beginner, Fundamental, or Intermediate student is ready to take the next higher level class, or 
 the Advanced student met the class objectives. </p>
 <p>Please click 
-<a href='$evaluateStudentURL?semester=$theSemester&strpass=2&inp_mode=$inp_mode&inp_call_sign=$advisor_call_sign&token=$token'>
+<a href='$evaluateStudentURL?semester=$theSemester&strpass=2&inp_mode=$inp_mode&inp_call_sign=$advisor_call_sign&token=$token' target='_blank'>
 Evaluate Students</a>.<br />A CWA web page will display and allow you to enter your evaluations.</p>
 <p>When all your evaluations are completed, you’ll be immediately able to register as an advisor for the next semester.</p>";
 
 			$effective_date		= date('Y-m-d 00:00:00');
-			$closeStr			= strtotime("+ 5 days");
+			$closeStr			= strtotime("+ 4 days");
 			$close_date			= date('Y-m-d 00:00:00',$closeStr);
 			$token				= mt_rand();
 			$inputParams		= array("effective_date|$effective_date|s",
 										"close_date|$close_date|s",
 										"resolved_date||s",
-										"send_reminder|N|s",
+										"send_reminder|3|s",
 										"send_once|N|s",
 										"call_sign|$advisor_call_sign|s",
 										"role||s",
-										"email_text||s",
+										"email_text|$emailContent|s",
 										"reminder_text|$reminder_text|s",
 										"resolved|N|s",
 										"token|$token|s");
@@ -368,6 +411,10 @@ Evaluate Students</a>.<br />A CWA web page will display and allow you to enter y
 			if ($reminderResult[0] === FALSE) {
 				if ($doDebug) {
 					echo "adding reminder failed. $reminderResult[1]<br />";
+				}
+			} else {
+				if ($doDebug) {
+					echo "adding reminder was successful<br />";
 				}
 			}
 
@@ -377,7 +424,7 @@ Evaluate Students</a>.<br />A CWA web page will display and allow you to enter y
 	// send email that the job was run
 	$thisDate				= date('Y-m-d H:i:s');
 	$theRecipient			= 'kcgator@gmail.com';
-	$theSubject				= 'Program Send Evaluation Email to Advisors Was Executed by $userName';
+	$theSubject				= "Program Send Evaluation Email to Advisors Was Executed by $userName";
 	if ($testMode) {
 		$theContent			= "Send Evaluation Email to Advisors was run on $thisDate in TESTMODE";
 	} else {
