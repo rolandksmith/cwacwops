@@ -2,7 +2,7 @@ function gather_and_display_student_statistics_func() {
 
 /* Gather and Display Student Statistics
  *
- * Program reads the Past_student pod for a particular semester and calculates
+ * Program reads the student table for a particular semester and calculates
  * the following statistics:
  *
  *	For each level
@@ -25,6 +25,7 @@ function gather_and_display_student_statistics_func() {
  
  	Modified 16Apr23 by Roland to fix action_log
  	Modified 13Jul23 by Roland to use consolidated tables
+ 	Modified 1Mar24 by Roland to display either the statistics or a csv-compatible table
 */
 
 	global $wpdb;
@@ -40,6 +41,7 @@ function gather_and_display_student_statistics_func() {
 	$validUser = $initializationArray['validUser'];
 	$userName  = $initializationArray['userName'];
 	$siteURL			= $initializationArray['siteurl'];
+	$validTestmode		= $initializationArray['validTestmode'];
 
 	if ($validUser == "N") {
 		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
@@ -61,6 +63,7 @@ function gather_and_display_student_statistics_func() {
 	$notCounted					= 0;
 	$inpSemester				= '';
 	$theURL						= "$siteURL/cwa-gather-and-display-student-statistics/";
+	$jobname					= "Gather and Display Student Statistics";
 	
 // get the input information
 	if (isset($_REQUEST)) {
@@ -80,8 +83,39 @@ function gather_and_display_student_statistics_func() {
 				$inp_semester	 = $str_value;
 				$inp_semester	 = filter_var($inp_semester,FILTER_UNSAFE_RAW);
 		    }
+			if ($str_key 		== "out_format") {
+				$out_format	 = $str_value;
+				$out_format	 = filter_var($out_format,FILTER_UNSAFE_RAW);
+		    }
+			if ($str_key 		== "inp_verbose") {
+				$inp_verbose	 = $str_value;
+				$inp_verbose	 = filter_var($inp_verbose,FILTER_UNSAFE_RAW);
+				if ($inp_verbose == 'Y') {
+					$doDebug	= TRUE;
+				}
+			}
+			if ($str_key 		== "inp_mode") {
+				$inp_mode	 = $str_value;
+				$inp_mode	 = filter_var($inp_mode,FILTER_UNSAFE_RAW);
+				if ($inp_mode == 'TESTMODE') {
+					$testMode = TRUE;
+				}
+			}
 		}
 	}
+
+	if (in_array($userName,$validTestmode)) {			// give option to run in test mode 
+		$testModeOption	= "<tr><td>Operation Mode</td>
+							<td><input type='radio' class='formInputButton' name='inp_mode' value='Production' checked='checked'> Production<br />
+								<input type='radio' class='formInputButton' name='inp_mode' value='TESTMODE'> TESTMODE</td></tr>
+							<tr><td>Verbose Debugging?</td>
+								<td><input type='radio' class='formInputButton' name='inp_verbose' value='N' checked='checked'> Standard Output<br />
+									<input type='radio' class='formInputButton' name='inp_verbose' value='Y'> Turn on Debugging </td></tr>";
+	} else {
+		$testModeOption	= '';
+	}
+
+
 	
 	$content = "<style type='text/css'>
 fieldset {font:'Times New Roman', sans-serif;color:#666;background-image:none;
@@ -153,17 +187,22 @@ td:last-child {
 		$pastSemesters	= $initializationArray['pastSemesters'];
 		$semesterArray	= explode("|",$pastSemesters);
 		foreach($semesterArray as $theValue) {
-			$optionList	.= "<input type='radio' class='formInputButton' name='inp_semester' value='$theValue'>$theValue<br />";
+			$optionList	.= "<input type='radio' class='formInputButton' name='inp_semester' value='$theValue' required>$theValue<br />";
 		}
 		
 		$content 		.= "<h3>Gather and Display Student Statistics</h3>
 
 							<form method='post' action='$theURL' 
-							name='selection_form' ENCTYPE='multipart/form-data''>
+							name='selection_form' ENCTYPE='multipart/form-data'>
 							<input type='hidden' name='strpass' value='2'>
 							<table style='border-collapse:collapse;'>
 							<tr><td style='width:150px;vertical-align:top;'>Semester of Interest</td>
 								<td>$optionList</td></tr>
+							<tr><td style='vertical-align:top;'>Output Format</td>
+								<td><input type='radio' class='formInputButton' name='out_format' value='report' required>Report<br />
+									<input type='radio' class='formInputButton' name='out_format' value='csv' required>csv Formated Table<br />
+									<input type='radio' class='formInputButton' name='out_format' value='both' required>Both Formats</td></tr>
+							$testModeOption
 							<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
 							</form>";
 	
@@ -172,6 +211,9 @@ td:last-child {
 
 
 	} elseif ("2" == $strPass) {
+		if ($doDebug) {
+			echo "<br />at $strPass with inp_semester: $inp_semester and out_format: $out_format<br />";
+		}
 
 // data counts Array
 $dataCounts['Fundamental'] = array(
@@ -541,166 +583,258 @@ $advisorArray = array();
 			echo "</pre><br />";
 		}
 
-		$content	.= "<h4>Data From the $inp_semester Semester</h4>
-						<p><table style='width:900px;'>
-						<tr><th>Category</th>
-						<th style='width:140px;text-align:center;'>Beginner</th>
-						<th style='width:140px;text-align:center;'>Fundamental</th>
-						<th style='width:140px;text-align:center;'>Intermediate</th>
-						<th style='width:140px;text-align:center;'>Advanced</th>
-						<th style='width:140px;text-align:center;'>Total</th></tr>
-						<tr><td>A: Registered Students (<i>A/Total%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['verified']/$dataCounts['total']['registered']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['verified']/$dataCounts['total']['registered']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['verified']/$dataCounts['total']['registered']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['verified']/$dataCounts['total']['registered']*100),1);
-						$content	.= $dataCounts['Beginner']['registered'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['registered'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['registered'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['registered'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['registered'] . " (100.0%)</td></tr>
-						<tr><td>B: Verified Students (<i>B/A%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['verified']/$dataCounts['Beginner']['registered']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['verified']/$dataCounts['Fundamental']['registered']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['verified']/$dataCounts['Intermediate']['registered']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['verified']/$dataCounts['Advanced']['registered']*100),1);
-						$pc5		= number_format(($dataCounts['total']['verified']/$dataCounts['total']['registered']*100),1);
-						$content	.= $dataCounts['Beginner']['verified'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['verified'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['verified'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['verified'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['verified'] . " ($pc5%)</td></tr>
-						<tr><td>C: Students Asked to be Removed (<i>C/A%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['refused']/$dataCounts['Beginner']['registered']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['refused']/$dataCounts['Fundamental']['registered']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['refused']/$dataCounts['Intermediate']['registered']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['refused']/$dataCounts['Advanced']['registered']*100),1);
-						$pc5		= number_format(($dataCounts['total']['refused']/$dataCounts['total']['registered']*100),1);
-						$content	.= $dataCounts['Beginner']['refused'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['refused'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['refused'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['refused'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['refused'] . " ($pc5%)</td></tr>
-						<tr><td>D: Non-Responding Students (<i>D/A%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['noResponse']/$dataCounts['Beginner']['registered']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['noResponse']/$dataCounts['Fundamental']['registered']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['noResponse']/$dataCounts['Intermediate']['registered']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['noResponse']/$dataCounts['Advanced']['registered']*100),1);
-						$pc5		= number_format(($dataCounts['total']['noResponse']/$dataCounts['total']['registered']*100),1);
-						$content	.= $dataCounts['Beginner']['noResponse'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['noResponse'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['noResponse'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['noResponse'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['noResponse'] . " ($pc5%)</td></tr>
-						<tr><td colspan='6'><hr></td></tr>
-						<tr><td>E: Students Completing the Class (<i>E/B%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['completed']/$dataCounts['Beginner']['verified']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['completed']/$dataCounts['Fundamental']['verified']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['completed']/$dataCounts['Intermediate']['verified']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['completed']/$dataCounts['Advanced']['verified']*100),1);
-						$pc5		= number_format(($dataCounts['total']['completed']/$dataCounts['total']['verified']*100),1);
-						$content	.= $dataCounts['Beginner']['completed'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['completed'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['completed'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['completed'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['completed'] . " ($pc5%)</td></tr>
-						<tr><td>F: Students Evaluated as Promotable (<i>F/E%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['promotable']/$dataCounts['Beginner']['completed']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['promotable']/$dataCounts['Fundamental']['completed']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['promotable']/$dataCounts['Intermediate']['completed']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['promotable']/$dataCounts['Advanced']['completed']*100),1);
-						$pc5		= number_format(($dataCounts['total']['promotable']/$dataCounts['total']['completed']*100),1);
-						$content	.= $dataCounts['Beginner']['promotable'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['promotable'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['promotable'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['promotable'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['promotable'] . " ($pc5%)</td></tr>
-						<tr><td>G: Students Evaluated as Not Promotable (<i>G/E%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['notPromotable']/$dataCounts['Beginner']['completed']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['notPromotable']/$dataCounts['Fundamental']['completed']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['notPromotable']/$dataCounts['Intermediate']['completed']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['notPromotable']/$dataCounts['Advanced']['completed']*100),1);
-						$pc5		= number_format(($dataCounts['total']['notPromotable']/$dataCounts['total']['completed']*100),1);
-						$content	.= $dataCounts['Beginner']['notPromotable'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['notPromotable'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['notPromotable'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['notPromotable'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['notPromotable'] . " ($pc5%)</td></tr>
-						<tr><td>H: Students Not Evaluated (<i>H/E%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['notEvaluated']/$dataCounts['Beginner']['completed']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['notEvaluated']/$dataCounts['Fundamental']['completed']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['notEvaluated']/$dataCounts['Intermediate']['completed']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['notEvaluated']/$dataCounts['Advanced']['completed']*100),1);
-						$pc5		= number_format(($dataCounts['total']['notEvaluated']/$dataCounts['total']['completed']*100),1);
-						$content	.= $dataCounts['Beginner']['notEvaluated'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['notEvaluated'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['notEvaluated'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['notEvaluated'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['notEvaluated'] . " ($pc5%)</td></tr>
-						<tr><td>I: Students Who Withdrew (<i>I/E%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['withdrew']/$dataCounts['Beginner']['completed']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['withdrew']/$dataCounts['Fundamental']['completed']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['withdrew']/$dataCounts['Intermediate']['completed']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['withdrew']/$dataCounts['Advanced']['completed']*100),1);
-						$pc5		= number_format(($dataCounts['total']['withdrew']/$dataCounts['total']['completed']*100),1);
-						$content	.= $dataCounts['Beginner']['withdrew'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['withdrew'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['withdrew'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['withdrew'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['withdrew'] . " ($pc5%)</td></tr>
-						<tr><td colspan='6'><hr></td></tr>
-						<tr><td>J: Students Replaced (<i>J/B%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['replaced']/$dataCounts['Beginner']['verified']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['replaced']/$dataCounts['Fundamental']['verified']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['replaced']/$dataCounts['Intermediate']['verified']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['replaced']/$dataCounts['Advanced']['verified']*100),1);
-						$pc5		= number_format(($dataCounts['total']['replaced']/$dataCounts['total']['verified']*100),1);
-						$content	.= $dataCounts['Beginner']['replaced'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['replaced'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['replaced'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['replaced'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['replaced'] . " ($pc5%)</td></tr>
-						<tr><td>K: Advisor Declined Replacement Student (<i>K/B%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['decline']/$dataCounts['Beginner']['verified']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['decline']/$dataCounts['Fundamental']['verified']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['decline']/$dataCounts['Intermediate']['verified']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['decline']/$dataCounts['Advanced']['verified']*100),1);
-						$pc5		= number_format(($dataCounts['total']['decline']/$dataCounts['total']['verified']*100),1);
-						$content	.= $dataCounts['Beginner']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['decline'] . " ($pc1%)</td></tr>
-						<tr><td>L: Advisor Did Not Verify Replacement Student (<i>L/B%</i>)</td><td style='text-align:center;'>";
-						$pc1		= number_format(($dataCounts['Beginner']['noVerify']/$dataCounts['Beginner']['verified']*100),1);
-						$pc2		= number_format(($dataCounts['Fundamental']['noVerify']/$dataCounts['Fundamental']['verified']*100),1);
-						$pc3		= number_format(($dataCounts['Intermediate']['noVerify']/$dataCounts['Intermediate']['verified']*100),1);
-						$pc4		= number_format(($dataCounts['Advanced']['noVerify']/$dataCounts['Advanced']['verified']*100),1);
-						$pc5		= number_format(($dataCounts['total']['noVerify']/$dataCounts['total']['verified']*100),1);
-						$content	.= $dataCounts['Beginner']['noVerify'] . " ($pc1%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['noVerify'] . " ($pc2%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['noVerify'] . " ($pc3%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['noVerify'] . " ($pc4%)</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['noVerify'] . " ($pc5%)</td></tr>
-						<tr><td colspan='6'><hr></td></tr>
-						<tr><td>Advisors</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Beginner']['advisors'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['advisors'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['advisors'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['advisors'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['advisors'] . "</td></tr>
-						<tr><td>Classes Held</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Beginner']['classes'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Fundamental']['classes'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Intermediate']['classes'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['Advanced']['classes'] . "</td><td style='text-align:center;'>";
-						$content	.= $dataCounts['total']['classes'] . "</td></tr>
-						<tr><td colspan='6'><hr></td></tr>
-						</table>
-						<p>Percentages calculated by the formula specified in the category</p>";
+		if ($out_format == 'report' || $out_format == 'both') {
 
-		if ($notCounted > 0) {
-			$content	.= "<p>$notCounted: Students for some reason were not counted.</p>";
+			$content	.= "<h4>Data From the $inp_semester Semester</h4>
+							<p><table style='width:900px;'>
+							<tr><th>Category</th>
+							<th style='width:140px;text-align:center;'>Beginner</th>
+							<th style='width:140px;text-align:center;'>Fundamental</th>
+							<th style='width:140px;text-align:center;'>Intermediate</th>
+							<th style='width:140px;text-align:center;'>Advanced</th>
+							<th style='width:140px;text-align:center;'>Total</th></tr>
+							<tr><td>A: Registered Students (<i>A/Total%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['verified']/$dataCounts['total']['registered']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['verified']/$dataCounts['total']['registered']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['verified']/$dataCounts['total']['registered']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['verified']/$dataCounts['total']['registered']*100),1);
+							$content	.= $dataCounts['Beginner']['registered'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['registered'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['registered'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['registered'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['registered'] . " (100.0%)</td></tr>
+							<tr><td>B: Verified Students (<i>B/A%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['verified']/$dataCounts['Beginner']['registered']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['verified']/$dataCounts['Fundamental']['registered']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['verified']/$dataCounts['Intermediate']['registered']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['verified']/$dataCounts['Advanced']['registered']*100),1);
+							$pc5		= number_format(($dataCounts['total']['verified']/$dataCounts['total']['registered']*100),1);
+							$content	.= $dataCounts['Beginner']['verified'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['verified'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['verified'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['verified'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['verified'] . " ($pc5%)</td></tr>
+							<tr><td>C: Students Asked to be Removed (<i>C/A%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['refused']/$dataCounts['Beginner']['registered']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['refused']/$dataCounts['Fundamental']['registered']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['refused']/$dataCounts['Intermediate']['registered']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['refused']/$dataCounts['Advanced']['registered']*100),1);
+							$pc5		= number_format(($dataCounts['total']['refused']/$dataCounts['total']['registered']*100),1);
+							$content	.= $dataCounts['Beginner']['refused'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['refused'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['refused'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['refused'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['refused'] . " ($pc5%)</td></tr>
+							<tr><td>D: Non-Responding Students (<i>D/A%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['noResponse']/$dataCounts['Beginner']['registered']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['noResponse']/$dataCounts['Fundamental']['registered']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['noResponse']/$dataCounts['Intermediate']['registered']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['noResponse']/$dataCounts['Advanced']['registered']*100),1);
+							$pc5		= number_format(($dataCounts['total']['noResponse']/$dataCounts['total']['registered']*100),1);
+							$content	.= $dataCounts['Beginner']['noResponse'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['noResponse'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['noResponse'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['noResponse'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['noResponse'] . " ($pc5%)</td></tr>
+							<tr><td colspan='6'><hr></td></tr>
+							<tr><td>E: Students Completing the Class (<i>E/B%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['completed']/$dataCounts['Beginner']['verified']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['completed']/$dataCounts['Fundamental']['verified']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['completed']/$dataCounts['Intermediate']['verified']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['completed']/$dataCounts['Advanced']['verified']*100),1);
+							$pc5		= number_format(($dataCounts['total']['completed']/$dataCounts['total']['verified']*100),1);
+							$content	.= $dataCounts['Beginner']['completed'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['completed'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['completed'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['completed'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['completed'] . " ($pc5%)</td></tr>
+							<tr><td>F: Students Evaluated as Promotable (<i>F/E%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['promotable']/$dataCounts['Beginner']['completed']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['promotable']/$dataCounts['Fundamental']['completed']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['promotable']/$dataCounts['Intermediate']['completed']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['promotable']/$dataCounts['Advanced']['completed']*100),1);
+							$pc5		= number_format(($dataCounts['total']['promotable']/$dataCounts['total']['completed']*100),1);
+							$content	.= $dataCounts['Beginner']['promotable'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['promotable'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['promotable'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['promotable'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['promotable'] . " ($pc5%)</td></tr>
+							<tr><td>G: Students Evaluated as Not Promotable (<i>G/E%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['notPromotable']/$dataCounts['Beginner']['completed']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['notPromotable']/$dataCounts['Fundamental']['completed']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['notPromotable']/$dataCounts['Intermediate']['completed']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['notPromotable']/$dataCounts['Advanced']['completed']*100),1);
+							$pc5		= number_format(($dataCounts['total']['notPromotable']/$dataCounts['total']['completed']*100),1);
+							$content	.= $dataCounts['Beginner']['notPromotable'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['notPromotable'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['notPromotable'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['notPromotable'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['notPromotable'] . " ($pc5%)</td></tr>
+							<tr><td>H: Students Not Evaluated (<i>H/E%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['notEvaluated']/$dataCounts['Beginner']['completed']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['notEvaluated']/$dataCounts['Fundamental']['completed']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['notEvaluated']/$dataCounts['Intermediate']['completed']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['notEvaluated']/$dataCounts['Advanced']['completed']*100),1);
+							$pc5		= number_format(($dataCounts['total']['notEvaluated']/$dataCounts['total']['completed']*100),1);
+							$content	.= $dataCounts['Beginner']['notEvaluated'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['notEvaluated'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['notEvaluated'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['notEvaluated'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['notEvaluated'] . " ($pc5%)</td></tr>
+							<tr><td>I: Students Who Withdrew (<i>I/E%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['withdrew']/$dataCounts['Beginner']['completed']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['withdrew']/$dataCounts['Fundamental']['completed']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['withdrew']/$dataCounts['Intermediate']['completed']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['withdrew']/$dataCounts['Advanced']['completed']*100),1);
+							$pc5		= number_format(($dataCounts['total']['withdrew']/$dataCounts['total']['completed']*100),1);
+							$content	.= $dataCounts['Beginner']['withdrew'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['withdrew'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['withdrew'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['withdrew'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['withdrew'] . " ($pc5%)</td></tr>
+							<tr><td colspan='6'><hr></td></tr>
+							<tr><td>J: Students Replaced (<i>J/B%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['replaced']/$dataCounts['Beginner']['verified']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['replaced']/$dataCounts['Fundamental']['verified']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['replaced']/$dataCounts['Intermediate']['verified']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['replaced']/$dataCounts['Advanced']['verified']*100),1);
+							$pc5		= number_format(($dataCounts['total']['replaced']/$dataCounts['total']['verified']*100),1);
+							$content	.= $dataCounts['Beginner']['replaced'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['replaced'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['replaced'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['replaced'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['replaced'] . " ($pc5%)</td></tr>
+							<tr><td>K: Advisor Declined Replacement Student (<i>K/B%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['decline']/$dataCounts['Beginner']['verified']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['decline']/$dataCounts['Fundamental']['verified']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['decline']/$dataCounts['Intermediate']['verified']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['decline']/$dataCounts['Advanced']['verified']*100),1);
+							$pc5		= number_format(($dataCounts['total']['decline']/$dataCounts['total']['verified']*100),1);
+							$content	.= $dataCounts['Beginner']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['decline'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['decline'] . " ($pc1%)</td></tr>
+							<tr><td>L: Advisor Did Not Verify Replacement Student (<i>L/B%</i>)</td><td style='text-align:center;'>";
+							$pc1		= number_format(($dataCounts['Beginner']['noVerify']/$dataCounts['Beginner']['verified']*100),1);
+							$pc2		= number_format(($dataCounts['Fundamental']['noVerify']/$dataCounts['Fundamental']['verified']*100),1);
+							$pc3		= number_format(($dataCounts['Intermediate']['noVerify']/$dataCounts['Intermediate']['verified']*100),1);
+							$pc4		= number_format(($dataCounts['Advanced']['noVerify']/$dataCounts['Advanced']['verified']*100),1);
+							$pc5		= number_format(($dataCounts['total']['noVerify']/$dataCounts['total']['verified']*100),1);
+							$content	.= $dataCounts['Beginner']['noVerify'] . " ($pc1%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['noVerify'] . " ($pc2%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['noVerify'] . " ($pc3%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['noVerify'] . " ($pc4%)</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['noVerify'] . " ($pc5%)</td></tr>
+							<tr><td colspan='6'><hr></td></tr>
+							<tr><td>Advisors</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Beginner']['advisors'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['advisors'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['advisors'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['advisors'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['advisors'] . "</td></tr>
+							<tr><td>Classes Held</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Beginner']['classes'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Fundamental']['classes'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Intermediate']['classes'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['Advanced']['classes'] . "</td><td style='text-align:center;'>";
+							$content	.= $dataCounts['total']['classes'] . "</td></tr>
+							<tr><td colspan='6'><hr></td></tr>
+							</table>
+							<p>Percentages calculated by the formula specified in the category</p>";
+	
+			if ($notCounted > 0) {
+				$content	.= "<p>$notCounted: Students for some reason were not counted.</p>";
+			}
+		}
+		if($out_format == 'csv' || $out_format == 'both') {
+			$levelConvArray				= array('Beginner'=>'1',
+												'Fundamental'=>'2',
+												'Intermediate'=>'3',
+												'Advanced'=>'4',
+												'total'=>'5');
+			$categoryConvArray			= array('registered'=>'a',
+												'verified'=>'b',
+												'refused'=>'c',
+												'noResponse'=>'d',
+												'completed'=>'e',
+												'promotable'=>'f',
+												'notPromotable'=>'g',
+												'notEvaluated'=>'h',
+												'withdrew'=>'i',
+												'replaced'=>'j',
+												'decline'=>'k',
+												'noVerify'=>'l',
+												'advisors'=>'m',
+												'classes'=>'n');
+			// transform data counts array
+			$csvCountsArray	= array();
+			foreach($dataCounts as $thisLevel=>$thisData) {
+				foreach($thisData as $thisCategory => $thisCount) {
+					$convLevel			= $levelConvArray[$thisLevel];
+					$convCategory		= $categoryConvArray[$thisCategory];
+				
+					$csvCountsArray[]	= "$convCategory|$convLevel|$thisCount";
+				}
+
+			}
+			sort($csvCountsArray);
+			if ($doDebug) {
+				echo "csvCountsArray: <br /><pre>";
+				print_r($csvCountsArray);
+				echo "</pre><br />";
+			}
+
+			$categoryNameArray = array('a'=>'Registered Students',
+										'b'=>'Verified Students',
+										'c'=>'Students Asked to be Removed',
+										'd'=>'Non-Responding Students',
+										'e'=>'Students Completing the Class',
+										'f'=>'Students Evaluated as Promotable',
+										'g'=>'Students Evaluated as Not Promotable',
+										'h'=>'Students Not Evaluated',
+										'i'=>'Students Who Withdrew',
+										'j'=>'Students Replaced',
+										'k'=>'Advisor Declined Replacement Student',
+										'l'=>'Advisor Did Not Verify Replacement Student',
+										'm'=>'Advisors',
+										'n'=>'Classes Held');
+			$prevCategory		= '';
+			$dispCategory		= '';
+			$firstTime			= TRUE;
+			$category			= '';
+			$column1			= '';
+			$column2			= '';
+			$column3			= '';
+			$column4			= '';
+			$column5			= '';
+		
+			$content	.= "<h3>$jobname for the $inp_semester Semester</h3><h4>csv-formated Table</h4><pre>
+Category\tBeginner\tFundamental\tIntermediate\tAdvanced\tTotal\n"; 
+			foreach($csvCountsArray as $thisData) {
+				$myArray 		= explode("|",$thisData);
+				$theCategory	= $myArray[0];
+				$theLevel		= $myArray[1];
+				$theCount		= $myArray[2];
+				if ($theCategory != $prevCategory) {
+					if ($firstTime) {
+						$firstTime			= FALSE;
+						$dispCategory		= $categoryNameArray[$theCategory];
+						$prevCategory 		= $theCategory;
+					} else {
+						$content			.= "$dispCategory\t$column1\t$column2\t$column3\t$column4\t$column5\n";
+						$dispCategory		= $categoryNameArray[$theCategory];
+						$column1			= '';
+						$column2			= '';
+						$column3			= '';
+						$column4			= '';
+						$column5			= '';
+						$prevCategory		= $theCategory;
+					}
+				}
+				${'column' . $theLevel} = $theCount;
+			}				
+			$content	.= "$dispCategory\t$column1\t$column2\t$column3\t$column4\t$column5\n</pre>";
 		}
 	
 /*
@@ -722,7 +856,7 @@ echo "</pre><br />";
 	if ($testMode) {
 		$thisStr		= 'Testmode';
 	}
-	$result			= write_joblog_func("Gather and Display Student Statistics|$nowDate|$nowTime|$userName|Time|$thisStr|$strPass: $elapsedTime");
+	$result			= write_joblog_func("$jobname|$nowDate|$nowTime|$userName|Time|$thisStr|$strPass: $elapsedTime");
 	if ($result == 'FAIL') {
 		$content	.= "<p>writing to joblog.txt failed</p>";
 	}
