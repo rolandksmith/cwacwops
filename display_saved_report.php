@@ -191,12 +191,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 							order by report_name";
 		$wpw1_cwa_reports	= $wpdb->get_results($sql);
 		if ($wpw1_cwa_reports === FALSE) {
-			echo "Reading $reportsTableName table failed<br />";
-			echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-			if ($wpdb->last_error != '') {
-				echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-			}
-			$content									.= "<p>$reportsTableName table not found</p>";
+			handleWPDBError($jobname,$doDebug);
 		} else {
 			$numRRows									= $wpdb->num_rows;
 			if ($numRRows > 0) {
@@ -213,11 +208,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 													order by date_created DESC limit 3";
 					$wpw1_cwa_reports_detail			= $wpdb->get_results($sql);
 					if ($wpw1_cwa_reports_detail === FALSE) {
-						echo "Reading $reportsTableName table failed<br />";
-						echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-						if ($wpdb->last_error != '') {
-							echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-						}
+						handleWPDBError($jobname,$doDebug);
 					} else {
 						$linesOut						= 0;
 						foreach($wpw1_cwa_reports_detail as $reportsDetailRow) {
@@ -283,13 +274,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 			$sql				= "select * from $reportsTableName where report_id=$inp_id";
 			$wpw1_cwa_reports	= $wpdb->get_results($sql);
 			if ($wpw1_cwa_reports === FALSE) {
-				if ($doDebug) {
-					echo "Reading $reportsTableName table failed<br />";
-					echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-					if ($wpdb->last_error != '') {
-						echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-					}
-				}
+				handleWPDBError($jobname,$doDebug);
 			} else {
 				$numRRows							= $wpdb->num_rows;
 				if ($doDebug) {
@@ -338,11 +323,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 											order by report_date DESC";
 			$wpw1_cwa_reports_detail			= $wpdb->get_results($sql);
 			if ($wpw1_cwa_reports_detail === FALSE) {
-				echo "Reading $reportsTableName table failed<br />";
-				echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-				if ($wpdb->last_error != '') {
-					echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-				}
+				handleWPDBError($jobname,$doDebug);
 			} else {
 				$linesOut						= 0;
 				$content						.= "<h3>Display Saved Report</h3>
@@ -378,11 +359,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 											limit 30";
 			$wpw1_cwa_reports_detail			= $wpdb->get_results($sql);
 			if ($wpw1_cwa_reports_detail === FALSE) {
-				echo "Reading $reportsTableName table failed<br />";
-				echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-				if ($wpdb->last_error != '') {
-					echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-				}
+				handleWPDBError($jobname,$doDebug);
 			} else {
 				$linesOut						= 0;
 				$content						.= "<h3>$jobname</h3>
