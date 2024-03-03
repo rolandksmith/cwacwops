@@ -128,6 +128,16 @@ function evaluate_student_func() {
 	$student68						= '';
 	$student69						= '';
 	$student70						= '';
+	$student71						= '';
+	$student72						= '';
+	$student73						= '';
+	$student74						= '';
+	$student75						= '';
+	$student76						= '';
+	$student77						= '';
+	$student78						= '';
+	$student79						= '';
+	$student80						= '';
 	$inp_sunday						= '';
 	$inp_monday						= '';
 	$inp_tuesday					= '';
@@ -378,6 +388,36 @@ function evaluate_student_func() {
 			}
 			if ($str_key 		== "student70") {
 				$student70		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student71") {
+				$student71		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student72") {
+				$student72		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student73") {
+				$student73		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student74") {
+				$student74		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student75") {
+				$student75		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student76") {
+				$student76		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student77") {
+				$student77		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student78") {
+				$student78		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student79") {
+				$student79		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student80") {
+				$student80		 = strtoupper($str_value);
 			}
 			if ($str_key 		== "inp_first_name") {
 				$inp_first_name	 = htmlentities($str_value);
@@ -685,9 +725,9 @@ function processEachStudent($studentCallsign,$advisorCallsign,$assignedAdvisorCl
 			}
 		} else {
 			if ($doDebug) {
-				echo "PROGRAM ERROR: No student record found for student = $studentInfo<br />";
+				echo "PROGRAM ERROR: No student record found for student = $studentCallsign<br />";
 			}
-			$returnMessage				= "PROGRAM ERROR: No student record found for $studentInfo<br />";
+			$returnMessage				= "PROGRAM ERROR: No student record found for $studentCallsign<br />";
 		}
 	}
 	return array($returnMessage,$returnContent);
@@ -1517,7 +1557,7 @@ evaluationComplete: $class_evaluation_complete<br />";
 		$content					.= "<h3>Evaluate Students</h3>";
 // Go through each of the student records
 		$prelimUnevaluatedCount		= 0;
-		for ($snum=10;$snum<61;$snum++) {
+		for ($snum=10;$snum<81;$snum++) {
 			$strSnum			= strval($snum);
 			$theInfo			= ${'student' . $strSnum};
 			if ($doDebug) {
