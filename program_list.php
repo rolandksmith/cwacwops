@@ -495,12 +495,7 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 	if ($userRole == 'advisor') {
 		// see if the advisor has a advisor record. If not, indicate that they must sign up
 		$sql	= "select count(call_sign) from $advisorTableName 
-					where call_sign = '$userName' and 
-					(semester = '$currentSemester' or
-					semester = '$nextSemester' or 
-					semester = '$semesterTwo' or
-					semester = '$semesterThree' or 
-					semester = '$semesterFour')";
+					where call_sign = '$userName' ";
 		$advisorCount	= $wpdb->get_var($sql);
 		// if advisorCount is NULL or zero there is no record. Advisor 
 		// needs to sign up for a class
@@ -550,12 +545,7 @@ if ($userRole == 'student' || $userRole == 'administrator') {
 	if ($userRole == 'student') {
 		// see if the student has a student record. If not, indicate that they must sign up
 		$sql	= "select count(call_sign) from $studentTableName 
-					where call_sign = '$userName' and 
-					(semester = '$currentSemester' or
-					semester = '$nextSemester' or 
-					semester = '$semesterTwo' or
-					semester = '$semesterThree' or 
-					semester = '$semesterFour')";
+					where call_sign = '$userName' ";
 		$studentCount	= $wpdb->get_var($sql);
 		// if studentCount is NULL or zero there is no record. Student 
 		// needs to sign up for a class
@@ -572,6 +562,8 @@ if ($userRole == 'student' || $userRole == 'administrator') {
 							details.</p>
 						<p><a href='$siteURL/cwa-check-student-status/?inp_verified=1&strpass=2&inp_callsign=$userName' target='_blank'>Check Student Status</a><br />
 							The program displays the current status of your CW Academy class request.</p>
+						<p><a href='$siteURL/cwa-display-recent-reminders/' target='_blank'>Display Recent Reminders</a>
+							Displays recent reminders starting with the most recent reminder. Displays 25 at a time</p>
 						<p><a href='https://cwops.org/cw-academy/cw-academy-student-resources/' target='_blank'>Student Resources</a><br />
 							Use this link to access the curriculum and various practice files. This information is hosted on cwops.org.</p>";
 }
