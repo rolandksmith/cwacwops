@@ -1157,33 +1157,151 @@ td:last-child {
 		} else {
 			if ($userRole == 'student') {
 				// find out if a student record exists
-				$sql	= "select count(call_sign) from $studentTableName 
+				
+				/*	see if a current or future semester record exists
+				
+					CurrentSemester		Promotable			FutureSemester	 set showSignup		set showAll
+					FALSE				FALSE				FALSE				TRUE				FALSE
+					FALSE				FALSE				TRUE				FALSE				TRUE
+					FALSE				TRUE				FALSE				Not possible
+					FALSE				TRUE				TRUE				Not possible
+					TRUE				FALSE				FALSE				FALSE				TRUE
+					TRUE				FALSE				TRUE				Not possible
+					TRUE				TRUE				FALSE				TRUE				FALSE
+					TRUE				TRUE				TRUE				FALSE				TRUE
+				
+				*/			
+
+				$gotCurrentSemester				= FALSE;
+				$gotPromotable					= FALSE;
+				$gotFutureSemester				= FALSE;
+				$sql	= "select semester, 
+				                  promotable 
+				            from $studentTableName 
 							where call_sign = '$userName' and 
-							(semester = '$currentSemester' or
+							(semester = '$currentSemester' or 
 							semester = '$nextSemester' or 
 							semester = '$semesterTwo' or
 							semester = '$semesterThree' or 
 							semester = '$semesterFour')";
-				$studentCount	= $wpdb->get_var($sql);
-				// if studentCount is NULL or zero there is no record. Student 
-				// needs to sign up for a class
-				// otherwise, the options is to modify an existing record
-				if ($studentCount === NULL || $studentCount == 0) {
-					$showSignup		= TRUE;
-				}				
-			
-			
-			
+				$studentData	= $wpdb->get_results($sql);
+				if ($studentData === FALSE) {
+					handleWPDBError($jobname,$doDebug);
+				} else {
+					$numSRows	= $wpdb->num_rows;
+					if ($doDebug) {
+						echo "ran $sql<br />and retrieved $numSRows rows<br />";
+					}
+					if ($numSRows == 0) {
+						$gotCurrentSemester				= FALSE;
+						$gotPromotable					= FALSE;
+						$gotFutureSemester				= FALSE;
+						if ($doDebug) {
+							echo "no rows retrieved. All logicals set to FALSE<br />";
+						}
+					} else {
+						foreach($studentData as $studentRow) {
+							$thisSemester				= $studentRow->semester;
+							$thisPromotable				= $studentRow->promotable;
+							
+							if ($doDebug) {
+								echo "<br />thisSemester: $thisSemester<br />
+									  thisPromotable: $thisPromotable<br />";
+							}
+							
+							if ($thisSemester == $currentSemester) {
+								$gotCurrentSemester 	= TRUE;
+								if ($thisPromotable != '') {
+									$gotPromotable		= TRUE;
+								}
+							} else {
+								$gotFutureSemester		= TRUE;
+							}
+						}
+					}
+				}
+				if ($doDebug) {
+					echo "<br />Truth Settings<br />";
+					if ($gotCurrentSemester) {
+						echo "gotCurrentSemester is TRUE<br />";
+					} else {
+						echo "gotCurrentSemester is FALSE<br />";
+					}
+					if ($gotPromotable) {
+						echo "gotPromotable is TRUE<br />";
+					} else {
+						echo "gotPromotable is FALSE<br />";
+					}
+					if ($gotFutureSemester) {
+						echo "gotFutureSemester is TRUE<br />";
+					} else {
+						echo "gotFutureSemester is FALSE<br />";
+					}
+				}
+				if ($gotCurrentSemester === FALSE && $gotPromotable === FALSE && $gotFutureSemester === FALSE) {
+					$showSignup			= TRUE;
+					$showAll			= FALSE;
+
+				} elseif ($gotCurrentSemester === FALSE && $gotPromotable === FALSE && $gotFutureSemester === TRUE) {
+					$showSignup			= FALSE;
+					$showAll			= TRUE;
+					
+				} elseif ($gotCurrentSemester === FALSE && $gotPromotable === TRUE && $gotFutureSemester === FALSE) {
+					$showSignup			= FALSE;
+					$showAll			= FALSE;
+					sendErrorEmail("$jobname Pass1 Have Promotable but no current or future semester");
+					
+				} elseif ($gotCurrentSemester === FALSE && $gotPromotable === TRUE && $gotFutureSemester === TRUE) {
+					$showSignup			= FALSE;
+					$showAll			= TRUE;
+					sendErrorEmail("$jobname Pass1 Have Promotable but no current semester");
+					
+				} elseif ($gotCurrentSemester === TRUE && $gotPromotable === FALSE && $gotFutureSemester === FALSE) {
+					$showSignup			= FALSE;
+					$showAll			= TRUE;
+					
+				} elseif ($gotCurrentSemester === TRUE && $gotPromotable === FALSE && $gotFutureSemester === TRUE) {
+					$showSignup			= FALSE;
+					$showAll			= TRUE;
+					sendErrorEmail("$jobname Pass1 Have current semester, no promotable, but have future semester as well");
+					
+				} elseif ($gotCurrentSemester === TRUE && $gotPromotable === TRUE && $gotFutureSemester === FALSE) {
+					$showSignup			= TRUE;
+					$showAll			= FALSE;
+					
+				} elseif ($gotCurrentSemester === TRUE && $gotPromotable === TRUE && $gotFutureSemester === TRUE) {
+					$showSignup			= FALSE;
+					$showAll			= TRUE;
+					
+				} else {
+					$showSignup			= TRUE;
+					$showAll			= FALSE;
+					
+				}
 			
 			} elseif ($userRole == 'administrator') {
 				$showAll	= TRUE;
+				$showSignup	= TRUE;
 			}
+			if ($doDebug) {
+				if ($showSignup) {
+					echo "showSignup is TRUE<br />";
+				} else {
+					echo "showSignup is FALSE<br />";
+				}
+				if ($showAll) {
+					echo "showAll is TRUE<br />";
+				} else {
+					echo "showAll is FALSE<br />";
+				}
+			}
+			
 			$content		.= "<p>Welcome to the CW Academy where our mission is to increase the 
 								number of competent CW operators on the amateur radio bands and our 
 								goal is to guide you to becoming a better CW operator as you 
-								increase your CW skills, speed and activity!</p>
+								increase your CW skills, speed, and activity!</p>
 								<table style='width:800px;border:4px solid green;'>";
-			if ($showSignup || $showAll) {
+			if ($showSignup) {
 				$content		.= "<tr><td style='vertical-align:top;'><b>Sign-up</b><br />You should now 
 											sign up as a student for an upcoming semester<br />
 											<form method='post' action='$theURL' 
@@ -1192,15 +1310,8 @@ td:last-child {
 											<input type='submit' class='formInputButton' name='option1submit' value='Sign-Up'>
 											</form></td>";
 			}
-			if (!$showSignup || $showAll) {
-				$content			.= "<td style='vertical-align:top;'><b>Check SignupStatus</b><br />You have already signed up and want to check 
-											the status of your registration<br />
-											<form method='post' action='$siteURL/cwa-check-student-status/' 
-											name='option2_form' ENCTYPE='multipart/form-data'>
-											<input type='hidden' name='strpass' value='1'>
-											<input type='submit' class='formInputButton' name='option2submit' value='Check Status'>
-											</form></td>
-									<td style='vertical-align:top;'><b>Modify Signup Information</b><br />You have already signed up and wish 
+			if ($showAll) {
+				$content			.= "<td style='vertical-align:top;'><b>Modify Signup Information</b><br />You have already signed up and wish 
 											to update or modify your sign up information<br />
 											<form method='post' action='$theURL' 
 											name='option3_form' ENCTYPE='multipart/form-data'>
@@ -1208,7 +1319,14 @@ td:last-child {
  											<input type='submit' class='formInputButton' name='option3submit' value='Update Registration'>
 											</form></td>";
 			}
-			$content			.= "<td style='vertical-align:top;'><b>Practice Assessment</b><br />If you want to take a practice Morse Code 
+			$content				.= "<td style='vertical-align:top;'><b>Check SignupStatus</b><br />You have already signed up and want to check 
+											the status of your registration<br />
+											<form method='post' action='$siteURL/cwa-check-student-status/' 
+											name='option2_form' ENCTYPE='multipart/form-data'>
+											<input type='hidden' name='strpass' value='1'>
+											<input type='submit' class='formInputButton' name='option2submit' value='Check Status'>
+											</form></td>
+										<td style='vertical-align:top;'><b>Practice Assessment</b><br />If you want to take a practice Morse Code 
 											Proficiency Assessment, click the 'Practice Assessment' button below. You are allowed to take 
 											a practice Morse Code Proficiency Assessment twice in a 45-day period.<br />
 											<form method='post' action='$siteURL/cwa-practice-assessment/' 
@@ -1244,14 +1362,22 @@ td:last-child {
 		$foundARecord			= FALSE;
 		// Look up the student to determine if a record already exists
 		// if so, do the update process. Otherwise, do the new student (maybe)
-
-		$sql				= "select * from $studentTableName 
-								where call_sign='$inp_callsign' 
-								 and (semester = '$currentSemester' 
+		if ($allowSignup) {
+			$semesterStr		= "(semester = '$nextSemester' 
+									 or semester = '$semesterTwo' 
+									 or semester = '$semesterThree' 
+									 or Semester = '$semesterFour')"; 
+		} else {
+			$semesterStr		= "(semester = '$currentSemester' 
 									 or semester = '$nextSemester' 
 									 or semester = '$semesterTwo' 
 									 or semester = '$semesterThree' 
-									 or Semester = '$semesterFour') 
+									 or Semester = '$semesterFour')";		
+		}
+
+		$sql				= "select * from $studentTableName 
+								where call_sign='$inp_callsign' 
+								 and $semesterStr 
 								order by date_created DESC 
 								limit 1";
 		$wpw1_cwa_student		= $wpdb->get_results($sql);
@@ -2721,8 +2847,7 @@ $studentTableName for $inp_callsign. Database says there was no record to update
 			$recordCount		= $wpdb->get_var("select count(call_sign)
 													from $studentTableName 
 													where call_sign = '$inp_callsign' 
-													and (semester = '$currentSemester' or 
-														 semester = '$nextSemester' or 
+													and (semester = '$nextSemester' or 
 														 semester = '$semesterTwo' or 
 														 semester = '$semesterThree' or 
 														 semester = '$semesterFour')");
@@ -6085,8 +6210,7 @@ no record. Can not store the update";
 		// check to see there is a signup record
 		$sql				= "select * from $studentTableName 
 								where call_sign='$userName' 
-								 and (semester = '$currentSemester' 
-									 or semester = '$nextSemester' 
+								 and (semester = '$nextSemester' 
 									 or semester = '$semesterTwo' 
 									 or semester = '$semesterThree' 
 									 or Semester = '$semesterFour') 
@@ -6096,15 +6220,6 @@ no record. Can not store the update";
 		if ($wpw1_cwa_student === FALSE) {
 			handleWPDBError($jobname,$doDebug);
 		} else {
-			$lastError			= $wpdb->last_error;
-			if ($lastError != '') {
-				handleWPDBError($jobname,$doDebug);
-				$content		.= "Fatal program error. System Admin has been notified";
-				if (!$doDebug) {
-					return $content;
-				}
-			}
-
 			$numSRows			= $wpdb->num_rows;
 			if ($doDebug) {
 				$myStr			= $wpdb->last_query;
@@ -6195,12 +6310,11 @@ no record. Can not store the update";
 			$content			.= "<h3>$jobname</h3>
 									<h4>Signup Information</h4>";
 			if ($daysToGo == 0) {
-				$daysToGo			= days_to_semester($proximateSemester);
+				$daysToGo			= days_to_semester($nextSemester);
 			}
 
 			if ($doDebug) {
 				echo "daysToGo: $daysToGo<br />
-						proximateSemester: $proximateSemester<br />
 						nextSemester: $nextSemester<br />
 						semesterTwo: $semesterTwo<br />
 						semesterThree: $semesterThree<br />";
@@ -6281,11 +6395,6 @@ no record. Can not store the update";
 											<td><input type='text' class='formInputText' name='inp_email' id='chk_email' size='50' maxlength='100' value='$userEmail' required ><br />
 												<b>Important!</b> Make certain that the email address you enter is spelled correctly and is complete. All communication from 
 												CW Academy is by email.</td></tr>
-										<tr><td style='vertical-align:top;'><b>Phone Country Code and Number</b><br />
-												<em>The country code for the US and Canada is 1</em></td>
-											<td><input type='txt' class='formInputText' name='inp_ph_code' id='inp_ph_code' size='5' maxlength='5' value='1' >
-												<input type='text' class='formInputText' name='inp_phone' id='chk_phone' size='20' maxlength='20' required >
-											Enter the phone number as numbers only. No other characters.</td</tr>
 										$semesterSelection
 										$testModeOption<br />
 										<tr><td colspan='2'>'<input class='formInputButton' type='submit' onclick=\"return validate_form(this.form);\" value='Next' /></td></tr></table>
@@ -6307,8 +6416,7 @@ no record. Can not store the update";
 		// get any future student records from the database
 		$sql			= "select * from $studentTableName 
 							where call_sign = '$inp_callsign' 
-							and (semester = '$currentSemester' 
-							or semester = '$nextSemester' 
+							and (semester = '$nextSemester' 
 							or semester = '$semesterTwo' 
 							or semester = '$semesterThree' 
 							or semester = '$semesterFour')";
