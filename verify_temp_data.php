@@ -224,8 +224,6 @@ function verify_temp_data_func() {
 					$temp_data			= $tempResultRow->temp_data;
 					$date_written		= $tempResultRow->date_written;
 
-					$content			.= "<br />Processing $callsign ";
-
 					// see if there is a user_login record
 					
 					$userSQL			= "select user_login 
@@ -233,9 +231,9 @@ function verify_temp_data_func() {
 										   where lower(user_login) = '$callsign'";
 					$user_login			= $wpdb->get_var($userSQL);
 					if ($user_login === NULL) {
-						$content		.= "Getting user_login returned NULL<br />";
+//						$content		.= "Getting user_login returned NULL<br />";
 						if (in_array($token,$tokenList)) {		/// delete the record
-							$content	.= "Token of $token and no user_login. Deleting<br />";
+							$content	.= "<br />Processing $callsign Token of $token and no user_login. Deleting<br />";
 							$deleteResult 	= deleteTempRecord($record_id);
 							if ($deleteResult === FALSE) {
 								$content	.= "Deletion failed<br />";
@@ -249,7 +247,7 @@ function verify_temp_data_func() {
 						} else {
 							$pastDate 		= date('Y-m-d H:i:s', strtotime($currentDate . ' -90 days'));						
 							if ($date_written < $pastDate) {			// older than 90 days
-								$content	.= "Record older than 90 days and token is not in the list. Deleting<br />";
+								$content	.= "<br />Processing $callsign Record older than 90 days and token is not in the list. Deleting<br />";
 								$deleteResult 	= deleteTempRecord($record_id);
 								if ($deleteResult === FALSE) {
 									$content	.= "Deletion failed<br />";
@@ -260,17 +258,17 @@ function verify_temp_data_func() {
 									$content	.= "No record found by id $record_id Nothing deleted<br />";
 								}							
 							} else {
-								$content		.= "Record less than 90 days old. No deletion<br />";
+//								$content		.= "Record less than 90 days old. No deletion<br />";
 							}
 						}
 					} else {
-						$content	.= "has user_login of  $user_login<br />";
+//						$content	.= "has user_login of  $user_login<br />";
 						// if the token is not in tokenList and record older than 90 days, delete
 						if (!in_array($token,$tokenList)) {
-							$content		.= "Token not in token list, eligible to be deleted<br />";
+//							$content		.= "Token not in token list, eligible to be deleted<br />";
 							$pastDate 		= date('Y-m-d H:i:s', strtotime($currentDate . ' -90 days'));						
 							if ($date_written < $pastDate) {			// older than 90 days
-								$content	.= "Record older than 90 days. Deleting<br />";
+								$content	.= "<br />Processing $callsign Record older than 90 days. Deleting<br />";
 								$deleteResult 	= deleteTempRecord($record_id);
 								if ($deleteResult === FALSE) {
 									$content	.= "Deletion failed<br />";
@@ -281,10 +279,10 @@ function verify_temp_data_func() {
 									$content	.= "No record found by id $record_id Nothing deleted<br />";
 								}
 							} else {
-								$content		.= "Record less than 90 days old. No deletion<br />";
+//								$content		.= "Record less than 90 days old. No deletion<br />";
 							}
 						} else {
-							$content			.= "Token of $token. Will not be deleted<br />";
+//							$content			.= "Token of $token. Will not be deleted<br />";
 						}
 					}
 				}
@@ -325,7 +323,7 @@ function verify_temp_data_func() {
 		$closeStr		= strtotime("+2 days");
 		$close_date		= date('Y-m-d H:i:s', $closeStr);
 		$token			= mt_rand();
-		$reminder_text	= "<p>To view the $jobname report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+		$reminder_text	= "<p><b>Verify Temp Data</b> To view the $jobname report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 		$inputParams		= array("effective_date|$nowDate $nowTime|s",
 									"close_date|$close_date|s",
 									"resolved_date||s",
