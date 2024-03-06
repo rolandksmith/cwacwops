@@ -1930,7 +1930,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 											$student45DayCount++;
 										}
 									}
-									$theSubject			= "CW Academy == Thank You for Your Application";
+									$theSubject			= "CW Academy -- Thank You for Your Application";
 									if ($testMode) {
 										$theRecipient	= 'rolandksmith@gmail.com';
 										$theSubject 	= "TESTMODE $theSubject";
@@ -3291,10 +3291,10 @@ assignment that meet the criteria for your class.<p>";
 		}
  		if ($doDebugLog) {
  			if ($testMode) {
-				$storeResult	= storeReportData_v2("TESTMODE $jobname DEBUG",$content);
+				$storeResult	= storeReportData_v2("TESTMODE $jobname DEBUG",$debugLog);
 				$storeResult	= TRUE;
 			} else {
-				$storeResult	= storeReportData_v2("$jobname DEBUG",$content);
+				$storeResult	= storeReportData_v2("$jobname DEBUG",$debugLog);
 			}
 			if ($storeResult !== FALSE) {
 				$content	.= "<br />Debug report stored in reports table as $storeResult[1]";
