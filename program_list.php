@@ -276,6 +276,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart/' target='_blank'>Student and Advisor Color Chart</a>
 			<li><a href='$siteURL/cwa-thank-you-remove/' target='_blank'>Thank You Remove</a>
 			<li><a href='$siteURL/cwa-thank-you-yes/' target='_blank'>Thank You Yes</a>
+			<li><a href='$siteURL/cwa-user-administration/' target='_blank'>User Administration (Take Over Acct)
 			<li><a href='$siteURL/utility-show-offsets-for-a-country-or-zip-code/' target='_blank'>UTILITY Show Offsets for a Country or Zip Code</a>
 			<li><a href='$siteURL/utility-calculate-utc/' target='_blank'>UTILITY: Calculate UTC</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=50' target='_blank'>Unassign a Student Regardless of Status</a>
@@ -303,6 +304,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a>
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart-v2/' target='_blank'>Student and Advisor Color Chart V2</a><br /><br />
 			<li><a href='$siteURL/cwa-display-users-program-list/' target='_blank'>Display Users Program List (FAKE)<a>
+			<li><a href='$siteURL/cwa-user-administration/' target='_blank'>User Administration (Take Over Acct)
 			<li><a href='$siteURL/cwa-manage-advisor-class-assignments/?strpass=20' target='_blank'>Manage Advisor Class Assignments (Fake)</a>
 			<li><a href='$siteURL/cwa-student-registration/' target='_blank'>Student Registration (Fake)</a>
 			<li><a href='$siteURL/cwa-advisor-class-history/' target='_blank'>Advisor Class History</a>
