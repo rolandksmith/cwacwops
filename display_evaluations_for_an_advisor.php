@@ -25,7 +25,7 @@ function display_evaluations_for_an_advisor_func() {
 
 	global $wpdb, $pastAdvisorTableName, $doDebug;
 	
-	$doDebug						= FALSE;
+	$doDebug						= TRUE;
 	$testMode						= FALSE;
 	$initializationArray 			= data_initialization_func();
 	if ($doDebug) {
@@ -59,6 +59,7 @@ function display_evaluations_for_an_advisor_func() {
 	$inp_advisor				= '';
 	$theSemester				= '';
 	$mode						= '';
+	$token						= '';
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -77,6 +78,10 @@ function display_evaluations_for_an_advisor_func() {
 			if ($str_key 		== "inp_id") {
 				$inp_id			 = $str_value;
 				$inp_id			 = filter_var($inp_id,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "token") {
+				$token			 = $str_value;
+				$token			 = filter_var($token,FILTER_UNSAFE_RAW);
 			}
 			if ($str_key 		== "mode") {
 				$mode			 = $str_value;
@@ -181,9 +186,11 @@ td:last-child {
 		}
 		$advisorTableName			= "wpw1_cwa_consolidated_advisor2";
 		$evaluateAdvisorTableName	= "wpw1_cwa_evaluate_advisor2";
+		$studentTableName			= "wpw1_cwa_consolidated_student2";
 	} else {
 		$advisorTableName			= "wpw1_cwa_consolidated_advisor";
 		$evaluateAdvisorTableName	= "wpw1_cwa_evaluate_advisor";
+		$studentTableName			= "wpw1_cwa_consolidated_student";
 	}
 
 	if (in_array($userName,$validTestmode)) {			// give option to run in test mode 
@@ -235,15 +242,13 @@ td:last-child {
 
 	} elseif ("2" == $strPass) {
 
-	$currentSemester		= $initializationArray['currentSemester'];
-	$pastSemester			= $initializationArray['prevSemester'];
-	if ($currentSemester == 'Not in Session') {
-		$thisSemester		= $pastSemester;
-	} else {
-		$thisSemester		= $currentSemester;
-	}
-
-
+		$currentSemester		= $initializationArray['currentSemester'];
+		$pastSemester			= $initializationArray['prevSemester'];
+		if ($currentSemester == 'Not in Session') {
+			$thisSemester		= $pastSemester;
+		} else {
+			$thisSemester		= $currentSemester;
+		}
 
 		$goodData			= FALSE;
 		// if mode=1 then input came from advisor email and has advisor and id
@@ -392,6 +397,32 @@ td:last-child {
 							$advisor_last_name					= $evaluateAdvisorRow->last_name;
 
 							$advisor_last_name 					= no_magic_quotes($advisor_last_name);
+							
+							$thisStudentName					= '';
+							if ($evaluateAdvisor_anonymous != '') {
+								// get the student name
+								$studentSQL						= "select last_name, 
+																		   first_name 
+																	from $studentTableName 
+																	where call_sign = '$evaluateAdvisor_anonymous' 
+																	and semester = '$thisSemester'";
+								$studentResponse				= $wpdb->get_results($studentSQL);
+								if ($studentResponse === FALSE) {
+									handleWPDBError($jobname,$doDebug);
+								} else {
+									$numSRows					= $wpdb->num_rows;
+									if ($doDebug) {
+										echo "ran $studentSQL<br />and retrieved $numSRows rows<br />";
+									}
+									if ($numSRows > 0) {
+										foreach($studentResponse as $studentResponseRow) {
+											$thisLastName		= $studentResponseRow->last_name;
+											$thisFirstName		= $studentResponseRow->first_name;
+											$thisStudentName	= "($thisLastName, $thisFirstName)";
+										}
+									}
+								}
+							}
 
 							if ($evaluateAdvisor_student_comments != '') {
 								$evaluateAdvisor_student_comments	= str_replace("<p>","",$evaluateAdvisor_student_comments);
@@ -408,7 +439,7 @@ td:last-child {
 											<tr><th style='width:200px;'>Field</th><th>Value</th></tr>
 											<tr><td>Advisor Call Sign:</td><td>$evaluateAdvisor_advisor_callsign</td></tr>
 											<tr><td>Advisor Name:</td><td>$advisor_last_name, $advisor_first_name	</td></tr>
-											<tr><td>Anonymous:</td><td>$evaluateAdvisor_anonymous</td></tr>
+											<tr><td>Anonymous:</td><td>$evaluateAdvisor_anonymous ($thisLastName, $thisFirstName)</td></tr>
 											<tr><td>Level:</td><td>$evaluateAdvisor_level</td></tr>
 											<tr><td>Semester:</td><td>$evaluateAdvisor_advisor_semester</td></tr>
 											<tr><td>Expectations:</td><td>$evaluateAdvisor_expectations</td></tr>
@@ -435,6 +466,10 @@ td:last-child {
 						}
 					}
 				}
+			}
+			// remove the reminder if applicable
+			if ($token != '') {
+				$result		= resolve_reminder($inp_advisor,$token,$testMode,$doDebug);			
 			}
 		} else {
 			$content		.= "Invalid Request";

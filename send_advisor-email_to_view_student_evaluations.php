@@ -9,6 +9,7 @@ function send_advisor_email_to_view_student_evaluations_func() {
  *  modified 7Jun21 by Roland to send emails to a list of advisors or to all advisors
  	modified 25Oct22 by Roland to accomodate timezone table format
  	Modified 10Jul23 by Roland to run from consolicated tables
+ 	Modified 7Mar24 by Roland to use reminders
 */
 
 	global $wpdb;
@@ -156,13 +157,13 @@ td:last-child {
 	if ($testMode) {
 		$content						.= "<p><strong>Operating in Test Mode.</strong></p>";
 		$advisorClassTableName			= 'wpw1_cwa_consolidated_advisorclass';
-		$advisorTableName			= 'wpw1_cwa_consolidated_advisor';
+		$advisorTableName				= 'wpw1_cwa_consolidated_advisor';
 		if ($doDebug) {
 			echo "<p><strong>Operating in Test Mode.</strong></p>";
 		}
 	} else {
 		$advisorClassTableName			= 'wpw1_cwa_consolidated_advisorclass';
-		$advisorTableName			= 'wpw1_cwa_consolidated_advisor';
+		$advisorTableName				= 'wpw1_cwa_consolidated_advisor';
 	}
 	
 	if ($bobTest) {
@@ -174,12 +175,12 @@ td:last-child {
 
 	if (in_array($userName,$validTestmode)) {			// give option to run in test mode 
 		$testModeOption	= "<tr><td>Operation Mode</td>
-<td><input type='radio' class='formInputButton' name='inp_mode' value='Production' checked='checked'> Production<br />
-	<input type='radio' class='formInputButton' name='inp_mode' value='bobtest' > BobTest<br />
-	<input type='radio' class='formInputButton' name='inp_mode' value='TESTMODE'> TESTMODE</td></tr>
-<tr><td>Verbose Debugging?</td>
-	<td><input type='radio' class='formInputButton' name='inp_verbose' value='N' checked='checked'> Standard Output<br />
-		<input type='radio' class='formInputButton' name='inp_verbose' value='Y'> Turn on Debugging </td></tr>";
+								<td><input type='radio' class='formInputButton' name='inp_mode' value='Production' checked='checked'> Production<br />
+									<input type='radio' class='formInputButton' name='inp_mode' value='bobtest' > BobTest<br />
+									<input type='radio' class='formInputButton' name='inp_mode' value='TESTMODE'> TESTMODE</td></tr>
+								<tr><td>Verbose Debugging?</td>
+									<td><input type='radio' class='formInputButton' name='inp_verbose' value='N' checked='checked'> Standard Output<br />
+										<input type='radio' class='formInputButton' name='inp_verbose' value='Y'> Turn on Debugging </td></tr>";
 	} else {
 		$testModeOption	= '';
 	}
@@ -196,17 +197,17 @@ td:last-child {
 			echo "Function starting.<br />";
 		}
 		$content 		.= "<h3>Send Advisor Email to View Student Evaluations</h3>
-<p><form method='post' action='$theURL' 
-name='selection_form' ENCTYPE='multipart/form-data''>
-<input type='hidden' name='strpass' value='2'>
-<table>
-<tr><td>Send Email List</td>
-	<td><input type='test' class='formInputText' name='inp_list' size='50' maxlength='100' value='all'> <br />To send the email 
-to all advisors, enter the word 'all'.<br /> To send to one or more specific advisors, enter the list separated 
-by commas</td></tr>
-$testModeOption
-<tr><td colspan='2'><input class='formInputButton' type='submit' value='Next' /></td></tr></table>
-</form></p>";
+							<p><form method='post' action='$theURL' 
+							name='selection_form' ENCTYPE='multipart/form-data''>
+							<input type='hidden' name='strpass' value='2'>
+							<table>
+							<tr><td>Send Email List</td>
+								<td><input type='test' class='formInputText' name='inp_list' size='50' maxlength='100' value='all'> <br />To send the email 
+							to all advisors, enter the word 'all'.<br /> To send to one or more specific advisors, enter the list separated 
+							by commas</td></tr>
+							$testModeOption
+							<tr><td colspan='2'><input class='formInputButton' type='submit' value='Next' /></td></tr></table>
+							</form></p>";
 
 ///// Pass 2 -- do the work
 
@@ -232,33 +233,34 @@ $testModeOption
 		
 		//// get the advisor and advisorclass records
 		
-		$sql 		= "select a.advisor_call_sign, a.evaluation_complete, b.advisor_id, b.first_name, b.last_name, b.email 
-from $advisorClassTableName as a join $advisorTableName as b 
-where a.semester='$theSemester' 
-and a.advisor_call_sign=b.call_sign 
-and a.semester=b.semester 
-order by a.advisor_call_sign,a.sequence";
+		$sql 		= "select a.advisor_call_sign, 
+							  a.evaluation_complete, 
+							  b.advisor_id, 
+							  b.first_name, 
+							  b.last_name, 
+							  b.email 
+						from $advisorClassTableName as a 
+						join $advisorTableName as b 
+						where a.semester='$theSemester' 
+						and a.advisor_call_sign=b.call_sign 
+						and a.semester=b.semester 
+						order by a.advisor_call_sign,a.sequence";
 		$wpw1_cwa_advisorclass			= $wpdb->get_results($sql);
 		if ($wpw1_cwa_advisorclass === FALSE) {
-			if ($doDebug) {
-				echo "Reading $advisorClassTableName and $advisorTableName tables failed<br />";
-				echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-				echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-			}
+			handleWPDBError($jobname,$doDebug);
 		} else {
 			$numACRows									= $wpdb->num_rows;
 			if ($doDebug) {
-				$myStr						= $wpdb->last_query;
-				echo "ran $myStr<br />and found $numACRows rows in $advisorClassTableName and $advisorTableName tables<br />";
+				echo "ran $sql<br />and found $numACRows rows in $advisorClassTableName and $advisorTableName tables<br />";
 			}
 			if ($numACRows > 0) {
 				foreach ($wpw1_cwa_advisorclass as $advisorClassRow) {
 					$advisor_ID					 		= $advisorClassRow->advisor_id;
 					$advisorClass_advisor_callsign 		= $advisorClassRow->advisor_call_sign;
-					$advisor_first_name 					= $advisorClassRow->first_name;
+					$advisor_first_name 				= $advisorClassRow->first_name;
 					$advisor_last_name 					= $advisorClassRow->last_name;
 					$advisor_email 						= strtolower($advisorClassRow->email);
-					$advisorClass_evaluation_complete 		= $advisorClassRow->evaluation_complete;
+					$advisorClass_evaluation_complete 	= $advisorClassRow->evaluation_complete;
 
 					if ($doDebug) {
 						echo "<br />Processing $advisorClass_advisor_callsign<br />";
@@ -330,18 +332,13 @@ order by a.advisor_call_sign,a.sequence";
 				$my_to		= $theEmail;
 				$mailCode	= 12;
 //				$my_to		= "kcgator@gmail.com";												
-				$myHeaders 	= array('Content-Type: text/html; charset=UTF-8',
-									'Bcc: Bob Carter <kcgator@gmail.com>,Joe Fisher <cwa@aa8ta.net>, Roland Smith <rolandksmith@gmail.com>',
-									'from: Joe Fischer <cwa@aa8ta.net>',
-									'Reply-To: no reply <noreply@cwops.org>');
 			}
 			$my_message 	= "<p>To: $theLastName, $theFirstName ($key):</p>
 <p>Around the end of the semester the students were sent an email requesting their 
 evaluation of the class, tools, curriculum, and advisor. Many students have submitted 
 their evaluation. If any of your students submitted an evaluation, you can view the evaluations your students submitted by 
-clicking <a href='$viewURL?strpass=2&inp_advisor=$key&inp_id=$theID&mode=1'>Display Student Evaluations</a>.</p>
-<p>Please note that some students may have entered more that one evaluation. Also, you might want to check back 
-after a few days as more students may have responded by then.</p>
+logging into <a href='$siteURL/program-list/'>CW Academy</a> and following the link under 
+Reminders and Actions Requested.
 <table style='border:4px solid red;'><tr><td>
 <p><span style='color:red;font-size:14pt;'><b>Do not reply to this email as the address is not monitored.</b> 
 <br />Please refer to the appropriate person at <a href='https://cwops.org/cwa-class-resolution/'>CWA Class 
@@ -351,9 +348,11 @@ CW Academy</p>";
 				
 				$mailResult		= emailFromCWA_v2(array('theRecipient'=>$my_to,
 															'theSubject'=>$my_subject,
-															'jobname'=>$jobname,
 															'theContent'=>$my_message,
+															'theCc'=>'',
+															'theAttachment'=>'',
 															'mailCode'=>$mailCode,
+															'jobname'=>$jobname,
 															'increment'=>$increment,
 															'testMode'=>$testMode,
 															'doDebug'=>$doDebug));
@@ -362,6 +361,38 @@ CW Academy</p>";
 						echo "A email was sent to $my_to<br /><br />";
 					}
 					$emailsSent++;
+
+					// add the reminder
+					$effective_date		 	= date('Y-m-d H:i:s');
+					$closeStr				= strtotime("+5 days");
+					$close_date				= date('Y-m-d H:i:s', $closeStr);
+					$token					= mt_rand();
+					$email_text				= "<p></p>";
+					$reminder_text			= "<p><b>View Student Evaluations:</b> To see your student 
+evaluations, click 
+<a href='$viewURL?strpass=2&inp_advisor=$key&inp_id=$theID&mode=1&token=$token' target='_blank'>Display Student Evaluations</a>. 
+Note that some students may have entered more that one evaluation. Also, you might want to check back 
+after a few days as more students may have responded by then.</p>";
+					$inputParams		= array("effective_date|$effective_date|s",
+												"close_date|$close_date|s",
+												"resolved_date||s",
+												"send_reminder|N|s",
+												"send_once|Y|s",
+												"call_sign|$key|s",
+												"role||s",
+												"email_text|$email_text|s",
+												"reminder_text|$reminder_text|s",
+												"resolved||s",
+												"token|$token|s");
+					$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
+					if ($insertResult[0] === FALSE) {
+						if ($doDebug) {
+							echo "inserting reminder failed: $insertResult[1]<br />";
+						}
+						$content		.= "Inserting reminder failed: $insertResult[1]<br />";
+					} else {
+						$content		.= "Reminder successfully added<br />";
+					}
 				}
 				$myInt--;
 			}
