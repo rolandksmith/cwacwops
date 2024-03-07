@@ -546,7 +546,7 @@ CW Academy</p>";
 										}
 									}
 								} else {
-									$content	.= "<p>No record for student $studentCallSign in $studentTableName pod</p>";
+									$content	.= "<p>No record for student $studentCallSign in $studentTableName. Advisor: $advisorClass_advisor_callsign $advisorClass_sequence</p>";
 								}
 							}
 						}
