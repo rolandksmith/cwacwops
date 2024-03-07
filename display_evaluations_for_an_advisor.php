@@ -415,7 +415,7 @@ td:last-child {
 											<tr><td>Effective:</td><td>$evaluateAdvisor_effective</td></tr>
 											<tr><td>Curriculum:</td><td>$evaluateAdvisor_curriculum</td></tr>
 											<tr><td>Scales:</td><td>$evaluateAdvisor_scales</td></tr>
-											<tr><td>Morse Trainer:</td><td>$evaluateAdvisor_morse_trainer</td></tr>
+											<tr><td>MCT, Word List, or ICR:</td><td>$evaluateAdvisor_morse_trainer</td></tr>
 											<tr><td>Morse Runner:</td><td>$evaluateAdvisor_morse_trainer</td></tr>
 											<tr><td>LCWO</td><td>$evaluateAdvisor_lcwo</td></tr>
 											<tr><td>RufzXP:</td><td>$evaluateAdvisor_rufzxp</td></tr>
