@@ -514,7 +514,7 @@ td:last-child {
 													<input type='radio' name='inp_scales' class='formInputButton' value='Not Really'> Not Really<br />
 													<input type='radio' name='inp_scales' class='formInputButton' value='Not Applicable'> Not Applicable</td>
 											</tr><tr>
-												<td style='vertical-align:top;'>Was Morse Code Trainer effective for you?</td>
+												<td style='vertical-align:top;'>Was Morse Code Trainer, Word List, or ICR effective for you?</td>
 												<td><input type='radio' name='inp_morse_trainer' class='formInputButton' value='Very Much'> Very Much<br />
 													<input type='radio' name='inp_morse_trainer' class='formInputButton' value='Mostly'> Mostly<br />
 													<input type='radio' name='inp_morse_trainer' class='formInputButton' value='Somewhat'> Somewhat<br />
