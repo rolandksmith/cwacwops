@@ -747,7 +747,8 @@ td:last-child {
 							$evaluateAdvisor_lcwo		 		= $evaluateAdvisorRow->lcwo;
 							$evaluateAdvisor_cwt 				= $evaluateAdvisorRow->cwt;
 							$evaluateAdvisor_applications 		= $evaluateAdvisorRow->applications;
-							$evaluateAdvisor_short_stories_qsos = $evaluateAdvisorRow->short_stories_qsos;
+							$evaluateAdvisor_qsos 				= $evaluateAdvisorRow->qsos;
+							$evaluateAdvisor_short_stories		= $evaluateAdvisorRow->short_stories;
 							$evaluateAdvisor_enjoy_class 		= $evaluateAdvisorRow->enjoy_class;
 							$evaluateAdvisor_student_comments 	= $evaluateAdvisorRow->student_comments;
 
@@ -781,7 +782,8 @@ td:last-child {
 											<tr><td>LCWO:</td><td>$evaluateAdvisor_lcwo</td></tr>
 											<tr><td>RufzXP:</td><td>$evaluateAdvisor_rufzxp</td></tr>
 											<tr><td>CWT:</td><td>$evaluateAdvisor_cwt</td></tr>
-											<tr><td>Short Stories / QSOs</td><td>$evaluateAdvisor_short_stories_qsos</td></tr>
+											<tr><td>QSOs</td><td>$evaluateAdvisor_qsos</td></tr>
+											<tr><td>Short Stories</td><td>$evaluateAdvisor_short_stories</td></tr>
 											<tr><td>Enjoy Class</td><td>$evaluateAdvisor_enjoy_class</td></tr>
 											<tr><td style='vertical-align:top;'>Student Comments:</td><td>$evaluateAdvisor_student_comments</td></tr>
 											<tr><td style='vertical-align:top;'>Student Applicationss:</td><td>$evaluateAdvisor_applications</td></tr>
