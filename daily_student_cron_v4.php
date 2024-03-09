@@ -3187,6 +3187,11 @@ assignment that meet the criteria for your class.<p>";
 						$semesterCountArray[$student_semester]['verified']		= 0;
 						$semesterCountArray[$student_semester]['assigned']		= 0;
 						$semesterCountArray[$student_semester]['unassigned']	= 0;
+						$semesterCountArray[$student_semester]['Beginner']		= 0;
+						$semesterCountArray[$student_semester]['Fundamental']	= 0;
+						$semesterCountArray[$student_semester]['Intermediate']	= 0;
+						$semesterCountArray[$student_semester]['Advanced']		= 0;
+						
 					}
 					$semesterCountArray[$student_semester]['total']++;
 					if ($student_email_number == 4 && $student_response == '') {
@@ -3203,6 +3208,18 @@ assignment that meet the criteria for your class.<p>";
 					}
 					if ($student_response == 'Y' && $student_student_status == '') {
 						$semesterCountArray[$student_semester]['unassigned']++;
+					}
+					if ($student_level == 'Beginner') {
+						$semesterCountArray[$student_semester]['Beginner']++;
+					}
+					if ($student_level == 'Fundamental') {
+						$semesterCountArray[$student_semester]['Fundamental']++;
+					}
+					if ($student_level == 'Intermediate') {
+						$semesterCountArray[$student_semester]['Intermediate']++;
+					}
+					if ($student_level == 'Advanced') {
+						$semesterCountArray[$student_semester]['Advanced']++;
 					}
 				}				// end of the student foreach		((((this is true))))
 				if ($doDebugLog) {
@@ -3270,7 +3287,15 @@ assignment that meet the criteria for your class.<p>";
 					$myInt_verified		= $semesterCountArray[$thisSemester]['verified'];
 					$myInt_assigned		= $semesterCountArray[$thisSemester]['assigned'];
 					$myInt_unassigned	= $semesterCountArray[$thisSemester]['unassigned'];
+					$myInt_Beginner		= $semesterCountArray[$thisSemester]['Beginner'];
+					$myInt_Fundamental	= $semesterCountArray[$thisSemester]['Fundamental'];
+					$myInt_Intermediate	= $semesterCountArray[$thisSemester]['Intermediate'];
+					$myInt_Advanced		= $semesterCountArray[$thisSemester]['Advanced'];
 					$content	.= "<tr><td colspan='2'>$thisSemester</td></tr>
+									<tr><td style='text-align:right;'>$myInt_Beginner</td><td>Beginner Registrations</td></tr>
+									<tr><td style='text-align:right;'>$myInt_Fundamental</td><td>Fundamental Registrations</td></tr>
+									<tr><td style='text-align:right;'>$myInt_Intermediate</td><td>Intermediate Registrations</td></tr>
+									<tr><td style='text-align:right;'>$myInt_Advanced</td><td>Advanced Registrations</td></tr>
 									<tr><td style='text-align:right;'>$myInt_total</td><td>Total Registrations</td></tr>
 									<tr><td style='text-align:right;'>$myInt_dropped</td><td>Regitrations dropped</tr>
 									<tr><td style='text-align:right;'>$myInt_replaced</td><td>Replacements</td></tr>
