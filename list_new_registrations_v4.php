@@ -191,8 +191,9 @@ function list_new_registrations_v4_func(){
 		$content			.= "<h3>$jobname Automatically Executed</h3>";
 		$runByCron			= TRUE;
 		$userName			= "CRON";
+
 		$dst				= date('I');
-		if ($dst == 0) {
+		if ($dst == 1) {
 			$checkBegin 	= strtotime('13:50:00');
 			$checkEnd 		= strtotime('14:30:00');
 			$thisTime 		= date('H:i:s');
@@ -202,13 +203,30 @@ function list_new_registrations_v4_func(){
 			$checkEnd 		= strtotime('13:30:00');
 			$thisTime 		= date('H:i:s');
 		}
+
 		$nowTime = strtotime($thisTime);
 		if ($nowTime >= $checkBegin && $nowTime <= $checkEnd) {
 			$runTheJob = TRUE;
+			$content		.= "$jobname was triggered at $thisTime. 
+checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
 		} else {
 			$runTheJob = FALSE;
 			$userName	= "CRON Aborted";
-				$debugData .= "runTheJob is FALSE<br />";
+			if ($doDebugLog) {
+				$debugLog .= "runTheJob is FALSE<br />";
+			}
+			$theRecipient	= 'rolandksmith@gmail.com';
+			$theSubject		= 'CW Academy - Cron Triggered';
+			$theContent		= "$jobname was triggered at $thisTime. It did not run. 
+checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
+			$mailCode		= 16;
+			$result			= emailFromCWA_v2(array('theRecipient'=>$theRecipient,
+													'theSubject'=>$theSubject,
+													'jobname'=>$jobname,
+													'theContent'=>$theContent,
+													'mailCode'=>$mailCode,
+													'testMode'=>$testMode,
+													'doDebug'=>FALSE));
 		}
 	}
 	if ($runTheJob) {
