@@ -207,8 +207,6 @@ function list_new_registrations_v4_func(){
 		$nowTime = strtotime($thisTime);
 		if ($nowTime >= $checkBegin && $nowTime <= $checkEnd) {
 			$runTheJob = TRUE;
-			$content		.= "$jobname was triggered at $thisTime. 
-checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
 		} else {
 			$runTheJob = FALSE;
 			$userName	= "CRON Aborted";
