@@ -5571,15 +5571,6 @@ taking any further action.<br /><br />Otherwise:<br />";
 			if ($wpw1_cwa_student === FALSE) {
 				handleWPDBError("$jobname MGMT 96",$doDebug);
 			} else {
-				$lastError			= $wpdb->last_error;
-				if ($lastError != '') {
-					handleWPDBError("$jobname MGMT 96",$doDebug);
-					$content		.= "Fatal program error. System Admin has been notified";
-					if (!$doDebug) {
-						return $content;
-					}
-				}
-
 				$numSRows		= $wpdb->num_rows;
 				if ($doDebug) {
 					$myStr		= $wpdb->last_query;
@@ -5647,15 +5638,6 @@ $userName changed call sign from $inp_student_callsign to $inp_new_callsign ";
 							if ($wpw1_cwa_advisorclass === FALSE) {
 								handleWPDBError("$jobname MGMT 96",$doDebug);
 							} else {
-								$lastError			= $wpdb->last_error;
-								if ($lastError != '') {
-									handleWPDBError("$jobname MGMT 96",$doDebug);
-									$content		.= "Fatal program error. System Admin has been notified";
-									if (!$doDebug) {
-										return $content;
-									}
-								}
-		
 								$numACRows				= $wpdb->num_rows;
 								if ($doDebug) {
 									$myStr				= $wpdb->last_query;
@@ -5782,15 +5764,6 @@ student$strSnum call sign changed from $inp_student_callsign to $inp_new_callsig
 			if ($audioResult === FALSE) {
 				handleWPDBError("$jobname MGMT 96",$doDebug);
 			} else {
-				$lastError			= $wpdb->last_error;
-				if ($lastError != '') {
-					handleWPDBError("$jobname MGMT 96",$doDebug);
-					$content		.= "Fatal program error. System Admin has been notified";
-					if (!$doDebug) {
-						return $content;
-					}
-				}
-
 				$numRows				= $wpdb->num_rows;
 				if ($doDebug) {
 					$myStr				= $wpdb->last_query;
@@ -5836,29 +5809,23 @@ student$strSnum call sign changed from $inp_student_callsign to $inp_new_callsig
 			if ($assessmentResult === FALSE) {
 				handleWPDBError("$jobname pass 96",$doDebug);
 			} else {
-				$lastError		= $wpdb->last_error;
-				if ($lastError != '') {
-					handleWPDBError("$jobname Pass 96",$doDebug);
+				$numRows			= $wpdb->num_rows;
+				if ($doDebug) {
+					echo "ran $sql<br />and retrieved $numRows rows<br />";
 				}
-				$content		.= "Fatal program error. Sys admin has been notified";
-				return $content;
-			}
-			$numRows			= $wpdb->num_rows;
-			if ($doDebug) {
-				echo "ran $sql<br />and retrieved $numRows rows<br />";
-			}
-			if ($numRows > 0) {
-				foreach($assessmentResult as $assessmentRow) {
-					$record_id		= $assessmentRow->record_id;
-					$thisCallsign	= $assessmentRow->callsign;
-					
-					$updateResult	= $wpdb->update($newAssessmentTableName,
-											array('callsign'=>$inp_new_callsign),
-											array('record_id'=>$record_id),
-											array("%s"),
-											array('%d'));
-					if ($updateResult === FALSE) {
-						handleWPDBError("$jobname pass 96",$doDebug);
+				if ($numRows > 0) {
+					foreach($assessmentResult as $assessmentRow) {
+						$record_id		= $assessmentRow->record_id;
+						$thisCallsign	= $assessmentRow->callsign;
+						
+						$updateResult	= $wpdb->update($newAssessmentTableName,
+												array('callsign'=>$inp_new_callsign),
+												array('record_id'=>$record_id),
+												array("%s"),
+												array('%d'));
+						if ($updateResult === FALSE) {
+							handleWPDBError("$jobname pass 96",$doDebug);
+						}
 					}
 				}
 			}
@@ -5870,29 +5837,23 @@ student$strSnum call sign changed from $inp_student_callsign to $inp_new_callsig
 			if ($tempResult === FALSE) {
 				handleWPDBError("$jobname pass 96",$doDebug);
 			} else {
-				$lastError		= $wpdb->last_error;
-				if ($lastError != '') {
-					handleWPDBError("$jobname Pass 96",$doDebug);
+				$numRows			= $wpdb->num_rows;
+				if ($doDebug) {
+					echo "ran $sql<br />and retrieved $numRows rows<br />";
 				}
-				$content		.= "Fatal program error. Sys admin has been notified";
-				return $content;
-			}
-			$numRows			= $wpdb->num_rows;
-			if ($doDebug) {
-				echo "ran $sql<br />and retrieved $numRows rows<br />";
-			}
-			if ($numRows > 0) {
-				foreach($tempResult as $tempRow) {
-					$record_id		= $tempRow->record_id;
-					$thisCallsign	= $tempRow->callsign;
-					
-					$updateResult	= $wpdb->update($tempDataTableName,
-											array('callsign'=>$inp_new_callsign),
-											array('record_id'=>$record_id),
-											array("%s"),
-											array('%d'));
-					if ($updateResult === FALSE) {
-						handleWPDBError("$jobname pass 96",$doDebug);
+				if ($numRows > 0) {
+					foreach($tempResult as $tempRow) {
+						$record_id		= $tempRow->record_id;
+						$thisCallsign	= $tempRow->callsign;
+						
+						$updateResult	= $wpdb->update($tempDataTableName,
+												array('callsign'=>$inp_new_callsign),
+												array('record_id'=>$record_id),
+												array("%s"),
+												array('%d'));
+						if ($updateResult === FALSE) {
+							handleWPDBError("$jobname pass 96",$doDebug);
+						}
 					}
 				}
 			}
