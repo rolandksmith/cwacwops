@@ -474,8 +474,9 @@ td {padding:5px;font-size:small;}
 	} else {
 		$content			.= "<h3>$jobname Process Automatically Executed</h3>";
 		$userName			= "CRON";
+
 		$dst				= date('I');
-		if ($dst == 0) {
+		if ($dst == 1) {
 			$checkBegin 	= strtotime('13:50:00');
 			$checkEnd 		= strtotime('14:30:00');
 			$thisTime 		= date('H:i:s');
@@ -485,6 +486,7 @@ td {padding:5px;font-size:small;}
 			$checkEnd 		= strtotime('13:30:00');
 			$thisTime 		= date('H:i:s');
 		}
+
 		$nowTime = strtotime($thisTime);
 		if ($nowTime >= $checkBegin && $nowTime <= $checkEnd) {
 			$runTheJob = TRUE;
@@ -494,17 +496,18 @@ td {padding:5px;font-size:small;}
 			if ($doDebugLog) {
 				$debugLog .= "runTheJob is FALSE<br />";
 			}
-//			$theRecipient	= 'rolandksmith@gmail.com';
-//			$theSubject		= 'CW Academy - Cron Triggered';
-//			$theContent		= "The Student Cron was triggered at $thisTime. It did not run.";
-//			$mailCode		= 16;
-//			$result			= emailFromCWA_v2(array('theRecipient'=>$theRecipient,
-//													'theSubject'=>$theSubject,
-//													'jobname'=>$jobname,
-//													'theContent'=>$theContent,
-//													'mailCode'=>$mailCode,
-//													'testMode'=>$testMode,
-//													'doDebug'=>FALSE));
+			$theRecipient	= 'rolandksmith@gmail.com';
+			$theSubject		= 'CW Academy - Cron Triggered';
+			$theContent		= "$jobname was triggered at $thisTime. It did not run. 
+checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
+			$mailCode		= 16;
+			$result			= emailFromCWA_v2(array('theRecipient'=>$theRecipient,
+													'theSubject'=>$theSubject,
+													'jobname'=>$jobname,
+													'theContent'=>$theContent,
+													'mailCode'=>$mailCode,
+													'testMode'=>$testMode,
+													'doDebug'=>FALSE));
 		}
 	}
 	if ($runTheJob) {
@@ -1351,7 +1354,7 @@ td {padding:5px;font-size:small;}
 												$closeStr			= strtotime("+10 days");
 												$close_date			= date('Y-m-d H:i:s',$closeStr);
 												$token				= mt_rand();
-												$reminder_text		= "<p>Your class makeup has been revised and students need to be contacted 
+												$reminder_text		= "<p><b>Replacement Student:</b> Your class makeup has been revised and students need to be contacted 
 and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_advisor_call_sign&token=$token'>Advisor Verification of Students</a> to complete that task.";
 												$inputParams		= array("effective_date|$myStr|s",
 																			"close_date|$close_date|s",
@@ -1772,7 +1775,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 											$debugLog .= "adding reminder to reminders table<br />";
 										}
 										$token			= mt_rand();
-										$reminder_text	= "<p>You need to update your registration information and identify your class preferences.</p>
+										$reminder_text	= "<p><b>Select Class Schedule Preferences:</b> You need to update your registration information and identify your class preferences.</p>
 <p>Click on <a href='$siteURL/cwa-student-registration/?token=$token'>Student Registration</a> 
 														 	and select option three.</p>";
 										// add the reminder
@@ -2276,7 +2279,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 																						<p>Regards,<br />
 																						CW Academy</p>";
 																$token				= mt_rand();
-																$reminder_text		= "<p>It is time to verify your availability to take a class in the upcoming semester 
+																$reminder_text		= "<p><b>Select Class Schedule Preferences:</b> It is time to verify your availability to take a class in the upcoming semester 
 and to select your class preferences. The class catalog is now available. Your options are:<br />
 1. To verify your availability and select class choices click <a href='$studentRegistrationURL?inp_verify=Y&strpass=2&inp_verify=Y&token=$token&enstr=$encstr'>Select Class Choices</a><br />
 2. You can move your registration to the $semesterTwo semester by clicking <a href='$TURemoveURL?appid=$student_ID&strpass=2&xmode=$xmode&inp_option=1&token=$token'>HERE</a><br />
@@ -2303,7 +2306,7 @@ my registration</a>";
 																				<p>Regards,<br />
 																				CW Academy</p>";
 																$token			= mt_rand();
-																$reminder_text	= "<p>You previously started registering for a $student_level Level class
+																$reminder_text	= "<p><b>Complete Registration:</b> You previously started registering for a $student_level Level class
 but did not complete the registration process. If you are interested in being a student in the upcoming semester, you must complete your 
 registration. To do so, click <a href='$studentRegistrationURL?inp_verify=Y&token=$token&strpass=2&enstr=$encstr'>Student Registration</a>. 
 Update your information as needed and make your class preference choices.</p>";
@@ -2471,7 +2474,7 @@ Update your information as needed and make your class preference choices.</p>";
 											$closeStr			= strtotime("+10 days");
 											$close_date			= date('Y-m-d H:i:s', $closeStr);
 											$token				= mt_rand();
-											$reminder_text		= "<p>Student <a href='$studentUpdateURL?request_type=callsign&request_info=$student_call_sign&request_table=$studentTableName&strpass=2' 'target='_blank'>$student_call_sign</a> 
+											$reminder_text		= "<p><b>Signup on Hold:</b> Student <a href='$studentUpdateURL?request_type=callsign&request_info=$student_call_sign&request_table=$studentTableName&strpass=2' 'target='_blank'>$student_call_sign</a> 
 had a student status of V and is on hold waiting for a possible reassignment. When the issue is resolved, click 'Remove Item'.</p>";
 											$inputParams		= array("effective_date|$effective_date|s",
 																		"close_date|$close_date|s",
@@ -2888,7 +2891,7 @@ had a student status of V and is on hold waiting for a possible reassignment. Wh
 																	$close_date				= date('Y-m-d H:i:s',$closeStr);
 																	$token					= mt_rand();
 																	$effective_date			= date('Y-m-d H:i:s');
-																	$reminder_text			= "<p>To see your current class makeup and and verify the student(s) click on 
+																	$reminder_text			= "<p><b>Manage Students:</b> To see your current class makeup and and verify the student(s) click on 
 <a href='$siteURL/cwa-manage-advisor-class?strpass=2&callsign=$advisor_call_sign&token=$token'>Manage Advisor Class</a> 
 																								to complete that task.</p>";
 																	$inputParams		= array("effective_date|$effective_date|s",
@@ -3361,7 +3364,7 @@ assignment that meet the criteria for your class.<p>";
 		$closeStr		= strtotime("+2 days");
 		$close_date		= date('Y-m-d H:i:s', $closeStr);
 		$token			= mt_rand();
-		$reminder_text	= "<p>To view the Daily Student Cron report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+		$reminder_text	= "<p><b>Daily Student Cron:</b> To view the Daily Student Cron report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 		$inputParams		= array("effective_date|$nowDate $nowTime|s",
 									"close_date|$close_date|s",
 									"resolved_date||s",
@@ -3380,7 +3383,7 @@ assignment that meet the criteria for your class.<p>";
 			}
 		}
 		$token			= mt_rand();
-		$reminder_text	= "<p>To view the Daily Student Cron report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+		$reminder_text	= "<p><b>Daily Student Cron:</b> To view the Daily Student Cron report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 		$inputParams		= array("effective_date|$nowDate $nowTime|s",
 									"close_date|$close_date|s",
 									"resolved_date||s",
