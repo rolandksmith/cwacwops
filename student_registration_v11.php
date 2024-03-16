@@ -49,6 +49,7 @@ function student_registration_v11_func() {
 	Modified 12Nov23 by Roland in an attempt to prevent duplicate registrations
 	Modified 20Nov23 by Roland for the portal process
 	Modified 30Jan24 by Roland to allow Beginners to skip the assessment
+	Modified 15Mar24 by Roland to fix changing the semester
 		
 */
     
@@ -4653,32 +4654,19 @@ already taken Fundamental and was promoted. At Interupt the student decided to $
 								$semesterChanged						= TRUE;
 								$updateParams[]							= "email_sent_date||s";
 								$updateParams[]							= "email_number|0|s";
-								$updateParams[]							= 'response||s';
+								$updateParams[]							= "response||s";
 								$updateParams[]							= "response_date||s";
 								$updateParams[]							= "welcome_date||s";
+								$updateParams[]							= "first_class_choice|None|s";
+								$updateParams[]							= "second_class_choice|None|s";
+								$updateParams[]							= "third_class_choice|None|s";
+								$updateParams[]							= "first_class_choice_utc|None|s";
+								$updateParams[]							= "second_class_choice_utc|None|s";
+								$updateParams[]							= "third_class_choice_utc|None|s";
+								$updateParams[]							= "catalog_options||s";
+								$updateParams[]							= "flexible||s";
 								$significantChange						= TRUE;
 							}
-						}
-						if ($inp_semester != $student_semester) {
-							$updateParams[]						= "semester|$inp_semester|s";
-							$doUpdate							= TRUE;
-							$updateLog							.= "semester changed from $student_semester to $inp_semester. ";
-							$student_semester					= $inp_semester;
-							$semesterChanged					= TRUE;
-							$updateParams[]							= "email_sent_date||s";
-							$updateParams[]							= "email_number|0|s";
-							$updateParams[]							= "response||s";
-							$updateParams[]							= "response_date||s";
-							$updateParams[]							= "welcome_date||s";
-							$updateParams[]							= "first_class_choice|None|s";
-							$updateParams[]							= "second_class_choice|None|s";
-							$updateParams[]							= "third_class_choice|None|s";
-							$updateParams[]							= "first_class_choice_utc|None|s";
-							$updateParams[]							= "second_class_choice_utc|None|s";
-							$updateParams[]							= "third_class_choice_utc|None|s";
-							$updateParams[]							= "catalog_options||s";
-							$updateParams[]							= "flexible||s";
-							$significantChange						= TRUE;
 						}
 						if ($inp_level != $student_level) {
 							$updateParams[]						= "level|$inp_level|s";
@@ -4723,14 +4711,14 @@ already taken Fundamental and was promoted. At Interupt the student decided to $
 							if ($doDebug) {
 								echo "semester has changed. Checking to see if offset changes<br />";
 							}
-							$myArray			= explode(" ",$student_semester);
+							$myArray			= explode(" ",$new_semester);
 							$thisYear			= $myArray[0];
 							$thisMonDay			= $myArray[1];
 							$myConvertArray		= array('Jan/Feb'=>'-01-01','May/Jun'=>'-05-01','Sep/Oct'=>'-09-01','JAN/FEB'=>'-01-01','APR/MAY'=>'-04-01','MAY/JUN'=>'-05-01','SEP/OCT'=>'-09-01','Apr/May'=>'-04-01');
 							$myMonDay			= $myConvertArray[$thisMonDay];
 							$thisNewDate		= "$thisYear$myMonDay 00:00:00";
 							if ($doDebug) {
-								echo "converted $inp_semester to $thisNewDate<br />";
+								echo "converted $new_semester to $thisNewDate<br />";
 							}
 							$dateTimeZoneLocal 	= new DateTimeZone($student_timezone_id);
 							$dateTimeZoneUTC 	= new DateTimeZone("UTC");
