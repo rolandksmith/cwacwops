@@ -1,10 +1,13 @@
 function removeServiceDuplicates() {
 	global $wpdb;
-	$sql = "select * from wpw1_cwa_advisor_service2 
+	$filename = "wpw1_cwa_advisor_service";
+	ini_set('max_execution_time',0);
+	set_time_limit(0);
+	$sql = "select * from $filename 
 			order by advisor, semester";
 	$result = $wpdb->get_results($sql);
 	if ($result === FALSE) {
-		echo "selecting from wpw1_cwa_advisor_servic2 failed<br />";
+		echo "selecting from $filename failed<br />";
 	} else {
 		$numRows = $wpdb->num_rows;
 		echo "ran $sql<br />and retrieved $numRows rows<br />";
@@ -24,7 +27,7 @@ function removeServiceDuplicates() {
 				if ($advisor == $prevAdvisor && $semester == $prevSemester) {
 					echo "have duplicate<br />";
 					$duplicates++;
-					$deleteResult = $wpdb->delete('wpw1_cwa_advisor_service2',
+					$deleteResult = $wpdb->delete($filename,
 												array('record_id'=>$record_id),
 												array('%d'));
 					if ($deleteResult === FALSE) {
