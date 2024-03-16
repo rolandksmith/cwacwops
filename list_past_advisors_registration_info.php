@@ -378,9 +378,7 @@ $testModeOption
 		$result			= $wpdb->get_results($sql);
 		if ($result === FALSE) {
 			if ($doDebug) {
-				echo "Running $sql returned FALSE<br />";
-				echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-				echo "wpdb->last_error: " . $wpdb->last_error . "<br />";
+				handleWPDBError($jobname,$doDebug);
 			}
 		} else {
 			$numARows	= $wpdb->num_rows;
@@ -414,13 +412,10 @@ $testModeOption
 																					     level 
 																					FROM $advisorClassTableName 
 																					WHERE advisor_call_sign='$advisorCallSign' 
+																					and semester = '$futureSemester' 
 																					order by sequence");
 						if ($wpw1_cwa_advisorclass === FALSE) {
-							if ($doDebug) {
-								echo "Reading $advisorClassTableName table failed<br />
-									  wpdb->last_query: " . $wpdb->last_query . "<br />
-									  wpdb->last_error: " . $wpdb->last_error . "<br />";
-							}
+							handleWPDBError($jobname,$doDebug);
 						} else {
 							$numACRows						= $wpdb->num_rows;
 							if ($doDebug) {
@@ -432,7 +427,7 @@ $testModeOption
 									$classSequence			= $advisorClassRow->sequence;
 									$classLevel				= $advisorClassRow->level;
 						
-									$classesArray[$advisorCallSign][$futureSemester][$classSequence] 	= "$thisLevel|Eval --";
+									$classesArray[$advisorCallSign][$futureSemester][$classSequence] 	= "$classLevel|";
 								}
 							}
 						}
@@ -495,7 +490,7 @@ $testModeOption
 					if ($doDebug) {
 						echo "getting the contents of box $mySemester<br />";
 					}
-					$content		.= "<td>${'box' . $mySemester}</td>";
+					$content		.= "<td style='vertical-align:top;'>${'box' . $mySemester}</td>";
 				}
 				$content			.= "</tr>									
 										<tr><td colspan='$columnCount'><hr></td></tr>";
