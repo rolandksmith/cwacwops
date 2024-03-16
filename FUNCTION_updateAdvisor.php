@@ -53,15 +53,10 @@ function updateAdvisor($inpArray) {
 												'doDebug'=>$doDebug);
 				$updateResult	= updateAdvisor($advisorUpdateData);
 				if ($updateResult[0] === FALSE) {
-					$myError	= $wpdb->last_error;
-					$mySql		= $wpdb->last_query;
-					$errorMsg	= "$jobname Processing $advisor_call_sign in $advisorNewTableName failed. Reason: $updateResult[1]<br />SQL: $mySql<br />Error: $myError<br />";
-					if ($doDebug) {
-						echo $errorMsg;
-					}
-					sendErrorEmail($errorMsg);
-					$content		.= "Unable to update content in $advisorNewTableName<br />";
+					handleWPDBError($jobname,$doDebug);
 				} else {
+
+
 		
 	returns array(TRUE,advisor_id) if update was successful
 			array(FALSE,'reason') if not successful
