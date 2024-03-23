@@ -463,116 +463,131 @@ td:last-child {
 												<td>$student_semester</td></tr>
 											<tr><td>Level</td>
 												<td>$student_level</td></tr>";
-					if ($daysToSemester > 45) {
-						if ($student_no_catalog == 'Y') {
-							$thisOptions				= '';
-							if ($student_catalog_options != '') {
-								$myArray				= explode(",",$student_catalog_options);
-								foreach($myArray as $thisData) {
-									$myStr			= $catalogOptions[$thisData];
-									$thisOptions	.= "$myStr<br />";
+												
+					if ($student_response == 'R') {
+						$content		.= "<tr><td>Response</td>
+												<td>REFUSED -- you have indicated that you are not 
+													available to take a class.</td></tr></table>
+													<p>If you have further questions, concerns, or want 
+													the status changed, contact the appropriate person at 
+													<a href='https://cwops.org/cwa-class-resolution/' 
+													target='_blank'>CW Academy Class Resolution</a>.</p>";
+					} else {
+						if ($daysToSemester > 45) {
+							if ($student_response == 'Y') {
+								sendErrorEmail("$jobname -- $userName -- response is set to Y and more 
+than 45 days before the semester. Possible error");
+							}
+							if ($student_no_catalog == 'Y') {
+								$thisOptions				= '';
+								if ($student_catalog_options != '') {
+									$myArray				= explode(",",$student_catalog_options);
+									foreach($myArray as $thisData) {
+										$myStr			= $catalogOptions[$thisData];
+										$thisOptions	.= "$myStr<br />";
+									}
+								} else {
+									if ($student_flexible == 'Y') {
+										$thisOptions	= "Flexible";
+									} else {
+										$thisOptions		= 'None Selected';
+									}
+								}										
+								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>$thisOptions</td></tr>
+												</table>
+												<p>About 45 days before the semester begins 
+												you will receive an email requesting you to review your class 
+												preferences and update them. The NEW catalog will be available 
+												by then. <span style='color:red;'>You <b>MUST</b> respond to that 
+												email or you will not be considered for assignment to a class</span></p>";
+							} else {
+								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>First: $student_first_class_choice<br />
+														Second: $student_second_class_choice<br />
+														Third: $student_third_class_choice</td></tr>
+												</table>
+												<p>About 45 days before the semester begins 
+												you will receive an email requesting you to review your class 
+												preferences and update them. An updated catalog will be available 
+												by then. <span style='color:red;'>You <b>MUST</b> respond to that 
+												email or you will not be considered for assignment to a class</span></p>";
+							}
+						} elseif ($daysToSemester > 20) {			/// assignments haven't happened yet
+							if ($student_no_catalog == 'Y' && $student_response == '') {
+								$passPhone				= substr($student_phone,-5,5);
+								$stringToPass			= "inp_callsign=$student_call_sign&inp_phone=$passPhone&inp_email=$student_email&inp_mode=$inp_mode&strPass=2&inp_verbose=$inp_verbose&inp_verify=Y";
+								$content	.= "</table>
+												<p>You have not verified your class 
+												preferences as requested in earlier emails from CW Academy. 
+												If you want to be considered for assignment to a class, 
+												you <span style='color:red;'><b>MUST</b></span> go to 
+												<a href='$studentRegistrationURL?enstr=$encstr'&inp_verify=Y&strpass=2'>Student Sign-up</a> 
+												and update your preferred class schedule and alternates.";
+							} else {
+								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>First: $student_first_class_choice<br />
+														Second: $student_second_class_choice<br />
+														Third: $student_third_class_choice</td></tr>
+												</table>
+												<p>Student assignment to advisor classes will not occur until about 
+												20 days before the $student_semester starts. Until then, no additional status information is available.</p>";
+								if ($doDebug) {
+									echo "Student assignment has not happened<br />";
+								}
+							}
+						} elseif ($daysToSemester > 0 && $daysToSemester < 21) {
+							if ($student_response == '') {
+								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>First: $student_first_class_choice<br />
+														Second: $student_second_class_choice<br />
+														Third: $student_third_class_choice</td></tr>
+												</table>
+												<p>You have not responded to CW Academy verification request emails. 
+											   Check your email, including the spam and promotions folders for email from 
+											   CW Academy and respond appropriately</p>";
+							} elseif ($student_response == 'Y') {
+								if ($student_student_status == '') {
+									$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>$student_first_class_choice<br />
+														$student_second_class_choice<br />
+														$student_third_class_choice</td></tr>
+												</table>
+												<p>You are on a waiting list for assignment to a class should a student drop out and a 
+													vacancy arise. You will receive more information before the semester starts. If you do not get assigned 
+													to a class, your sign up will be automatically moved to the next semester and you will be given heightened 
+													priority for assignment to a class.</p>";
+								} elseif ($student_student_status == 'S') {
+									$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
+													<td>$student_first_class_choice<br />
+														$student_second_class_choice<br />
+														$student_third_class_choice</td></tr>
+												</table>
+												<p>You have been assigned to a class. 
+													Your advisor should contact you within the next few days to give you the actual class schedule and 
+													confirm that you will be able to participate in this class.</p>";								
+								} elseif ($student_student_status == 'R' || $student_student_status == 'C' || $student_student_status == 'N' || $student_student_status == 'V') {
+									$content	.= "</table><p>You were assigned to a class, however the 
+													advisor has removed you from the class. Either the class did not 
+													meet your needs or you did not respond to the advisor.</p>";
+								} elseif ($student_student_status == 'Y') {
+									$content	.= "<tr><td style='vertical-align:top;'>Assigned Advisor</td>
+														<td>$student_assigned_advisor</td></tr>
+													</table>
+													<p>You have been assigned to a class and your advisor has contacted you to give 
+													you the actual class schedule and confirmed that you will be able to participate in this class.</p>";
 								}
 							} else {
-								if ($student_flexible == 'Y') {
-									$thisOptions	= "Flexible";
-								} else {
-									$thisOptions		= 'None Selected';
-								}
-							}										
-							$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>$thisOptions</td></tr>
-											</table>
-											<p>About 45 days before the semester begins 
-											you will receive an email requesting you to review your class 
-											preferences and update them. The NEW catalog will be available 
-											by then. <span style='color:red;'>You <b>MUST</b> respond to that 
-											email or you will not be considered for assignment to a class</span></p>";
-						} else {
-							$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>First: $student_first_class_choice<br />
-													Second: $student_second_class_choice<br />
-													Third: $student_third_class_choice</td></tr>
-											</table>
-											<p>About 45 days before the semester begins 
-											you will receive an email requesting you to review your class 
-											preferences and update them. An updated catalog will be available 
-											by then. <span style='color:red;'>You <b>MUST</b> respond to that 
-											email or you will not be considered for assignment to a class</span></p>";
+								$content	.= "<p>You were registered for the $student_semester semester for a 
+												$student_level class. You said that you were not available 
+												to take a class and your registration has been cancelled.</p>";
+							}								
 						}
-					} elseif ($daysToSemester > 20) {			/// assignments haven't happened yet
-						if ($student_no_catalog == 'Y' && $student_response == '') {
-							$passPhone				= substr($student_phone,-5,5);
-							$stringToPass			= "inp_callsign=$student_call_sign&inp_phone=$passPhone&inp_email=$student_email&inp_mode=$inp_mode&strPass=2&inp_verbose=$inp_verbose&inp_verify=Y";
-							$content	.= "</table>
-											<p>You have not verified your class 
-											preferences as requested in earlier emails from CW Academy. 
-											If you want to be considered for assignment to a class, 
-											you <span style='color:red;'><b>MUST</b></span> go to 
-											<a href='$studentRegistrationURL?enstr=$encstr'&inp_verify=Y&strpass=2'>Student Sign-up</a> 
-											and update your preferred class schedule and alternates.";
-						} else {
-							$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>First: $student_first_class_choice<br />
-													Second: $student_second_class_choice<br />
-													Third: $student_third_class_choice</td></tr>
-											</table>
-											<p>Student assignment to advisor classes will not occur until about 
-											20 days before the $student_semester starts. Until then, no additional status information is available.</p>";
-							if ($doDebug) {
-								echo "Student assignment has not happened<br />";
-							}
-						}
-					} elseif ($daysToSemester > 0 && $daysToSemester < 21) {
-						if ($student_response == '') {
-							$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>First: $student_first_class_choice<br />
-													Second: $student_second_class_choice<br />
-													Third: $student_third_class_choice</td></tr>
-											</table>
-											<p>You have not responded to CW Academy verification request emails. 
-										   Check your email, including the spam and promotions folders for email from 
-										   CW Academy and respond appropriately</p>";
-						} elseif ($student_response == 'Y') {
-							if ($student_student_status == '') {
-								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>$student_first_class_choice<br />
-													$student_second_class_choice<br />
-													$student_third_class_choice</td></tr>
-											</table>
-											<p>You are on a waiting list for assignment to a class should a student drop out and a 
-												vacancy arise. You will receive more information before the semester starts. If you do not get assigned 
-												to a class, your sign up will be automatically moved to the next semester and you will be given heightened 
-												priority for assignment to a class.</p>";
-							} elseif ($student_student_status == 'S') {
-								$content	.= "<tr><td style='vertical-align:top;'>Class Preferences</td>
-												<td>$student_first_class_choice<br />
-													$student_second_class_choice<br />
-													$student_third_class_choice</td></tr>
-											</table>
-											<p>You have been assigned to a class. 
-												Your advisor should contact you within the next few days to give you the actual class schedule and 
-												confirm that you will be able to participate in this class.</p>";								
-							} elseif ($student_student_status == 'R' || $student_student_status == 'C' || $student_student_status == 'N' || $student_student_status == 'V') {
-								$content	.= "</table><p>You were assigned to a class, however the 
-												advisor has removed you from the class. Either the class did not 
-												meet your needs or you did not respond to the advisor.</p>";
-							} elseif ($student_student_status == 'Y') {
-								$content	.= "<tr><td style='vertical-align:top;'>Assigned Advisor</td>
-													<td>$student_assigned_advisor</td></tr>
-												</table>
-												<p>You have been assigned to a class and your advisor has contacted you to give 
-												you the actual class schedule and confirmed that you will be able to participate in this class.</p>";
-							}
-						} else {
-							$content	.= "<p>You were registered for the $student_semester semester for a 
-											$student_level class. You said that you were not available 
-											to take a class and your registration has been cancelled.</p>";
-						}								
-					}
-			
-					$content		.= "<p>If you have further questions or concerns, contact the appropriate person at 
-										<a href='https://cwops.org/cwa-class-resolution/' target='_blank'>CW Academy Class Resolution</a>.</p>
+				
+						$content		.= "<p>If you have further questions or concerns, contact the appropriate person at 
+											<a href='https://cwops.org/cwa-class-resolution/' target='_blank'>CW Academy Class Resolution</a>.</p>
 										<p>Thanks!<br />CW Academy</p>";
+					}
 				}
 			} else {
 				$content		.= "<h3>Student Registration Check</h3>
