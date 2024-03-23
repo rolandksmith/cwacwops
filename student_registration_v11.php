@@ -3605,8 +3605,8 @@ if ($testMode) {
 								$content	.= "<input class='formInputButton' type='submit' onclick=\"return validate_checkboxes(this.form);\" value='Submit' />";
 //								$content	.= "<input class='formInputButton' type='submit' value='Submit' />";
 							} else {			
-//								$content	.= "<input class='formInputButton' type='submit' onclick=\"return validate_form(this.form);\" value='Submit' />";
-								$content	.= "<input class='formInputButton' type='submit' value='Submit' />";
+								$content	.= "<input class='formInputButton' type='submit' onclick=\"return validate_form(this.form);\" value='Submit' />";
+//								$content	.= "<input class='formInputButton' type='submit' value='Submit' />";
 							}
 								$content	.= "</form></p>";
 						}
@@ -4100,38 +4100,21 @@ if ($testMode) {
 					}
 					$content			.= "<p>You are signed-up as follows:
 											<table style='width:60%;'>
-											<tr><td>Call Sign</td><td>$student_call_sign</td></tr>
-											<tr><td>First Name</td><td>$student_first_name</td></tr>
-											<tr><td>Last Name</td><td>$student_last_name</td></tr>
-											<tr><td>Email</td><td>$student_email</td></tr>
-											<tr><td>Phone</td><td>+$student_ph_code $student_phone</td></tr>
-											<tr><td>Text Messaging</td><td>$student_messaging</td></tr>
-											<tr><td>City</td><td>$student_city</td></tr>
-											<tr><td>State</td><td>$student_state</td></tr>
-											<tr><td>Zip Code</td><td>$student_zip_code</td></tr>
-											<tr><td>Country</td><td>$student_country</td></tr>";
-															if ($student_whatsapp != '') {
-																$content	.= "<tr><td>Whatsapp</td><td>$student_whatsapp</td></tr>";
-															}
-															if ($student_telegram != '') {
-																$content	.= "<tr><td>Telegram</td><td>$student_telegram</td></tr>";
-															}
-															if ($student_signal != '') {
-																$content	.= "<tr><td>Signal</td><td>$student_signal</td></tr>";
-															}
-															if ($student_messenger != '') {
-																$content	.= "<tr><td>Facebook Messenger</td><td>$student_messenger</td></tr>";
-															}
-															$content		.= "
-											<tr><td>Level</td><td>$student_level</td></tr>
-											<tr><td>Semester</td><td>$student_semester</td></tr>";
+											<tr><td colspan='2'>$student_last_name, $student_first_name ($student_call_sign)</td></tr>
+											<tr><td>Email: $student_email</td>
+												<td>Phone: $student_ph_code $student_phone</td></tr>
+											<tr><td>City: $student_city</td>
+												<td>State: $student_state</td></tr>
+											<tr><td>Zip Code: $student_zip_code</td>
+												<td>Country: $student_country</td></tr>
+											<tr><td>Level: $student_level</td>
+												<td>Semester: $student_semester</td></tr>";
 					if ($result_option == 'option') {
-						$content	.= "<tr><td>Class Preferences</td>";
+						$content	.= "<tr><td colspan='2'>Class Preferences<br />";
 						if ($student_flexible == 'Y') {
-							$content	.= "<td>My time is flexible</td></tr>";
+							$content	.= "My time is flexible</td></tr>";
 						} else {
 							$myArray	= explode(",",$student_catalog_options);
-							$content	.= "<td>";
 							foreach($myArray as $thisData) {
 								$myStr		= $catalogOptions[$thisData];
 								$content	.= "$myStr<br />";
@@ -4143,11 +4126,33 @@ if ($testMode) {
 											<tr><td>Second Class Choice</td><td>$secondChoice</td></tr>
 											<tr><td>Third Class Choice</td><td>$thirdChoice</td></tr>";
 					}
+					$box1		= "Whatsapp<br />----";		
+					$box2		= "Telegram<br />----";		
+					$box3		= "Signal<br />----";		
+					$box4		= "Messenger<br />----";		
+					if ($student_whatsapp != '') {
+						$box1	= "Whatsapp<<br />$student_whatsapp";
+					}
+					if ($student_telegram != '') {
+						$box2	= "Telegram<br />$student_telegram";
+					}
+					if ($student_signal != '') {
+						$box3	= "Signal<br />$student_signal";
+					}
+					if ($student_messenger != '') {
+						$box4	= "Messenger<br />$student_messenger";
+					}
+					$content	.= "<tr><td colspan='2'>
+									<table>
+									<tr><td style='text-align:center;'>$box1</td>
+										<td style='text-align:center;'>$box2</td>
+										<td style='text-align:center;'>$box3</td>
+										<td style='text-align:center;'>$box4</td></tr></table></td></tr>";
 					if ($student_youth == 'Yes') {
-						$content	.= "<tr><td>Youth</td><td>$student_youth</td></tr>
-										<tr><td>Age</td><td>$student_age</td></tr>
-										<tr><td>Parent / Guardian</td><td>$student_student_parent</td></tr>
-										<tr><td>Parent / Guardian Email</td><td>$student_student_parent_email</td></tr>";
+						$content	.= "<tr><td style='text-align:center;'>Youth<br />$student_youth</td>
+											<td style='text-align:center;'>Age<br />$student_age</td></tr>
+										<tr><td>Parent / Guardian<br />$student_student_parent</td>
+											<td>Parent / Guardian Email<br />$student_student_parent_email</td></tr>";
 					}
 					$content		.= "</table></p>
 										<p>If circumstances or your information changes, you can update this information up to 
@@ -5220,35 +5225,59 @@ no record. Can not store the update";
 												<button onClick=\"window.print()\">Click to print this<br />page for your records</button>
 												<p> Your information:
 												<table style='width:60%;'>
-												<tr><td>Call Sign</td><td>$student_call_sign</td></tr>
-												<tr><td>First Name</td><td>$student_first_name</td></tr>
-												<tr><td>First Name</td><td>$student_last_name</td></tr>
-												<tr><td>Email</td><td>$student_email</td></tr>
-												<tr><td>Phone</td><td>$student_ph_code $student_phone</td></tr>
-												<tr><td>Text Messaging</td><td>$student_messaging</td></tr>
-												<tr><td>City</td><td>$student_city</td></tr>
-												<tr><td>State</td><td>$student_state</td></tr>
-												<tr><td>Zip Code</td><td>$student_zip_code</td></tr>
-												<tr><td>Country</td><td>$student_country</td></tr>";
+												<tr><td colspan='2'>$student_last_name, $student_first_name ($student_call_sign)</td></tr>
+												<tr><td>Email: $student_email</td>
+													<td>Phone: $student_ph_code $student_phone</td></tr>
+												<tr><td>City: $student_city</td>
+													<td>State: $student_state</td></tr>
+												<tr><td>Zip Code: $student_zip_code</td>
+													<td>Country: $student_country</td></tr>
+												<tr><td>Level: $student_level</td>
+													<td>Semester: $student_semester</td></tr>";
+						if ($result_option == 'option') {
+							$content	.= "<tr><td colspan='2'>Class Preferences<br />";
+							if ($student_flexible == 'Y') {
+								$content	.= "My time is flexible</td></tr>";
+							} else {
+								$myArray	= explode(",",$student_catalog_options);
+								foreach($myArray as $thisData) {
+									$myStr		= $catalogOptions[$thisData];
+									$content	.= "$myStr<br />";
+								}
+								$content		.= "</td></tr>";
+							}
+						} else {
+							$content		.= "<tr><td>First Class Choice</td><td>$firstChoice</td></tr>
+												<tr><td>Second Class Choice</td><td>$secondChoice</td></tr>
+												<tr><td>Third Class Choice</td><td>$thirdChoice</td></tr>";
+						}
+						$box1		= "Whatsapp<br />----";		
+						$box2		= "Telegram<br />----";		
+						$box3		= "Signal<br />----";		
+						$box4		= "Messenger<br />----";		
 						if ($student_whatsapp != '') {
-							$content	.= "<tr><td>Whatsapp</td><td>$student_whatsapp</td></tr>";
+							$box1	= "Whatsapp<<br />$student_whatsapp";
 						}
 						if ($student_telegram != '') {
-							$content	.= "<tr><td>Telegram</td><td>$student_telegram</td></tr>";
+							$box2	= "Telegram<br />$student_telegram";
 						}
 						if ($student_signal != '') {
-							$content	.= "<tr><td>Signal</td><td>$student_signal</td></tr>";
+							$box3	= "Signal<br />$student_signal";
 						}
 						if ($student_messenger != '') {
-							$content	.= "<tr><td>Facebook Messenger</td><td>$student_messenger</td></tr>";
+							$box4	= "Messenger<br />$student_messenger";
 						}
-						$content		.= "<tr><td>Level</td><td>$student_level</td></tr>
-											<tr><td>Semester</td><td>$student_semester</td></tr>";
+						$content	.= "<tr><td colspan='2'>
+										<table>
+										<tr><td style='text-align:center;'>$box1</td>
+											<td style='text-align:center;'>$box2</td>
+											<td style='text-align:center;'>$box3</td>
+											<td style='text-align:center;'>$box4</td></tr></table></td></tr>";
 						if ($student_youth == 'Yes') {
-							$content	.= "<tr><td>Youth</td><td>$student_youth</td></tr>
-											<tr><td>Age</td><td>$student_age</td></tr>
-											<tr><td>Parent / Guardian</td><td>$student_student_parent</td></tr>
-											<tr><td>Parent / Guardian Email</td><td>$student_student_parent_email</td></tr>";
+							$content	.= "<tr><td style='text-align:center;'>Youth<br />$student_youth</td>
+												<td style='text-align:center;'>Age<br />$student_age</td></tr>
+											<tr><td>Parent / Guardian<br />$student_student_parent</td>
+												<td>Parent / Guardian Email<br />$student_student_parent_email</td></tr>";
 						}
 						$content		.= "</table></p>
 											<p>If circumstances or your information changes, you can update this information by returning to the 
@@ -5898,39 +5927,23 @@ no record. Can not store the update";
 												$nocatalogMsg
 												<button onClick=\"window.print()\">Click to print this<br />page for your records</button>";
 					}
-					$content				.= "<p> You are signed-up as follows:
-												<table style='width:60%;'>
-												<tr><td>Call Sign</td><td>$student_call_sign</td></tr>
-												<tr><td>First Name</td><td>$student_first_name</td></tr>
-												<tr><td>First Name</td><td>$student_last_name</td></tr>
-												<tr><td>Email</td><td>$student_email</td></tr>
-												<tr><td>Phone</td><td>$student_ph_code $student_phone</td></tr>
-												<tr><td>Text Messaging</td><td>$student_messaging</td></tr>
-												<tr><td>City</td><td>$student_city</td></tr>
-												<tr><td>State</td><td>$student_state</td></tr>
-												<tr><td>Zip Code</td><td>$student_zip_code</td></tr>
-												<tr><td>Country</td><td>$student_country</td></tr>";
-					if ($student_whatsapp != '') {
-						$content	.= "<tr><td>Whatsapp</td><td>$student_whatsapp</td></tr>";
-					}
-					if ($student_telegram != '') {
-						$content	.= "<tr><td>Telegram</td><td>$student_telegram</td></tr>";
-					}
-					if ($student_signal != '') {
-						$content	.= "<tr><td>Signal</td><td>$student_signal</td></tr>";
-					}
-					if ($student_messenger != '') {
-						$content	.= "<tr><td>Facebook Messenger</td><td>$student_messenger</td></tr>";
-					}
-					$content		.= "<tr><td>Level</td><td>$student_level</td></tr>
-										<tr><td>Semester</td><td>$student_semester</td></tr>";
+					$content			.= "<p>You are signed-up as follows:
+											<table style='width:60%;'>
+											<tr><td colspan='2'>$student_last_name, $student_first_name ($student_call_sign)</td></tr>
+											<tr><td>Email: $student_email</td>
+												<td>Phone: $student_ph_code $student_phone</td></tr>
+											<tr><td>City: $student_city</td>
+												<td>State: $student_state</td></tr>
+											<tr><td>Zip Code: $student_zip_code</td>
+												<td>Country: $student_country</td></tr>
+											<tr><td>Level: $student_level</td>
+												<td>Semester: $student_semester</td></tr>";
 					if ($result_option == 'option') {
-						$content	.= "<tr><td>Class Preferences</td>";
+						$content	.= "<tr><td colspan='2'>Class Preferences<br />";
 						if ($student_flexible == 'Y') {
-							$content	.= "<td>My time is flexible</td></tr>";
+							$content	.= "My time is flexible</td></tr>";
 						} else {
 							$myArray	= explode(",",$student_catalog_options);
-							$content	.= "<td>";
 							foreach($myArray as $thisData) {
 								$myStr		= $catalogOptions[$thisData];
 								$content	.= "$myStr<br />";
@@ -5940,14 +5953,35 @@ no record. Can not store the update";
 					} else {
 						$content		.= "<tr><td>First Class Choice</td><td>$firstChoice</td></tr>
 											<tr><td>Second Class Choice</td><td>$secondChoice</td></tr>
-											<tr><td>Third Class Choice</td><td>$thirdChoice</td></tr>
-											<tr><td>Any Available Class</td><td>$student_flexible</td></tr>";
+											<tr><td>Third Class Choice</td><td>$thirdChoice</td></tr>";
 					}
+					$box1		= "Whatsapp<br />----";		
+					$box2		= "Telegram<br />----";		
+					$box3		= "Signal<br />----";		
+					$box4		= "Messenger<br />----";		
+					if ($student_whatsapp != '') {
+						$box1	= "Whatsapp<<br />$student_whatsapp";
+					}
+					if ($student_telegram != '') {
+						$box2	= "Telegram<br />$student_telegram";
+					}
+					if ($student_signal != '') {
+						$box3	= "Signal<br />$student_signal";
+					}
+					if ($student_messenger != '') {
+						$box4	= "Messenger<br />$student_messenger";
+					}
+					$content	.= "<tr><td colspan='2'>
+									<table>
+									<tr><td style='text-align:center;'>$box1</td>
+										<td style='text-align:center;'>$box2</td>
+										<td style='text-align:center;'>$box3</td>
+										<td style='text-align:center;'>$box4</td></tr></table></td></tr>";
 					if ($student_youth == 'Yes') {
-						$content	.= "<tr><td>Youth</td><td>$student_youth</td></tr>
-										<tr><td>Age</td><td>$student_age</td></tr>
-										<tr><td>Parent / Guardian</td><td>$student_student_parent</td></tr>
-										<tr><td>Parent / Guardian Email</td><td>$student_student_parent_email</td></tr>";
+						$content	.= "<tr><td style='text-align:center;'>Youth<br />$student_youth</td>
+											<td style='text-align:center;'>Age<br />$student_age</td></tr>
+										<tr><td>Parent / Guardian<br />$student_student_parent</td>
+											<td>Parent / Guardian Email<br />$student_student_parent_email</td></tr>";
 					}
 					$content		.= "</table></p>
 										<p>If circumstances or your information changes, you can update this information up to 
