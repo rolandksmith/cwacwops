@@ -288,7 +288,7 @@ td:last-child {
 								</td></tr>
 								<tr><td>Advisor Records to Include</td>
 								<td><input type='radio' class='formInputButton' name='inp_type' value='assigned' checked='checked'>Assigned Advisors (use after students have been assigned)<br />
-									<input type='radio' class='formInputButton' name='inp_type' value='pre-assigned'>Pre-assigned Advisors (use before students have been assigned)</td></tr>
+									<input type='radio' class='formInputButton' name='inp_type' value='pre-assigned'>Pre-assigned Advisors and Assigned Advisors (use before students have been assigned)</td></tr>
 								<tr><td>Student Records to Include</td>
 								<td><input type='radio' class='formInputButton' name='inp_verified' value='verified' checked='checked'>Verified students (use after students verified attendance)<br />
 									<input type='radio' class='formInputButton' name='inp_verified' value='all'>All students except R</td></tr>
@@ -317,12 +317,18 @@ td:last-child {
 			$studentTableName		= 'wpw1_cwa_consolidated_student';
 			$thisMode				= 'PD';
 		}
- 		
+		$doPreAssigned				= FALSE;
+		$preAssignedStr				= 'FALSE';
+ 		if ($inp_type == 'pre-assigned') {
+ 			$doPreAssigned			= TRUE;
+ 			$preAssignedStr			= 'TRUE';
+ 		}
  		if ($doDebug) {
  			echo "Using inp_semester: $inp_semester<br />
 					advisorTableName: $advisorTableName<br />
 					advisorClassTableName: $advisorClassTableName<br />
-					studentTableName: $studentTableName<br />";
+					studentTableName: $studentTableName<br />
+					doPreAssigned: $preAssignedStr<br />";
  		}
  
 		$content .= "<h2>$jobname</h2>\n
@@ -356,15 +362,7 @@ td:last-child {
 							order by call_sign";
 		$wpw1_cwa_advisor	= $wpdb->get_results($sql);
 		if ($wpw1_cwa_advisor === FALSE) {
-			$myError			= $wpdb->last_error;
-			$myQuery			= $wpdb->last_query;
-			if ($doDebug) {
-				echo "Reading $advisorNewTableName table failed<br />
-					  wpdb->last_query: $myQuery<br />
-					  wpdb->last_error: $myError<br />";
-			}
-			$errorMsg			= "$jobname Reading $advisorTableName table failed. <p>SQL: $myQuery</p><p> Error: $myError</p>";
-			sendErrorEmail($errorMsg);
+			handleWPDBError($jobname,$doDebug);
 			$content		.= "Unable to obtain content from $advisorNewTableName<br />";
 		} else {
 			$numARows			= $wpdb->num_rows;
@@ -425,11 +423,12 @@ td:last-child {
 							echo "Preparing advisor class display for $advisor_call_sign<br />";
 						}
 		
-						$result				= prepare_advisor_class_display($advisor_call_sign,
+						$result				= prepare_preassigned_class_display($advisor_call_sign,
 																				$inp_semester,
 																				'Full', 			// full or sonly
 																				FALSE,				// show verified
 																				TRUE,				// include header
+																				$doPreAssigned,		// do preassigned and assigned or assigned only
 																				$testMode,
 																				$doDebug); 
 						if ($result[0] === FALSE) {
@@ -462,7 +461,7 @@ td:last-child {
 		if($doDebug) {
 			echo "<br />end of current advisor information report<br /><br />";
 		}
- 
+
 
 		
 //////// end of Current Advisor Assignment Information report			
