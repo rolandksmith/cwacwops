@@ -231,7 +231,7 @@ function generate_catalog_for_student($inp_data = array('')) {
 												<td style='vertical-align:top;'><input type='checkbox' name='inp_sked_times[]' class='formInputButton' value='STA' $STA> Afternoons</td>
 												<td style='vertical-align:top;'><input type='checkbox' name='inp_sked_times[]' class='formInputButton' value='STE' $STE> Evenings</td></tr>
 											<tr><td colspan='3'><hr></td></tr>
-											<tr><td colspan='3' style='vertical-align:top;'><input type='checkbox' name='inp_sked_times[]' class='formInputButton' value='ANY' $flexible> Any and All of the Above</td></tr>
+											<tr><td colspan='3' style='vertical-align:top;'><input type='checkbox' name='inp_flex' class='formInputButton' value='ANY' $flexible> Any and All of the Above</td></tr>
 											</table>
 											<p>Legend: <i>Mornings: 7am to Noon; Afternoon: Noon to 6pm; Evenings: 6pm to 10pm</i></p> 
 											<p>Your selection(s) above will help CW Academy put together class schedules that 
@@ -310,9 +310,12 @@ function generate_catalog_for_student($inp_data = array('')) {
 													<td style='text-align:center;'>$numClasses</tr>\n";
 						}
 					}
-					$thisChecked			= '';
+					$flexYChecked			= '';
+					$flexNChecked			= '';
 					if ($student_flexible == 'Y') {
-						$thisChecked		= 'checked';
+						$flexYChecked		= 'checked';
+					} else {
+						$flexNChecked		= 'checked';
 					}
 					$returnCatalog			.= "<tr><td><input type='radio' class='formInputText' id='chk_sked1' name='inp_sked1' value='None' $none1></td>\n
 													<td><input type='radio' class='formInputText' id='chk_sked2' name='inp_sked2' value='None' $none2></td>\n
@@ -320,10 +323,10 @@ function generate_catalog_for_student($inp_data = array('')) {
 													<td>None of the above</td>\n
 													<td></td></tr>\n
 												<tr><td colspan='5'><hr></td></tr>\n
-												<tr><td style='vertical-align:top;'><input type='checkbox' class='formInputText' id='chk_flex' name='inp_flex' value='Y' $thisChecked></td>\n
-													<td colspan='4' style='vertical-align:top;'><i>If you are  
-														flexible and can be assigned to any of the classes listed above, 
-														please check this box</i></td></tr>\n
+												<tr><td colspan='5' style='vertical-align:top;'><i>Indicate if you are  
+														flexible and can be assigned to any of the classes listed above</i><br />\n
+														<input type='radio' class='formInputText' name='inp_flex' value='Y' $flexYChecked>Yes, I'm flexible<br />
+														<input type='radio' class='formInputText' name='inp_flex' value='N' $flexNChecked>No</td></tr>\n
 												</table>";
 					$returnOption		= 'catalog';
 				}			
