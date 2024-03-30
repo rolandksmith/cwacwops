@@ -1981,7 +1981,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 
 //	Starting verification email process
 
-								if ($doDebugLog) {
+     								if ($doDebugLog) {
 									$debugLog .= "<br />Verification Process<br />";
 								}
 								if ($validEmailPeriod != "N") {
@@ -2089,6 +2089,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 */ 	
 
 													$sendEmail 		= FALSE;
+													$setReminder	= FALSE;
 													$finalNotice	= "";
 													switch($student_email_number) {
 														case 0:
@@ -2119,6 +2120,7 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 															$studentsSentFirstEmail++;
 															$content							.= "VERIFY Student <a href='$studentUpdateURL?request_type=callsign&request_info=$student_call_sign&request_table=$studentTableName&strpass=2' target='_blank'>$student_call_sign</a> ($student_level $student_semester) was sent the first verification email.<br />";
 															$sendEmail							= TRUE;
+															$setReminder						= TRUE;
 															break;
 														case 1:
 															if ($doDebugLog) {
@@ -2278,6 +2280,8 @@ and verified. Click on <a href='$advisorVerifyURL/?callsign=$advisorClass_adviso
 																						<p>Note: Please save this email in case you need to change something in the future....</p>
 																						<p>Regards,<br />
 																						CW Academy</p>";
+																						
+																						
 																$token				= mt_rand();
 																$reminder_text		= "<p><b>Select Class Schedule Preferences:</b> It is time to verify your availability to take a class in the upcoming semester 
 and to select your class preferences. The class catalog is now available. Your options are:<br />
@@ -2345,8 +2349,9 @@ Update your information as needed and make your class preference choices.</p>";
 	//															if ($doDebugLog) {
 	//																$emailCountArray[]	= "email sent. Count now $studentEmailCount<br />";
 	//															}
-																if ($addReminder) {
+																if ($addReminder && $setReminder) {
 																	$addReminder		= FALSE;
+																	$setReminder	 	= FALSE;
 																	// add the reminder to the reminders table
 																	if ($doDebugLog) {
 																		$debugLog .= "adding reminder to reminders table<br />";
