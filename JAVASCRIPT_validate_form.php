@@ -219,13 +219,8 @@ add_action( 'wp_head', function () { ?>
 				console.log(mySked3);
 			}
 
-		    if(document.getElementById('chk_flex').checked == true) {
-				gotFlex = true;
-				console.log('gotFlex is TRUE');
-			}
 
-
-			if(needSked1 && !gotFlex) {
+			if(needSked1) {
 				if (!gotSked1) {
 					errortext += 'You must select a 1st choice preference.\n';
 					errorcount++;
@@ -303,6 +298,7 @@ add_action( 'wp_head', function () { ?>
 			}
 		}
 
+			
 
 
 	    if (errorcount > 0) {

@@ -251,6 +251,7 @@ function student_registration_v11_func() {
 		$inp_times2						= '';
 		$inp_times3						= '';
 		$inp_bypass						= '';
+		$inp_flex						= '';
 
 		$inp_wpm						= '';
 		$inp_waiting_list				= '';
@@ -5385,6 +5386,7 @@ no record. Can not store the update";
 		if ($doDebug) {
 			echo "<br />arrived at pass 9<br />";
 		}
+		
 		$userName				= $inp_callsign;
 		$firstChoice			= '';
 		$secondChoice			= '';
@@ -5495,6 +5497,9 @@ no record. Can not store the update";
 					$thirdChoice							= $student_third_class_choice;
 
 					if ($result_option == 'option') {
+						if ($doDebug) {
+							echo "going through option logic<br >";
+						}
 						if ($student_no_catalog != 'Y') {
 							$student_no_catalog					= 'Y';
 							$updateParams[]						= "no_catalog|Y|s";
@@ -5560,97 +5565,72 @@ no record. Can not store the update";
 						$updateParams[]				= "abandoned|N|s";
 						$doUpdateStudent			= TRUE;
 
-						/* 	the student either selected one or more classes or said 
-							that any class would be sufficient
-							
-							if any class (inp_flex = Y), then set flexible to Y and 
-							set 1st class choice to 1900 Monday,Thursday local time and
-							calculate UTC
-							
-							Else, for each schedule not = None, break it apart by | 
-							and store into the appropriate local and utc variables
-						*/
-						
-						if ($student_flexible == 'Y') {
-							$inp_sked1				= "1900 Monday,Thursday";
-							$updateParams[]			= "first_class_choice|1900 Monday,Thursday|s";
-							$updateParams[]			= "second_class_choice|None|s";
-							$updateParams[]			= "third_class_choice|None|s";
-							$updateParams[]			= "second_class_choice_utc|None|s";
-							$updateParams[]			= "third_class_choice_utc|None|s";
+						if ($inp_flex == 'Y') {
 							$updateParams[]			= "flexible|Y|s";
 							$actionLogUpdates		.= "set flexible to Y ";
 							$doUpdateStudent		= TRUE;
-							$utcResult				= utcConvert('toutc',$student_timezone_offset,'1900','Monday,Thursday',$doDebug);
-							if ($utcResult[0] == 'OK') {
-								$myStr				= "$utcResult[1] $utcResult[2]";
-								$updateParams[]		= "first_class_choice_utc|$myStr|s";
-								$doUpdateStudent	= TRUE;
-							} else {
-								if ($doDebug) {
-									echo "converting 1900 Monday,Thursday for timezone offset $student_timezone_offset failed. Error; $result[3]<br />";
-								}
-								$updateParams[]		= "first_class_choice_utc|None|s";
-								$doUpdateStudent	= TRUE;
-							}
 						} else {
-							if ($inp_sked1 == 'None') {
+							$updateParams[]			= "flexible|N|s";
+							$actionLogUpdates		.= "set flexible to N ";
+							$doUpdateStudent		= TRUE;
+						}
+						if ($inp_sked1 == 'None') {
+							if ($doDebug) {
+								echo "inp_sked1 is None. Should not happen!!<br />";
+							}
+							sendErrorEmail("$jobname pass9 first class choice is None. Should not happen. Student $student_call_sign");
+						} else {
+							$myArray			= explode("|",$inp_sked1);
+							if (count($myArray) == 2) {
+								$updateParams[]		= "first_class_choice|$myArray[0]|s";
+								$updateParams[]		= "first_class_choice_utc|$myArray[1]|s";
+								$doUpdateStudent	= TRUE;
+								$firstChoice 		= $myArray[0];
+								$actionLogUpdates	.= "set first_class_choice to $myArray[0] ";
+							} else {
 								if ($doDebug) {
-									echo "inp_sked1 is None. Should not happen!!<br />";
+									echo "inp_sked1 is $inp_sked1 and it does not compute<br />";
+								}
+							}						
+							if ($inp_sked2 !== 'None') {
+								$myArray			= explode("|",$inp_sked2);
+								if (count($myArray) == 2) {
+									$updateParams[]		= "second_class_choice|$myArray[0]|s";
+									$updateParams[]		= "second_class_choice_utc|$myArray[1]|s";
+									$doUpdateStudent	= TRUE;
+									$secondChoice	 	= $myArray[0];
+									$actionLogUpdates	.= "set second_class_choice to $myArray[0] ";
+								} else {
+									$updateParams[]		= "second_class_choice|None|s";
+									$updateParams[]		= "second_class_choice_utc|None|s";
+									$doUpdateStudent	= TRUE;
+									$secondChoice 		= 'None';
 								}
 							} else {
-								$myArray			= explode("|",$inp_sked1);
-								if (count($myArray) == 2) {
-									$updateParams[]		= "first_class_choice|$myArray[0]|s";
-									$updateParams[]		= "first_class_choice_utc|$myArray[1]|s";
+									$updateParams[]		= "second_class_choice|None|s";
+									$updateParams[]		= "second_class_choice_utc|None|s";
 									$doUpdateStudent	= TRUE;
-									$firstChoice 		= $myArray[0];
-									$actionLogUpdates	.= "set first_class_choice to $myArray[0] ";
+									$secondChoice 		= 'None';
+							}
+							if ($inp_sked3 !== 'None') {
+								$myArray			= explode("|",$inp_sked3);
+								if (count($myArray) == 2) {
+									$updateParams[]		= "third_class_choice|$myArray[0]|s";
+									$updateParams[]		= "third_class_choice_utc|$myArray[1]|s";
+									$thirdChoice 		= $myArray[0];
+									$doUpdateStudent	= TRUE;
+									$actionLogUpdates	.= "set third_class_choice to $myArray[0] ";
 								} else {
-									if ($doDebug) {
-										echo "inp_sked1 is $inp_sked1 and it does not compute<br />";
-									}
+									$updateParams[]		= "third_class_choice|None|s";
+									$updateParams[]		= "third_class_choice_utc|None|s";
+									$doUpdateStudent	= TRUE;
+									$thirdChoice 		= 'None';
 								}						
-								if ($inp_sked2 !== 'None') {
-									$myArray			= explode("|",$inp_sked2);
-									if (count($myArray) == 2) {
-										$updateParams[]		= "second_class_choice|$myArray[0]|s";
-										$updateParams[]		= "second_class_choice_utc|$myArray[1]|s";
-										$doUpdateStudent	= TRUE;
-										$secondChoice	 	= $myArray[0];
-										$actionLogUpdates	.= "set second_class_choice to $myArray[0] ";
-									} else {
-										$updateParams[]		= "second_class_choice|None|s";
-										$updateParams[]		= "second_class_choice_utc|None|s";
-										$doUpdateStudent	= TRUE;
-										$secondChoice 		= 'None';
-									}
-								} else {
-										$updateParams[]		= "second_class_choice|None|s";
-										$updateParams[]		= "second_class_choice_utc|None|s";
-										$doUpdateStudent	= TRUE;
-										$secondChoice 		= 'None';
-								}
-								if ($inp_sked3 !== 'None') {
-									$myArray			= explode("|",$inp_sked3);
-									if (count($myArray) == 2) {
-										$updateParams[]		= "third_class_choice|$myArray[0]|s";
-										$updateParams[]		= "third_class_choice_utc|$myArray[1]|s";
-										$thirdChoice 		= $myArray[0];
-										$doUpdateStudent	= TRUE;
-										$actionLogUpdates	.= "set third_class_choice to $myArray[0] ";
-									} else {
-										$updateParams[]		= "third_class_choice|None|s";
-										$updateParams[]		= "third_class_choice_utc|None|s";
-										$doUpdateStudent	= TRUE;
-										$thirdChoice 		= 'None';
-									}						
-								} else {
-										$updateParams[]		= "third_class_choice|None|s";
-										$updateParams[]		= "third_class_choice_utc|None|s";
-										$doUpdateStudent	= TRUE;
-										$thirdChoice 		= 'None';
-								}
+							} else {
+									$updateParams[]		= "third_class_choice|None|s";
+									$updateParams[]		= "third_class_choice_utc|None|s";
+									$doUpdateStudent	= TRUE;
+									$thirdChoice 		= 'None';
 							}
 						}
 
