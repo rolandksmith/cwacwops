@@ -94,7 +94,9 @@ function list_new_registrations_v4_func(){
 									'F8TAM', 
 									'BOBC',
 									'AH7RF',
-									'ah7rf');
+									'ah7rf', 
+									'f8tas', 
+									't8taa');
 	$registrationRecord				= FALSE;		// whether or not there is a registration record with callsign = user_login
 	$verifiedUser				= FALSE;		// whether or not the user_login record is verified
 	$validFormat				= FALSE;		// whether or not the user_login is a callsign or the user's last name
@@ -1691,61 +1693,63 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 			$debugData	.= print_r($setTempIgnoreArray,TRUE);
 			$debugData	.= "</pre><br />";
 
-
-		foreach($sendSignupEmailArray as $thisValue) {							
-			$myArray		= explode("&",$thisValue);
-			$thisEmail		= $myArray[0];
-			$thisUser		= $myArray[1];
-			$thisLastName	= $allUsersArray[$thisUser]['last_name'];
-			$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
-			$thisRole		= $allUsersArray[$thisUser]['user_role'];
-			
-				$debugData .= "Sending email to $thisEmail<br />";
-			$thisRole		= ucfirst($thisRole);
-			if ($thisRole == 'Student') {
-				$article	= 'a';
-				$textStr	= "take a class";
-			} else {
-				$article	= 'an';
-				$textStr	= "be an advisor";
-			}	
-			$theSubject		= "CW Academy -- Missing $thisRole Sign up Information";
-			$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
+		if (count($sendSignupEmailArray) > 0) {
+			foreach($sendSignupEmailArray as $thisValue) {							
+				$myArray		= explode("&",$thisValue);
+				$thisEmail		= $myArray[0];
+				$thisUser		= $myArray[1];
+				$thisLastName	= $allUsersArray[$thisUser]['last_name'];
+				$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
+				$thisRole		= $allUsersArray[$thisUser]['user_role'];
+				
+					$debugData .= "Sending email to $thisEmail<br />";
+				$thisRole		= ucfirst($thisRole);
+				if ($thisRole == 'Student') {
+					$article	= 'a';
+					$textStr	= "take a class";
+				} else {
+					$article	= 'an';
+					$textStr	= "be an advisor";
+				}	
+				$theSubject		= "CW Academy -- Missing $thisRole Sign up Information";
+				$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
 <p>You recently obtained a username and password for the 
 CW Academy website, but did not sign for a class. Obtaining a CW Academy username and password does 
 not automatically sign you up for $article $user_role class. Please go to <a href='$siteURL/program-list/'>CW 
 Academy</a> enter your usename and password, and sign up by clicking on the 'Sign up' button.<br />73,<br />CW Academy";
-			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
-														'theSubject'=>$theSubject,
-														'theContent'=>$theContent,
-														'theCc'=>'',
-														'theAttachment'=>'',
-														'mailCode'=>13,
-														'jobname'=>$jobname,
-														'increment'=>0,
-														'testMode'=>$testMode,
-														'doDebug'=>$doDebug));
-			$registrationEmailCount++;
+				$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
+															'theSubject'=>$theSubject,
+															'theContent'=>$theContent,
+															'theCc'=>'',
+															'theAttachment'=>'',
+															'mailCode'=>13,
+															'jobname'=>$jobname,
+															'increment'=>0,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug));
+				$registrationEmailCount++;
+			}
 		}
  
-		foreach($sendRegisterEmailArray as $thisValue) {
-			$myArray		= explode("&",$thisValue);
-			$thisEmail		= $myArray[0];
-			$thisUser		= $myArray[1];
-			$thisLastName	= $allUsersArray[$thisUser]['last_name'];
-			$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
-			$thisRole		= $allUsersArray[$thisUser]['user_role'];
-				$debugData .= "Sending email to $thisEmail<br />";
-			$thisRole		= ucfirst($thisRole);
-			if ($thisRole == 'Student') {
-				$article	= 'a';
-				$textStr	= "take a class";
-			} else {
-				$article	= 'an';
-				$textStr	= "be an advisor";
-			}	
-			$theSubject	 	= "CW Academy -- Please Set Up your Username and Password for CW Academy";
-			$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
+ 		if (count($sendRegisterEmailArray) > 0) {
+			foreach($sendRegisterEmailArray as $thisValue) {
+				$myArray		= explode("&",$thisValue);
+				$thisEmail		= $myArray[0];
+				$thisUser		= $myArray[1];
+				$thisLastName	= $allUsersArray[$thisUser]['last_name'];
+				$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
+				$thisRole		= $allUsersArray[$thisUser]['user_role'];
+					$debugData .= "Sending email to $thisEmail<br />";
+				$thisRole		= ucfirst($thisRole);
+				if ($thisRole == 'Student') {
+					$article	= 'a';
+					$textStr	= "take a class";
+				} else {
+					$article	= 'an';
+					$textStr	= "be an advisor";
+				}	
+				$theSubject	 	= "CW Academy -- Please Set Up your Username and Password for CW Academy";
+				$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
 <p>Since you signed up to $textStr, CW Academy has implemented a new 
 user management system which will further isolate your personal information from the Internet. In order 
 to have access to the CW Academy website, you will need to obtain a username and a password.</p>
@@ -1753,37 +1757,39 @@ to have access to the CW Academy website, you will need to obtain a username and
 your username and password. <b>NOTE!</b> Your username MUST be your amateur radio callsign, or, 
 if you don't have a callsign, it must be your last name.</p><br />73,<br />CW Academy";
 
-			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
-														'theSubject'=>$theSubject,
-														'theContent'=>$theContent,
-														'theCc'=>'',
-														'theAttachment'=>'',
-														'mailCode'=>13,
-														'jobname'=>$jobname,
-														'increment'=>0,
-														'testMode'=>$testMode,
-														'doDebug'=>$doDebug));
-			$registerEmailCount++;
+				$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
+															'theSubject'=>$theSubject,
+															'theContent'=>$theContent,
+															'theCc'=>'',
+															'theAttachment'=>'',
+															'mailCode'=>13,
+															'jobname'=>$jobname,
+															'increment'=>0,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug));
+				$registerEmailCount++;
+			}
 		}
 		
-		foreach($sendVerifyEmailArray as $thisValue) {
-			$myArray		= explode("&",$thisValue);
-			$thisEmail		= $myArray[0];
-			$thisUser		= $myArray[1];
-			$thisLastName	= $allUsersArray[$thisUser]['last_name'];
-			$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
-			$thisRole		= $allUsersArray[$thisUser]['user_role'];
-				$debugData .= "Sending email to $thisEmail<br />";
-			$thisRole		= ucfirst($thisRole);
-			if ($thisRole == 'Student') {
-				$article	= 'a';
-				$textStr	= "take a class";
-			} else {
-				$article	= 'an';
-				$textStr	= "be an advisor";
-			}	
-			$theSubject	 	= "CW Academy -- Please Verify your Username and Password for CW Academy";
-			$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
+		if (count($sendVerifyEmailArray) > 0) {
+			foreach($sendVerifyEmailArray as $thisValue) {
+				$myArray		= explode("&",$thisValue);
+				$thisEmail		= $myArray[0];
+				$thisUser		= $myArray[1];
+				$thisLastName	= $allUsersArray[$thisUser]['last_name'];
+				$thisFirstName	= $allUsersArray[$thisUser]['first_name'];
+				$thisRole		= $allUsersArray[$thisUser]['user_role'];
+					$debugData .= "Sending email to $thisEmail<br />";
+				$thisRole		= ucfirst($thisRole);
+				if ($thisRole == 'Student') {
+					$article	= 'a';
+					$textStr	= "take a class";
+				} else {
+					$article	= 'an';
+					$textStr	= "be an advisor";
+				}	
+				$theSubject	 	= "CW Academy -- Please Verify your Username and Password for CW Academy";
+				$theContent		= "<p>To: $thisLastName, $thisFirstName:</p>
 <p>You have obtained a username and password for the CW Academy 
 website, however, you have not verified that information. After
 creating yourusername and password, CW Academy has sent you 
@@ -1797,77 +1803,83 @@ you another email with a link to verify your username and password.</p>
 sign you up for a class. After verifying your username, you will need to log in 
 to the CW Academy website and sign up for a class.</p>
 <br />73,<br />CW Academy";
-
-			$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
-														'theSubject'=>$theSubject,
-														'theContent'=>$theContent,
-														'theCc'=>'',
-														'theAttachment'=>'',
-														'mailCode'=>13,
-														'jobname'=>$jobname,
-														'increment'=>0,
-														'testMode'=>$testMode,
-														'doDebug'=>$doDebug));
-			$verifyEmailCount++;
-		}
+	
+				$mailResult		= emailFromCWA_v2(array('theRecipient'=>$thisEmail,
+															'theSubject'=>$theSubject,
+															'theContent'=>$theContent,
+															'theCc'=>'',
+															'theAttachment'=>'',
+															'mailCode'=>13,
+															'jobname'=>$jobname,
+															'increment'=>0,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug));
+				$verifyEmailCount++;
+			}
+		}		
 		
 		
-		
-		
-		foreach ($setTempRegisterArray as $thisData) {
-				$debugData .= "adding temp_data record<br >";
-			$myArray			= explode("&",$thisData);
-			$thisCallSign		= $myArray[0];
-			$thisRole			= $myArray[1];
-			$tempResult			= $wpdb->insert('wpw1_cwa_temp_data', 
-										array('callsign'=>$thisCallSign, 
-												'token'=>'register', 
-												'temp_data'=>$thisRole, 
-												'date_written'=>$nowDate),
-										array('%s','%s','%s','%s'));
-			if ($tempResult === FALSE) {
-				handleWPDBError($jobname,$doDebug);
-			} else {
-					$debugData .= "added $user_login Register to temp_data<br />";
-				$tempDataAdded++;
+		if (count($setTempRegisterArray) > 0) {
+			foreach ($setTempRegisterArray as $thisData) {
+					$debugData .= "adding temp_data record<br >";
+				$myArray			= explode("&",$thisData);
+				$thisCallSign		= $myArray[0];
+				$thisRole			= $myArray[1];
+				$tempResult			= $wpdb->insert('wpw1_cwa_temp_data', 
+											array('callsign'=>$thisCallSign, 
+													'token'=>'register', 
+													'temp_data'=>$thisRole, 
+													'date_written'=>$nowDate),
+											array('%s','%s','%s','%s'));
+				if ($tempResult === FALSE) {
+					handleWPDBError($jobname,$doDebug);
+				} else {
+						$debugData .= "added $user_login Register to temp_data<br />";
+					$tempDataAdded++;
+				}
 			}
 		}
 		
-		foreach($deleteTempRegisterArray as $thisData) {
-				$debugData .= "Delete the temp_data";
-			$myArray			= explode("&",$thisData);
-			$thisCallSign		= $myArray[0];
-			$thisRole			= $myArray[1];
-			delete_temp_record($thisCallSign, 'register');
-			$tempDataDeleted++;
+		if (count($deleteTempRegisterArray) > 0) {
+			foreach($deleteTempRegisterArray as $thisData) {
+					$debugData .= "Delete the temp_data";
+				$myArray			= explode("&",$thisData);
+				$thisCallSign		= $myArray[0];
+				$thisRole			= $myArray[1];
+				delete_temp_record($thisCallSign, 'register');
+				$tempDataDeleted++;
+			}
 		}
 
-		foreach($deleteTempIgnoreArray as $thisData) {
+		if (count($deleteTempIgnoreArray) > 0) {
+			foreach($deleteTempIgnoreArray as $thisData) {
 				$debugData .= "Delete the temp_data";
-			$myArray			= explode("&",$thisData);
-			$thisCallSign		= $myArrray[0];
-			$thisRole			= $myArray[1];
-			delete_temp_record($thisCallSign, 'ignore');
-			$tempDataDeleted++;
+				$myArray			= explode("&",$thisData);
+				$thisCallSign		= $myArray[0];
+				$thisRole			= $myArray[1];
+				delete_temp_record($thisCallSign, 'ignore');
+				$tempDataDeleted++;
+			}
 		}
 
-
-		foreach($setTempIgnoreArray as $thisData) {
-				$debugData .= "adding temp_data Ignore record<br >";
-			$myArray			= explode("&",$thisData);
-			$thisCallSign		= $myArray[0];
-			$thisRole			= $myArray[1];		
-			$tempResult			= $wpdb->insert('wpw1_cwa_temp_data', 
-										array('callsign'=>$thisCallSign, 
-												'token'=>'ignore', 
-												'temp_data'=>$thisRole, 
-												'date_written'=>$nowDate),
-										array('%s','%s','%s','%s'));
-			if ($tempResult === FALSE) {
-				handleWPDBError($jobname,$doDebug);
-			} else {
-					$debugData .= "added $thisCallSign Ignore to temp_data Ignore<br />";
-				$tempDataAdded++;
+		if (count($setTempIgnoreArray) > 0) {
+			foreach($setTempIgnoreArray as $thisData) {
+					$debugData .= "adding temp_data Ignore record<br >";
+				$myArray			= explode("&",$thisData);
+				$thisCallSign		= $myArray[0];
+				$thisRole			= $myArray[1];		
+				$tempResult			= $wpdb->insert('wpw1_cwa_temp_data', 
+											array('callsign'=>$thisCallSign, 
+													'token'=>'ignore', 
+													'temp_data'=>$thisRole, 
+													'date_written'=>$nowDate),
+											array('%s','%s','%s','%s'));
+				if ($tempResult === FALSE) {
+					handleWPDBError($jobname,$doDebug);
+				} else {
+						$debugData .= "added $thisCallSign Ignore to temp_data Ignore<br />";
+					$tempDataAdded++;
+				}
 			}
 		}
 
