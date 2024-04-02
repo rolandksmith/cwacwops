@@ -337,7 +337,7 @@ checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
 		$closeStr		= strtotime("+2 days");
 		$close_date		= date('Y-m-d H:i:s', $closeStr);
 		$token			= mt_rand();
-		$reminder_text	= "<p><b>Verify Temp Data</b> To view the $jobname report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+		$reminder_text	= "<b>Verify Temp Data</b> To view the $jobname report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 		$inputParams		= array("effective_date|$nowDate $nowTime|s",
 									"close_date|$close_date|s",
 									"resolved_date||s",

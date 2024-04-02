@@ -368,11 +368,11 @@ CW Academy</p>";
 					$close_date				= date('Y-m-d H:i:s', $closeStr);
 					$token					= mt_rand();
 					$email_text				= "<p></p>";
-					$reminder_text			= "<p><b>View Student Evaluations:</b> To see your student 
+					$reminder_text			= "<b>View Student Evaluations:</b> To see your student 
 evaluations, click 
 <a href='$viewURL?strpass=2&inp_advisor=$key&inp_id=$theID&mode=1&token=$token' target='_blank'>Display Student Evaluations</a>. 
 Note that some students may have entered more that one evaluation. Also, you might want to check back 
-after a few days as more students may have responded by then.</p>";
+after a few days as more students may have responded by then.";
 					$inputParams		= array("effective_date|$effective_date|s",
 												"close_date|$close_date|s",
 												"resolved_date||s",

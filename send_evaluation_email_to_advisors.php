@@ -384,13 +384,13 @@ Resolution</a> for assistance.</span></p></td></tr></table>";
 				echo "preparing to add reminder<br />";
 			}
 			$token			= mt_rand();
-			$reminder_text	= "<p>Please enter the promotability information for your students, that is,  
+			$reminder_text	= "<b>Evaluate Student Promotability</b> Please enter the promotability information for your students, that is,  
 is the Beginner, Fundamental, or Intermediate student is ready to take the next higher level class, or 
-the Advanced student met the class objectives. </p>
-<p>Please click 
+the Advanced student met the class objectives. 
+Please click 
 <a href='$evaluateStudentURL?semester=$theSemester&strpass=2&inp_mode=$inp_mode&inp_call_sign=$advisor_call_sign&token=$token' target='_blank'>
-Evaluate Students</a>.<br />A CWA web page will display and allow you to enter your evaluations.</p>
-<p>When all your evaluations are completed, you’ll be immediately able to register as an advisor for the next semester.</p>";
+<b>Evaluate Students</b</a>. A CWA web page will display and allow you to enter your evaluations. 
+When all your evaluations are completed, you’ll be immediately able to register as an advisor for the next semester.";
 
 			$effective_date		= date('Y-m-d 00:00:00');
 			$closeStr			= strtotime("+ 4 days");

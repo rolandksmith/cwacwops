@@ -365,12 +365,11 @@ email sent to the advisor ";
 							$close_date				= date('Y-m-d H:i:s', $closeStr);
 							$token					= mt_rand();
 							$email_text				= "<p></p>";
-							$reminder_text			= "<p><b>:Mid-term Student Verification</b> 
-														<p>Please click 
-														<a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode'&token=$token>
-														HERE</a> to verify the current makeup of your class(es). A web page will be displayed showing each 
-														of your students for you to select whether or not that student is in your class as well as allow 
-														you to identify any additional students.</p>";
+							$reminder_text			= "<b>Mid-term Student Verification</b> 
+Please click <a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode'&token=$token>
+HERE</a> to verify the current makeup of your class(es). A web page will be displayed showing each 
+of your students for you to select whether or not that student is in your class as well as allow 
+you to identify any additional students.";
 							$inputParams		= array("effective_date|$effective_date|s",
 														"close_date|$close_date|s",
 														"resolved_date||s",

@@ -249,9 +249,14 @@ td:last-child {
 		if ($inp_method == 'add') {
 			$content			.= "<h3>$jobname</h3>
 									<h4>Add A New Reminder</h4>
+									<p>Leave Effective Date blank to set the current date & time as the effective date.<br />
+									For the Close Date, enter the number of days from the effective date that the reminder is to close. 
+									If Close Date is blank, then ten days will be assumed</p>
 									<form method='post' action='$theURL' 
 									name='menu_form' ENCTYPE='multipart/form-data'>
 									<input type='hidden' name='strpass' value='5'>
+									<input type='hidden' name='inp_verbose' value='$inp_verbose'>
+									<input type='hidden' name='inp_mode' value='$inp_mode'>
 									<table style='width:900px;'>
 									<tr><td style='vertical-align:top;width:150px;'>Effective Date</td>
 										<td><input type='text' class='formInputText' size='20' maxlength='20' name='effective_date'></td></tr>
@@ -376,6 +381,15 @@ td:last-child {
 				  reminder_text: $reminder_text<br />
 				  send_immediately: $send_immediately<br />
 				  resolved: $resolved<br />";
+		}
+		
+		if ($effective_date == '') {
+			$effective_date		= date('Y-m-d H:i:s');
+		}
+		if ($close_date != '') {
+			$close_date = date('Y-m-d H:i:s', strtotime($effective_date . " + $close_date days"));
+		} else {
+			$close_date = date('Y-m-d H:i:s', strtotime($effective_date . " + 10 days"));			
 		}
 		// package up the data and call function to add it to the reminders table
 		$inputParams		= array("effective_date|$effective_date|s",

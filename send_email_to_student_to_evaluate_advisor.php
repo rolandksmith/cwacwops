@@ -474,11 +474,11 @@ CW Academy</p>";
 														$close_date				= date('Y-m-d H:i:s', $closeStr);
 														$token					= mt_rand();
 														$email_text				= "<p></p>";
-														$reminder_text			= "<p><b>Evaluate Class, Curriculum, and Advisor:</b> CW Academy is asking you to 
+														$reminder_text			= "<b>Evaluate Class, Curriculum, and Advisor:</b> CW Academy is asking you to 
 																					fill out a survey form evaluating your class, the curriculum, and the 
 																					advisor. To fill out the survey, please click 
 																					<a href='$evaluateAdvisorURL?inp_student=$student_call_sign&strpass=2&extMode=$extMode&token=$token' target='_blank'>Student Evaluation of Advisor</a>.
-																					The link to the survey will on after $expireDate.</p>";
+																					The link to the survey will on after $expireDate.";
 														$inputParams		= array("effective_date|$effective_date|s",
 																					"close_date|$close_date|s",
 																					"resolved_date||s",

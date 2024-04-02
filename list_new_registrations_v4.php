@@ -2053,38 +2053,21 @@ Y Y Y Y Y Y
 			$closeStr		= strtotime("+2 days");
 			$close_date		= date('Y-m-d H:i:s', $closeStr);
 			$token			= mt_rand();
-			$reminder_text	= "<p>To view the New Registrations report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+			$reminder_text	= "<b>New Registrations</b> To view the New Registrations report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 			$inputParams		= array("effective_date|$nowDate $nowTime|s",
 										"close_date|$close_date|s",
 										"resolved_date||s",
 										"send_reminder|N|s",
 										"send_once|N|s",
-										"call_sign|WR7Q|s",
-										"role||s",
+										"call_sign||s",
+										"role|administrator|s",
 										"email_text||s",
 										"reminder_text|$reminder_text|s",
 										"resolved|N|s",
 										"token|$token|s");
 			$reminderResult	= add_reminder($inputParams,$testMode,$doDebug);
 			if ($reminderResult[0] === FALSE) {
-					$debugData .= "adding reminder failed. $reminderResult[1]<br />";
-				}
-			$token			= mt_rand();
-			$reminder_text	= "<p>To view the New Registrations report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=K7OJL&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
-			$inputParams		= array("effective_date|$nowDate $nowTime|s",
-										"close_date|$close_date|s",
-										"resolved_date||s",
-										"send_reminder|N|s",
-										"send_once|N|s",
-										"call_sign|K7OJL|s",
-										"role||s",
-										"email_text||s",
-										"reminder_text|$reminder_text|s",
-										"resolved|N|s",
-										"token|$token|s");
-			$reminderResult	= add_reminder($inputParams,$testMode,$doDebug);
-			if ($reminderResult[0] === FALSE) {
-					$debugData .= "adding reminder failed. $reminderResult[1]<br />";
+				$debugData .= "adding reminder failed. $reminderResult[1]<br />";
 			}
 		}	
 		// store the debugData
