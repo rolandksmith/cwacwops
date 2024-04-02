@@ -334,9 +334,10 @@ td:last-child {
 											<input type='hidden' name='request_type' value='$request_type'>
 											<input type='hidden' name='request_info' value='$request_info'>";
 			foreach($requestArray as $advisorCallSign) {
-				$prepareResult			= prepare_advisor_class_display($advisorCallSign,
+				$prepareResult			= prepare_preassigned_class_display($advisorCallSign,
 																		$inp_semester,
 																		$request_type,
+																		FALSE,
 																		FALSE,
 																		FALSE,
 																		$testMode,
@@ -347,7 +348,7 @@ td:last-child {
 					if($testMode) {
 						$myStr			= "TestMode";
 					}
-					$errorMsg			= "prepare_advisor_class_display failed in the Push. $myStr. $userName. $prepareResult[1]";
+					$errorMsg			= "prepare_preassigned_class_display failed in the Push. $myStr. $userName. $prepareResult[1]";
 					sendErrorEmail($errorMsg);
 				} else {
 					$content			.=	$prepareResult[1]; 

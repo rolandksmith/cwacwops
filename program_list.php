@@ -145,9 +145,12 @@ if ($userRole == 'administrator') {
 	$returnInfo		= display_reminders('administrator',$userName,$doDebug);
 	if ($returnInfo[0] === FALSE) {
 		if ($doDebug) {
-			echo "display_reminders returned $returnInfo[1]<br />";
+			echo "<br /><b>display_reminders</b> returned $returnInfo[1]<br />";
 		}
 	} else {
+		if ($doDebug) {
+			echo "<br /><b>display_reminders</b> returned $returnInfo[1]<br /><hr><br />";
+		}
 	
 		$content	.= "<h3>Administrator Menu for $userName</h3>
 			<div class='refresh' data-callsign='$userName' data-role='administrator' data-url='/wp-content/uploads/refreshapi.php' data-seconds='60'>

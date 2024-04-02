@@ -677,16 +677,17 @@ $testModeOption
 						if ($testMode) {
 							$advisor_subject		= "TESTMODE $advisor_subject";
 						}
-						$prepareResult				= prepare_advisor_class_display($advisorCallSign,
+						$prepareResult				= prepare_preassigned_class_display($advisorCallSign,
 																					$theSemester,
 																					'Full',
 																					TRUE,
+																					FALSE,
 																					FALSE,
 																					$testMode,
 																					$doDebug);
 						if ($prepareResult[0] == FALSE) {
 							$content				.= "<p>Getting the data to send to the advisor failed. $prepareResult[1]<br />";
-							$errorMsg				= "prepare_advisor_class_display failed: $prepareResult[1]";
+							$errorMsg				= "prepare_preassigned_class_display failed: $prepareResult[1]";
 							sendErrorEmail($errorMsg);
 						} else {
 							$email_to_advisor		.= $prepareResult[1];

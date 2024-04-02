@@ -495,10 +495,10 @@ $inp_msg
 <p>You still have the following unconfirmed student assignments for the 
 $theSemester Semester. Please verify the status of these students.<br /><p>";
 
-						$prepareResult				= prepare_advisor_class_display($advisor_call_sign,$theSemester,$inp_include,TRUE,FALSE,$testMode,$doDebug);
+						$prepareResult				= prepare_preassigned_class_display($advisor_call_sign,$theSemester,$inp_include,TRUE,FALSE,FALSE,$testMode,$doDebug);
 						if ($prepareResult[0] == FALSE) {
 							$content				.= "<p>Getting the data to send to the advisor failed. $prepareResult[1]<br />";
-							$errorMsg				= "prepare_advisor_class_display failed: $prepareResult[1]";
+							$errorMsg				= "prepare_preassigned_class_display failed: $prepareResult[1]";
 							sendErrorEmail($errorMsg);
 						} else {
 							$email_to_advisor		.= $prepareResult[1];
