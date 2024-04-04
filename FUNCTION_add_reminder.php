@@ -27,8 +27,15 @@ function add_reminder($inp_data=array(),$testMode=FALSE,$doDebug=FALSE) {
 		} else {
 			$content		.= "Reminder successfully added<br />";
 		}
+		
+		
+		If role is administrator and call_sign is blank, a reminder will be entered 
+		for each person in the administratorArray array
+		
 */
 
+// $doDebug = TRUE;
+ 
 	global $wpdb;
 
 	if ($testMode) {
@@ -40,6 +47,10 @@ function add_reminder($inp_data=array(),$testMode=FALSE,$doDebug=FALSE) {
 		$advisorTableName		= 'wpw1_cwa_consolidated_advisor';
 		$studentTableName		= 'wpw1_cwa_consolidated_student';
 	}
+	
+	$administratorArray			= array('WR7Q','K7OJL');
+	$doingAdministrator			= FALSE;
+	
 // $doDebug = TRUE;	
 	if ($doDebug) {
 		echo "<br /><b>Add Reminder inp_data:</b><br /><pre>";
@@ -50,47 +61,91 @@ function add_reminder($inp_data=array(),$testMode=FALSE,$doDebug=FALSE) {
 
 	foreach($inp_data as $myValue) {
 		$myArray				= explode("|",$myValue);
-//		if ($doDebug) {
-//			echo "myValue: $myValue<br />Exploded:<br /><pre>";
-//			print_r($myArray);
-//			echo "</pre><br />";
-//		}
 		$field					= $myArray[0];
 		$fieldValue				= $myArray[1];
 
 		if ($field == 'call_sign') {
 			$fieldValue			= strtoupper($fieldValue);
+			$thisCallSign		= $fieldValue;
 			if ($doDebug) {
 				echo "Updated call_sign to $fieldValue<br />";
 			}
 			$call_sign			= $fieldValue;
 		}
-//		if ($field == "email_text") {
-//			$email_text			= html_entity_decode($fieldValue);
-//			$email_text			= stripslashes($email_text);
-//		}
+
+		if ($field === 'role') {
+			$thisRole			= $fieldValue;
+		}
 
 		$fieldFormat			= $myArray[2];
 		$updateParams[$field]	= $fieldValue;
 		$updateFormat[]			= "%$fieldFormat";
 	}
+	
+	if ($thisRole == 'administrator' && $thisCallSign == '') {
+		if ($doDebug) {
+			echo "Have role as $thisRole and callsign is blank<br />";
+		}
+		$doingAdministrator		= TRUE;
+	}
+	
+	
+	
 	$updateParams['date_created']	= date('Y-m-d H:i:s');
 	$updateFormat[]					= '%s';
 	$updateParams['date_modified']	= date('Y-m-d H:i:s');
 	$updateFormat[]					= '%s';
-//	echo "ready to update<br /><pre>";
-//	print_r($updateParams);
-//	echo "</pre><br />Done";
+	$updateIssue					= FALSE;
 
-	$result				= $wpdb->insert($remindersTableName,
-										$updateParams,
-										$updateFormat);
-	if ($result === FALSE) {
-		$lastError		= $wpdb->last_error;
-		$lastQuery		= $wpdb->last_query;
-		if ($doDebug) {
-			echo "Inserting failed. Error:$lastError<br />Query: $lastQuery";
+	if ($doingAdministrator) {
+		foreach($administratorArray as $thisAdmin) {
+			if ($doDebug) {
+				echo "doing administrator for call_sign: $thisAdmin<br />";
+			}
+			$updateParams['role']			= '';
+			$updateParams['call_sign']		= $thisAdmin;
+			$myStr							= $updateParams['reminder_text'];
+			$myStr1							= str_replace('XXXXX',$thisAdmin,$myStr);
+			$updateParams['reminder_text']	= $myStr1;
+			if ($doDebug) {
+				echo "set reminder_text to $myStr<br />";
+			}
+
+			if ($doDebug) {
+				echo "ready to update doingAdministrator<br /><pre>";
+				print_r($updateParams);
+				echo "</pre><br />Done<br />";
+			}
+			$result				= $wpdb->insert($remindersTableName,
+												$updateParams,
+												$updateFormat);
+			if ($result === FALSE) {
+				handleWPDBError("FUNCTION Add Reminder",$doDebug);
+				$updateIssue	= TRUE;
+			}
+			$updateParams['reminder_text']		= $myStr;
+			if ($doDebug) {
+				echo "reset reminder_text to $myStr<br />";
+			}
 		}
+	} else {
+		if ($doDebug) {
+			echo "ready to update<br /><pre>";
+			print_r($updateParams);
+			echo "</pre><br />Done<br />";
+		}
+		$result				= $wpdb->insert($remindersTableName,
+											$updateParams,
+											$updateFormat);
+		if ($result === FALSE) {
+			handleWPDBError("FUNCTION Add Reminder",$doDebug);
+			$updateIssue 	= TRUE;
+		}
+	}
+	if ($doDebug) {
+		echo "returning<br /><hr><br />";
+	}
+	if ($updateIssue) {	
 		return array(FALSE,"Inserting failed. Error:$lastError<br />Query: $lastQuery");
 	} else {
 		return array(TRUE,'');

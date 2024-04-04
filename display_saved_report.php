@@ -22,7 +22,7 @@ function display_saved_report_func() {
 	$validUser 			= $initializationArray['validUser'];
 	$userName  			= $initializationArray['userName'];
 	$siteURL			= $initializationArray['siteurl'];
-	$versionNumber		= '2';
+	$versionNumber		= '2a';
 	
 //	CHECK THIS!								//////////////////////
 	if ($userName == '') {

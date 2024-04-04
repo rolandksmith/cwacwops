@@ -467,7 +467,7 @@ Resolution</a> for assistance.</b></span><br /></p>";
 						$email_text				= "<p></p>";
 						$reminder_text		= "<b>Student Participation Confirmation:</b> The makeup of your 
 your class has changed. You should now contact each unconfirmed student, verify if that student will be attending, and then update the 
-student status. Click on <a href='$siteURL/cwa-manage-advisor-class-assignments/?strpass=5&inp_call_sign=$advisorCallSign&token=$token' target='_blank'>Manage Advisor Class</a> 
+student status. Click on <a href='cwa-manage-advisor-class-assignments/?strpass=5&inp_call_sign=$advisorCallSign&token=$token' target='_blank'>Manage Advisor Class</a> 
 to perform this task."; 
 						$inputParams		= array("effective_date|$effective_date|s",
 													"close_date|$close_date|s",

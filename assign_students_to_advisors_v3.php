@@ -2269,7 +2269,7 @@ Please log into <a href='$siteURL/program-list'>CW Academy</a> to obtain your st
 					$reminder_text		= "<b>Student Participation Confirmation:</b> Students  have been 
 											assigned to your class. You should now contact each student, 
 											verify if that student will be attending, and then update the 
-											student status. Click on <a href='$siteURL/cwa-manage-advisor-class-assignments/?strpass=5&inp_call_sign=$advisorCallSign&token=$token'
+											student status. Click on <a href='cwa-manage-advisor-class-assignments/?strpass=5&inp_call_sign=$advisorCallSign&token=$token'
 											target='_blank'>Manage Advisor Class</a> to perform this task."; 
 					
 					$inputParams		= array("effective_date|$effective_date|s",

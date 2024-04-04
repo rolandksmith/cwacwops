@@ -26,6 +26,7 @@ function display_reminders($inp_role,$inp_callsign,$doDebug=FALSE) {
 							</table>
 */
 
+// $doDebug = TRUE;
 
 	global $wpdb;
 	
@@ -77,11 +78,7 @@ function display_reminders($inp_role,$inp_callsign,$doDebug=FALSE) {
 							order by date_created";	
 		$reminderResult	= $wpdb->get_results($sql);
 		if ($reminderResult === FALSE) {
-			$lastError	= $wpdb->last_error;
-			$lastQuery	=	$wpdb->last_query;
-			if ($doDebug) {
-				echo "unable to access wpw1_cwa_reminders. Error:$lastError<br />$lastQuery<br />";
-			}
+			handleWPDBError("FUNCTION Display Reminders",$doDebug);
 			$returnInfo		= "<b>FUNCTION Display Reminders Error: </b>unable to access wpw1_cwa_reminders.<br />
 								Error: $last_error<br />Query: $last_query";
 			if ($doDebug) {
@@ -113,13 +110,16 @@ function display_reminders($inp_role,$inp_callsign,$doDebug=FALSE) {
 						$call_sign		= $role;
 					}
 
-					$removeLink			= "<a href='$siteURL/cwa-remove-item/?inp_call_sign=$role&token=$token' target='_blank'>Remove Item</a>";
+					$removeLink			= "Click <a href='$siteURL/cwa-remove-item/?inp_call_sign=$call_sign&token=$token' target='_blank'>HERE</a> to remove this Reminder</a>";
 					$myInt				= strrpos($reminder_text,"</p>");
 					if ($myInt === FALSE) {
 						$reminder_text	= "$reminder_text<br />$removeLink";
 					} else {
 						$myStr			= substr($reminder_text,0,$myInt);
 						$reminder_text	= "$myStr<br />$removeLink</p>";
+					}
+					if ($doDebug) {
+						echo "formated $reminder_text<br />";
 					}
 					$returnInfo			.= "<tr><td>$reminder_text</td>
 												<td style='vertical-align:top;'>$effective_date<td></tr>";
@@ -166,13 +166,16 @@ function display_reminders($inp_role,$inp_callsign,$doDebug=FALSE) {
 							$date_created		= $reminderRow->date_created;
 							$date_modified		= $reminderRow->date_modified;
 				
-							$removeLink			= "<a href='$siteURL/cwa-remove-item/?inp_call_sign=$call_sign&token=$token' target='_blank'>Remove Item</a>";
+							$removeLink			= "Click <a href='$siteURL/cwa-remove-item/?inp_call_sign=$call_sign&token=$token' target='_blank'>HERE</a> to remove this Reminder</a>";
 							$myInt				= strrpos($reminder_text,"</p>");
 							if ($myInt === FALSE) {
 								$reminder_text	= "$reminder_text<br />$removeLink";
 							} else {
 								$myStr			= substr($reminder_text,0,$myInt);
 								$reminder_text	= "$myStr<br />$removeLink</p>";
+							}
+							if ($doDebug) {
+								echo "formated $reminder_text<br />";
 							}
 							$returnInfo			.= "<tr><td>$reminder_text</td>
 														<td style='vertical-align:top;'>$effective_date<td></tr>";

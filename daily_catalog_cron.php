@@ -656,7 +656,7 @@ checkBegin: $checkBegin. checkEnd: $checkEnd. nowTime: $nowTime";
 		$closeStr		= strtotime("+2 days");
 		$close_date		= date('Y-m-d H:i:s', $closeStr);
 		$token			= mt_rand();
-		$reminder_text	= "<b>Daily Catalog Cron</b> To view the Daily Catalog Cron report for $nowDate $nowTime, click <a href='$siteURL/cwa-display-saved-report/?strpass=3&inp_callsign=WR7Q&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
+		$reminder_text	= "<b>Daily Catalog Cron</b> To view the Daily Catalog Cron report for $nowDate $nowTime, click <a href='cwa-display-saved-report/?strpass=3&inp_callsign=XXXXX&inp_id=$reportid&token=$token' target='_blank'>Display Report</a>";
 		$inputParams		= array("effective_date|$nowDate $nowTime|s",
 									"close_date|$close_date|s",
 									"resolved_date||s",
