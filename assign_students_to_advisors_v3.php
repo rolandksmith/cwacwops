@@ -142,6 +142,7 @@ function assign_students_to_advisors_v3_func() {
 	$increment1						= 0;
 	$increment2						= 0;
 	$inp_report						= '';
+	$inp_addlInfo					= '';
 	$actionDate						= date('Ymd Hi');
 	$logDate						= date('Y-m-d H:i');
 	$advisorArray					= array();
@@ -297,6 +298,10 @@ function assign_students_to_advisors_v3_func() {
 			if ($str_key 		== "inp_student_verification") {
 				$inp_student_verification		 = $str_value;
 				$inp_student_verification		 = (filter_var($inp_student_verification,FILTER_UNSAFE_RAW));
+			}
+			if ($str_key 						== "inp_addlInfo") {
+				$inp_addlInfo					 = $str_value;
+				$inp_addlInfo					 = (filter_var($inp_addlInfo,FILTER_UNSAFE_RAW));
 			}
 		}
 	}
@@ -749,6 +754,8 @@ td:last-child {
 							<input type='text' class='formInputText' name='IntermediateExemptions' size='50' maxlength='100' value='$inp_intermediate_exemptions'><br />
 							Advanced Exemptions:<br />
 							<input type='text' class='formInputText' name='AdvancedExemptions' size='50' maxlength='100' value='$inp_advanced_exemptions'><br />
+					<tr><td style='vertical-align:top;'>Additional Comments to be included in email to advisors</td>
+						<td><textarea class=formInputText' cols='50' rows='5' name='inp_addlInfo'></textarea></td></tr>
 					<tr><td style='width:150px;vertical-align:top;'><b>TEST Mode Requests</b></td>
 						<td><input class='formInputButton' type='radio' name='request_type' value='A' checked>Assign Students and Display Results using Test Data (no updates and no emails)<br />
 							<input class='formInputButton' type='radio' name='request_type' value='F'>Assign Students, Display Results, and Update (no emails sent) using Test Data (Update password required)<br />
@@ -2227,7 +2234,11 @@ td:last-child {
 					}
 					$increment1++;
 
+					if ($inp_addlInfo != '') {
+						$thisStr			= "<p>$inp_addlInfo</p>";
+					}
 					$advisorEmail			= "<p>To: $advisor_last_name, $advisor_first_name ($advisorCallSign):</p>
+													$thisStr
 													<p>The process to make initial student assignments for the $nextSemester Semester is complete. 
 													Please log into <a href='$siteURL/program-list'>CW Academy</a> to obtain your student 
 													information and confirm student participation.</p>
