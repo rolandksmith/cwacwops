@@ -197,7 +197,7 @@ name='selection_form' ENCTYPE='multipart/form-data'>
 <table>
 <tr><td><b>Batch Backup and Restore</b></td></tr>
 <tr><td>
-	<input type='radio' class='formInputButton' id='primary' name='inp_request' value='primary'>
+	<input type='radio' class='formInputButton' id='primary' name='inp_request' value='primary' checked>
 	<label for='primary'>Advisor, AdvisorClass, Student, TempData to Backup Tables</label></td></tr>
 <tr><td>
 	<input type='radio' class='formInputButton' id='allcurrent' name='inp_request' value='allcurrent'>
