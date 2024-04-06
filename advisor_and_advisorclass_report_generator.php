@@ -1372,7 +1372,7 @@ function advisor_and_advisorclass_report_generator_func() {
 							$content .= "<td style='vertical-align:top;'>$advisor_survey_score</td>";
 							}
 							if ($languages 	== 'X') {
-							$content .= "<td style='vertical-align:top;'>$advisor_languages_spoken</td>";
+							$content .= "<td style='vertical-align:top;'>$advisor_languages</td>";
 							}
 							if ($fifo_date 	== 'X') {
 							$content .= "<td style='vertical-align:top;'>$advisor_fifo_date</td>";

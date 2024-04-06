@@ -876,6 +876,20 @@ student_call_sign: $student_call_sign<br />SQL: $myStr<br />Last error: $myStr1<
 									$student_remove_status	= 'R';
 									$advisorReply			= "You have confirmed that student $student_call_sign will NOT be attending your  class. 
 																You have requested a replacement.</p>";
+								} elseif ($inp_attend == 'advisor') {
+									if ($doDebug) {
+										echo "Doing Advisor; Replacement Yes<br />";
+									}
+									$student_action_log		= "$student_action_log / $actionDate CONFIRM $advisor_call_sign student will not attend as advisor does not want student. Advisor comments: $inp_comment_attend. Replacement requested ";
+									$advisor_action_log		= "$advisor_action_log / $actionDate CONFIRM $advisor_call_sign $student_call_sign will not attend as advisor does not want student. Advisor comments: $inp_comment_attend. Replacement requested ";
+									$studentUpdateParams	= array("action_log|$student_action_log|s");
+									$studentFormatParams	= array('');
+									$advisorUpdateParams	= array("action_log|$advisor_action_log|s");
+									$advisorFormatParams	= array('');
+									$student_remove_status	= 'V';
+									$advisorReply			= "You have confirmed that student $student_call_sign will NOT be attending your class. 
+																The student will be placed on the waiting list to possibly be assigned to a different advisor. 
+																You have requested a replacement. Thanks for putting in a useful comment.</p>";
 								} else {
 									if ($doDebug) {
 										echo "Doing Other; Replacement Yes<br />";
@@ -971,13 +985,39 @@ You did not request a replacement.</p>";
 									$advisor_action_log		= "$advisor_action_log / $actionDate CONFIRM advisor does not want $student_call_sign. No replacement requested ";
 									$studentUpdateParams	= array("action_log|$student_action_log|s",
 																	"excluded_advisor|$student_excluded_advisor|S",
-																	"hold_reason_code|X|s");
+																	"hold_reason_code|X|s", 
+																	"intervention_required|H|s");
 									$studentFormatParams	= array('');
 									$advisorUpdateParams	= array("action_log|$advisor_action_log|s");
 									$advisorFormatParams	= array('');
 									$student_remove_status	= '';
 									$advisorReply			= "You have confirmed that student $student_call_sign will NOT be attending your  class. 
 You did not request a replacement.</p>";
+									$theSubject			= "CW Academy Recycled Replacement Student";
+									if ($testMode) {
+										$theRecipient		= 'rolandksmith@gmail.com';
+										$mailCode			= 2;
+										$theSubject			= "TESTMODE $theSubject";
+										$increment++;
+									} else {
+										$mailCode			= 17;
+										$theRecipient		= 'rolandksmith@gmail.com';
+									}
+									$email_content			= "<p>Student $student_last_name, $student_first_name ($student_call_sign) 
+will not take the $student_level class from advisor $student_assigned_advisor due to 
+advisor not wanting the student. The advisor comments were: $inp_comment_attend The student is now on hold waiting further action.</p>
+Student action Log: $student_action_log</p>";
+									$mailResult		= emailFromCWA_v2(array('theRecipient'=>$theRecipient,
+																				'theSubject'=>$theSubject,
+																				'jobname'=>$jobname,
+																				'theContent'=>$email_content,
+																				'mailCode'=>$mailCode,
+																				'increment'=>$increment,
+																				'testMode'=>$testMode,
+																				'doDebug'=>$doDebug));
+									if ($mailResult === FALSE) {
+										sendErrorEmail("Email to Bob about student $student_call_sign from advisor_verification_of_student. Advisor: $advisor_call_sign");
+									}
 								} else {
 									if ($doDebug) {
 										echo "Doing Other; Replacement No<br />";

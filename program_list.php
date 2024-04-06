@@ -464,7 +464,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-list-new-registrations/' target='_blank'>List New Registrations</a>
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
-			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Asses/a>
+			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Assessment/a>
 			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blansment</a>
 			<li><a href='$siteURL/cwa-recover-deleted-record/' target='_blank'>Recover Deleted Record</a>
 			<li><a href='siteURL/cwa-remove-item/' target='_blank'>Remove Item</a>
@@ -513,7 +513,7 @@ if ($userRole == 'advisor' || $userRole == 'administrator') {
 	
 	}
 	$content		.= "<h4>Advisor Programs</h4>
-						<p><a href='$siteURL/cwa-manage-advisor-class/?strpass=5&inp_call_sign=$userName' target='_blank'>Manage Advisor Class</a><br />
+						<p><a href='$siteURL/cwa-manage-advisor-class-assignments/' target='_blank'>Manage Advisor Class Assignments</a><br />
 							This program displays the current class makeup and allows the advisor to specify student's status,
 							request replacement students, check Morse Code Proficency Assessments.</p>
 						<p><a href='$siteURL/cwa-view-a-student-cw-assessment-v2/' target='_blank'>View a Student's Morse Code Assessments</a><br />

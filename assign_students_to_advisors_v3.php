@@ -85,7 +85,7 @@ function assign_students_to_advisors_v3_func() {
 	 $processStudentArray, $studentAssignedAdvisorArray, $arbitraryArray, $theIncrement, 
 	 $debugReport, $keepDebug; 
 
-	$doDebug						= FALSE;
+	$doDebug						= TRUE;
 	$testMode						= FALSE;
 	$bobTest						= FALSE;
 	$keepDebug						= TRUE;
@@ -2234,6 +2234,7 @@ td:last-child {
 					}
 					$increment1++;
 
+					$thisStr				= '';
 					if ($inp_addlInfo != '') {
 						$thisStr			= "<p>$inp_addlInfo</p>";
 					}

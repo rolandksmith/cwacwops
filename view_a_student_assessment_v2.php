@@ -5,7 +5,7 @@ function view_a_student_cw_assessment_v2_func() {
 
 	global $wpdb;
 
-	$doDebug						= FALSE;
+	$doDebug						= TRUE;
 	$testMode						= FALSE;
 	$initializationArray 			= data_initialization_func();
 	if ($doDebug) {
@@ -54,6 +54,7 @@ function view_a_student_cw_assessment_v2_func() {
 	$versionNumber				= '2';
 	$jobname					= "View a Student CW Assessment V$versionNumber";
 	$token						= '';
+	$inp_advisor				= '';
 
 // get the input information
 	if (isset($_REQUEST)) {
@@ -106,6 +107,14 @@ function view_a_student_cw_assessment_v2_func() {
 			if ($str_key 		== "inp_id") {
 				$inp_id	 = $str_value;
 				$inp_id	 = filter_var($inp_id,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "inp_advisor") {
+				$advisor_call_sign	 = $str_value;
+				$advisor_call_sign	 = filter_var($advisor_call_sign,FILTER_UNSAFE_RAW);
+			}
+			if ($str_key 		== "token") {
+				$token	 = $str_value;
+				$token	 = filter_var($token,FILTER_UNSAFE_RAW);
 			}
 		}
 	}
@@ -216,16 +225,16 @@ if ($doDebug) {
 			echo "Function starting.<br />";
 		}
 		$content 		.= "<h3>$jobname</h3>
-<p>
-<form method='post' action='$theURL' 
-name='selection_form' ENCTYPE='multipart/form-data'>
-<input type='hidden' name='strpass' value='2'>
-<table style='border-collapse:collapse;'>
-<tr><td>Enter Student's Call Sign</td>
-	<td><input type='text' class='formInputText' size='25' maxlenth='25' name='inp_callsign' autofocus></td></tr>
-$testModeOption
-<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
-</form></p>";
+							<p>
+							<form method='post' action='$theURL' 
+							name='selection_form' ENCTYPE='multipart/form-data'>
+							<input type='hidden' name='strpass' value='2'>
+							<table style='border-collapse:collapse;'>
+							<tr><td>Enter Student's Call Sign</td>
+								<td><input type='text' class='formInputText' size='25' maxlenth='25' name='inp_callsign' autofocus></td></tr>
+							$testModeOption
+							<tr><td colspan='2'><input class='formInputButton' type='submit' value='Submit' /></td></tr></table>
+							</form></p>";
 		
 		
 ///// Pass 2 -- do the work
@@ -243,11 +252,7 @@ $testModeOption
 								   limit 1";
 			$wpw1_cwa_student	= $wpdb->get_results($sql);
 			if ($wpw1_cwa_student === FALSE) {
-				if ($doDebug) {
-					echo "Reading $studentTableName table<br />";
-					echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-					echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-				}
+				handleWPDBError($jobname,$doDebug);
 				$advisorOK		= FALSE;
 			} else {
 				$numSRows		= $wpdb->num_rows;
@@ -396,7 +401,8 @@ $testModeOption
 									
 					// if there is a reminder, resolve it
 					if ($token != '') {
-						$resolveResult		= resolve_reminder($advisor_call_sign,$token,$testMode,$doDebug);
+						$myStr				= strtoupper($userName);
+						$resolveResult		= resolve_reminder($myStr,$token,$testMode,$doDebug);
 						if ($resolveResult === FALSE) {
 							if ($doDebug) {
 								echo "resolve_reminder for $inp_callsign and $token failed<br />";
