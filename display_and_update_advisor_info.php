@@ -292,7 +292,7 @@ function display_and_update_advisor_info_func() {
 				$inp_sequence = filter_var($inp_sequence,FILTER_UNSAFE_RAW);
 			}
 			if ($str_key  == "inp_level") {
-				$inp_level = $str_value;
+				$inp_level = trim($str_value);
 				$inp_level = filter_var($inp_level,FILTER_UNSAFE_RAW);
 			}
 			if ($str_key  == "inp_class_size") {
