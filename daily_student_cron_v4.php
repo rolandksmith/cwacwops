@@ -2479,7 +2479,7 @@ Update your information as needed and make your class preference choices.";
 											$closeStr			= strtotime("+10 days");
 											$close_date			= date('Y-m-d H:i:s', $closeStr);
 											$token				= mt_rand();
-											$reminder_text		= "<b>Signup on Hold:</b> Student <a href='$studentUpdateURL?request_type=callsign&request_info=$student_call_sign&request_table=$studentTableName&strpass=2' 'target='_blank'>$student_call_sign</a> 
+											$reminder_text		= "<b>Signup on Hold:</b> Student <a href='$studentUpdateURL?request_type=callsign&request_info=$student_call_sign&request_table=$studentTableName&strpass=2' target='_blank'>$student_call_sign</a> 
 had a student status of V and is on hold waiting for a possible reassignment. When the issue is resolved, click 'Remove Item'.";
 											$inputParams		= array("effective_date|$effective_date|s",
 																		"close_date|$close_date|s",
