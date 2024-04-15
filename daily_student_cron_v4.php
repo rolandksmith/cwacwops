@@ -2491,7 +2491,7 @@ had a student status of V and is on hold waiting for a possible reassignment. Wh
 																		"email_text||s",
 																		"reminder_text|$reminder_text|s",
 																		"resolved|N|s",
-																		"token||s");
+																		"token|$token|s");
 											$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
 											if ($insertResult[0] === FALSE) {
 												if ($doDebugLog) {
