@@ -53,13 +53,7 @@
 												'doDebug'=>$doDebug);
 				$updateResult	= updateClass($classUpdateData);
 				if ($updateResult[0] === FALSE) {
-					$myError	= $wpdb->last_error;
-					$mySql		= $wpdb->last_query;
-					$errorMsg	= "A$jobname Processing $advisor_call_sign in $advisorClassTableName failed. Reason: $updateResult[1]<br />SQL: $mySql<br />Error: $myError<br />";
-					if ($doDebug) {
-						echo $errorMsg;
-					}
-					sendErrorEmail($errorMsg);
+					handleWPDBError("FUNCTION Update Advisor Class $jobname",$doDebug);
 					$content		.= "Unable to update content in $advisorClassTableName<br />";
 				} else {
 		
