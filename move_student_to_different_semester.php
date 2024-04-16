@@ -22,7 +22,6 @@ function move_student_to_different_semester_func() {
  	Modified 20Oct2022 by Roland to use new timezone table format
  	Modified 16Apr23 by Roland to fix action_log
  	Modified 13Jul23 by Roland to use consolidated tables
- 	Modified 15Apr24 by Roland to unenroll student, if an assigned advisor
  
 */
 
@@ -72,19 +71,19 @@ function move_student_to_different_semester_func() {
 			}
 			if ($str_key 		== "strpass") {
 				$strPass		 = $str_value;
-				$strPass		 = filter_var($strPass,FILTER_UNSAFE_RAW);
+				$strPass		 = filter_var($strPass,FILTER_SANITIZE_STRING);
 			}
 			if ($str_key 		== "inp_callSign") {
 				$inp_callSign	 = strtoupper($str_value);
-				$inp_callSign	 = filter_var($inp_callSign,FILTER_UNSAFE_RAW);
+				$inp_callSign	 = filter_var($inp_callSign,FILTER_SANITIZE_STRING);
 			}
 			if ($str_key 		== "inp_semesterA") {
 				$inp_semesterA	 = $str_value;
-				$inp_semesterA	 = filter_var($inp_semesterA,FILTER_UNSAFE_RAW);
+				$inp_semesterA	 = filter_var($inp_semesterA,FILTER_SANITIZE_STRING);
 			}
 			if ($str_key 		== "inp_semesterB") {
 				$inp_semesterB	 = $str_value;
-				$inp_semesterB	 = filter_var($inp_semesterB,FILTER_UNSAFE_RAW);
+				$inp_semesterB	 = filter_var($inp_semesterB,FILTER_SANITIZE_STRING);
 			}
 		}
 	}
@@ -168,10 +167,8 @@ td:last-child {
 			echo "<p><strong>Operating in Test Mode.</strong></p>";
 		}
 		$studentTableName			= "wpw1_cwa_consolidated_student2";
-		$advisorClassTableName		= "wpw1_cwa_consolidated_advisorclass2";
 	} else {
 		$studentTableName			= "wpw1_cwa_consolidated_student";
-		$advisorClassTableName		= "wpw1_cwa_consolidated_advisorclass";
 	}
 	$currentSemester	= $initializationArray['currentSemester'];
 	$nextSemester		= $initializationArray['nextSemester'];
@@ -417,8 +414,6 @@ td:last-child {
 							
 								}
 							} else {
-								$updateParams['pre_assigned_advisor'] 	= '';
-								$updateFormat[]				 		= '%s';
 								$updateParams['email_number'] 		= 0;
 								$updateFormat[]				 		= '%d';
 								$updateParams['email_sent_date'] 	= '';
@@ -456,35 +451,6 @@ td:last-child {
 												response to blank<br />
 												student_status to blank<br />
 												abandoned to 0<br />";
-												
-												
-								// if student is assigned to an advisor, remove student from the class
-								if ($student_assigned_advisor != '') {
-									$inp_data			= array('inp_student'=>$student_call_sign,
-																'inp_semester'=>$student_semester,
-																'inp_assigned_advisor'=>$student_assigned_advisor,
-																'inp_assigned_advisor_class'=>$student_assigned_advisor_class,
-																'inp_remove_status'=>'',
-																'inp_arbitrarily_assigned'=>'',
-																'inp_method'=>'remove',
-																'jobname'=>$jobname,
-																'userName'=>$userName,
-																'testMode'=>$testMode,
-																'doDebug'=>$doDebug);
-													
-									$removeResult		= add_remove_student($inp_data);
-									if ($removeResult[0] === FALSE) {
-										$thisReason		= $removeResult[1];
-										if ($doDebug) {
-											echo "attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
-										}
-										sendErrorEmail("$jobname Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason");
-										$content		.= "Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
-									} else {
-										$content		.= "Student removed from class and unassigned<br />";
-									}
-								
-								}
 							}
 							$student_action_log		= "$student_action_log / $actionDate MGMT MOVE Student moved from $inp_semesterA to $inp_semesterB. ";
 							$updateParams['action_log']			= $student_action_log;
