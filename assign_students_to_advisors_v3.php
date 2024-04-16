@@ -85,7 +85,7 @@ function assign_students_to_advisors_v3_func() {
 	 $processStudentArray, $studentAssignedAdvisorArray, $arbitraryArray, $theIncrement, 
 	 $debugReport, $keepDebug; 
 
-	$doDebug						= TRUE;
+	$doDebug						= FALSE;
 	$testMode						= FALSE;
 	$bobTest						= FALSE;
 	$keepDebug						= TRUE;
