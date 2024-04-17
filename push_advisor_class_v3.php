@@ -479,7 +479,7 @@ to perform this task.";
 													"email_text||s",
 													"reminder_text|$reminder_text|s",
 													"resolved||s",
-													"token||s");
+													"token|$token|s");
 						$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
 						if ($insertResult[0] === FALSE) {
 							if ($doDebug) {
