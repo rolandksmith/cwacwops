@@ -233,7 +233,7 @@ td:last-child {
 		if ($doDebug) {
 			echo "At pass 2 with $inp_callSign<br />";
 		}
-	
+		$content		.= "<h3>$jobname</h3>";
 // the current and target semesters must be different
 		if ($inp_semesterA == $inp_semesterB) {
 			$content	.= "Current and Target semesters must be different.";
@@ -323,45 +323,53 @@ td:last-child {
 						$student_date_created 					= $studentRow->date_created;
 						$student_date_updated			  		= $studentRow->date_updated;
 					
-						$updateParams							= array();
-						$updateFormat							= array();
-						$doProceed								= TRUE;
-						if ($doDebug) {
-							echo "Got the source record for $student_call_sign at $student_level in TZ $student_time_zone in semester $student_semester<br />";
-						}
-						// Look to see if the student already exists in the target semester
-						$sql					= "select * from $studentTableName 
-													where semester='$inp_semesterB' 
-													and call_sign = '$inp_callSign'";
-						$wpw1_cwa_student		= $wpdb->get_results($sql);
-						if ($wpw1_cwa_student === FALSE) {
-							if ($doDebug) {
-								echo "Reading $studentTableName table<br />";
-								echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
-								echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
-							}
+					
+						if ($student_assigned_advisor !!= '') {
+							$content		.= "Student is currently assigned to $student_assigned_advisor advisor's class $student_assigned_advisor_class class. 
+												Unassign the student before moving the student to a different semexter.";
 							$doProceed		= FALSE;
-						} else {
-							$numSRows			= $wpdb->num_rows;
+						} 
+						if ($doProceed) {
+							$updateParams							= array();
+							$updateFormat							= array();
+							$doProceed								= TRUE;
 							if ($doDebug) {
-								$myStr			= $wpdb->last_query;
-								echo "ran $myStr<br />and retrieved $numSRows rows from $studentTableName table<br />";
+								echo "Got the source record for $student_call_sign at $student_level in TZ $student_time_zone in semester $student_semester<br />";
 							}
-							if ($numSRows > 0) {
-								foreach ($wpw1_cwa_student as $studentRow) {
-									$studentB_ID						= $studentRow->student_id;
-									$studentB_call_sign					= strtoupper($studentRow->call_sign);
-									$studentB_time_zone					= $studentRow->time_zone;
-									$studentB_level						= $studentRow->level;
-									$studentB_semester  				= $studentRow->semester;
-							
-									If ($doDebug) {
-										echo "Found a duplicate for $inp_callSign in $studentB_semester, level $studentB_level, TZ $studentB_time_zone<br />";
+							// Look to see if the student already exists in the target semester
+							$sql					= "select * from $studentTableName 
+														where semester='$inp_semesterB' 
+														and call_sign = '$inp_callSign'";
+							$wpw1_cwa_student		= $wpdb->get_results($sql);
+							if ($wpw1_cwa_student === FALSE) {
+								if ($doDebug) {
+									echo "Reading $studentTableName table<br />";
+									echo "wpdb->last_query: " . $wpdb->last_query . "<br />";
+									echo "<b>wpdb->last_error: " . $wpdb->last_error . "</b><br />";
+								}
+								$doProceed		= FALSE;
+							} else {
+								$numSRows			= $wpdb->num_rows;
+								if ($doDebug) {
+									$myStr			= $wpdb->last_query;
+									echo "ran $myStr<br />and retrieved $numSRows rows from $studentTableName table<br />";
+								}
+								if ($numSRows > 0) {
+									foreach ($wpw1_cwa_student as $studentRow) {
+										$studentB_ID						= $studentRow->student_id;
+										$studentB_call_sign					= strtoupper($studentRow->call_sign);
+										$studentB_time_zone					= $studentRow->time_zone;
+										$studentB_level						= $studentRow->level;
+										$studentB_semester  				= $studentRow->semester;
+								
+										If ($doDebug) {
+											echo "Found a duplicate for $inp_callSign in $studentB_semester, level $studentB_level, TZ $studentB_time_zone<br />";
+										}
+										$content	.= "<p>Student $inp_callSign has a registration record in the target 
+														semester of $inp_semesterB. The registration is for a $studentB_level class.
+														 No action taken.</p>";
+										$doProceed	= FALSE;
 									}
-									$content	.= "<p>Student $inp_callSign has a registration record in the target 
-													semester of $inp_semesterB. The registration is for a $studentB_level class.
-													 No action taken.</p>";
-									$doProceed	= FALSE;
 								}
 							}
 						}

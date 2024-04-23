@@ -3237,9 +3237,9 @@ taking any further action.<br /><br />Otherwise:<br />";
 										</form></p>";
 					} else {
 						if ($doDebug) {
-							echo "No advisor found with the call sign $inp_advisor_callsign in the $theSemester semester<br />";
+							echo "No advisor found with the call sign $inp_advisor_callsign at level $student_level in the $theSemester semester<br />";
 						}
-						$content	.= "Advisor $inp_advisor_callsign is not signed up in the $theSemester semester.";
+						$content	.= "Advisor $inp_advisor_callsign is not signed up for a $student_level level class in the $theSemester semester.";
 					}
 				}
 			} else {		// no student found
@@ -3339,18 +3339,55 @@ taking any further action.<br /><br />Otherwise:<br />";
 				sendErrorEmail("$jobname Attempting to add $inp_student_callsign to $inp_advisor_callsign class $inp_advisorClass failed:<br />$thisReason");
 				$content		.= "Attempting to add $inp_student_callsign to $inp_advisor_callsign class $inp_advisorClass failed:<br />$thisReason<br />";
 			} else {
-				$content		.= "Student added to $inp_advisor_callsign class $inp_advisorClass<br />";
-				$content	.= "<p>Student $inp_student_callsign re-assigned advisor to $inp_advisor_callsign.</p>
-								<p>Click 'Push' to push the information to the advisor:<br />
-								<form method='post' action='$pushURL' 
-								name='selection_form_41' ENCTYPE='multipart/form-data'>
-								<input type='hidden' name='strpass' value='2'>
-								<input type='hidden' name='inp_semester' value='$theSemester'>
-								<input type='hidden' name='request_info' value='$inp_advisor_callsign'>
-								<input type='hidden' name='inp_mode' value='$inp_mode'>
-								<input type='hidden' name='request_type' value= 'Full'>
-								<input type='hidden' name='inp_mode' value='$inp_mode'>
-								<input type='submit' class='formInputButton' value='Push'></form>";
+				if ($doDebug) {
+					echo "deciding how many pushes are needed<br />inp_prev_advisor: $inp_prev_advisor<br />inp_advisor_callsign: $inp_advisor_callsign<br />";
+				}
+				if ($inp_prev_advisor == '') {
+					if ($doDebug) {
+						echo "No previous advisor. Pushing new advisor<br />";
+					}
+					$content		.= "<p>Student $inp_student_callsign assigned to advisor $inp_advisor_callsign.</p>
+										<p>Click 'Push' to push the information to the advisor:<br />
+										<form method='post' action='$pushURL' 
+										name='selection_form_41' ENCTYPE='multipart/form-data'>
+										<input type='hidden' name='strpass' value='2'>
+										<input type='hidden' name='inp_semester' value='$theSemester'>
+										<input type='hidden' name='request_info' value='$inp_advisor_callsign'>
+										<input type='hidden' name='inp_mode' value='$inp_mode'>
+										<input type='hidden' name='request_type' value= 'Full'>
+										<input type='hidden' name='inp_mode' value='$inp_mode'>
+										<input type='submit' class='formInputButton' value='Push'></form>";
+				} else {
+					if ($doDebug) {
+						echo "need to push previous and new advisor classes<br />"; 
+					}
+					$content		.= "<p>Student $inp_student_callsign re-assigned from advisor $inp_prev_advisor class $inp_prev_advisor_class 
+										to advisor $inp_advisor_callsign class $inp_advisorClass.</p>
+										<p>Both advisors need to be informed of the class change. Click 'Push $inp_prev_advisor' to push the 
+										information to the previous advisor. The 'push' will open in a new tab. 
+										When that is done, return here and click 'Push $inp_advisor_callsign'.</p>
+										<table style='width:auto;'>
+										<tr><td><form method='post' action='$pushURL' target='_blank' 
+												name='selection_form_41' ENCTYPE='multipart/form-data'> 
+												<input type='hidden' name='strpass' value='2'>
+												<input type='hidden' name='inp_semester' value='$theSemester'>
+												<input type='hidden' name='request_info' value='$inp_prev_advisor'>
+												<input type='hidden' name='inp_mode' value='$inp_mode'>
+												<input type='hidden' name='request_type' value= 'Full'>
+												<input type='hidden' name='inp_mode' value='$inp_mode'>
+												<input type='submit' class='formInputButton' value='Push $inp_prev_advisor'></form></td>
+											<td style='width:50px;'></td>
+											<td><form method='post' action='$pushURL' target='_blank' 
+												name='selection_form_41' ENCTYPE='multipart/form-data'> 
+												<input type='hidden' name='strpass' value='2'>
+												<input type='hidden' name='inp_semester' value='$theSemester'>
+												<input type='hidden' name='request_info' value='$inp_advisor_callsign'>
+												<input type='hidden' name='inp_mode' value='$inp_mode'>
+												<input type='hidden' name='request_type' value= 'Full'>
+												<input type='hidden' name='inp_mode' value='$inp_mode'>
+												<input type='submit' class='formInputButton' value='Push $inp_advisor_callsign'></form></td></tr>
+										</table>";
+				}
 			}
 		}
 		
