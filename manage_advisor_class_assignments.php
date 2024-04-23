@@ -763,7 +763,7 @@ td:last-child {
 									$studentUpdateParams[]	= "student_status|R|s";
 									$confirmationMsg		= "Student $student_call_sign confirmed as not attending and a replacement has been requested.<br />";
 									$removeStudent				= FALSE;
-								} elseif ($inp_attend == 'advisor') {
+		 						} elseif ($inp_attend == 'advisor') {
 									if ($doDebug) {
 										echo "Doing advisor; Replacement Yes<br />";
 									}
@@ -1359,6 +1359,13 @@ No replacement requested. ";
 					if ($doDebug) {
 						echo "DELETE THE TOKEN HERE<br />";
 					}
+					$resolveResult				= resolve_reminder($inp_call_sign,'studentConfirmation',$testMode,$doDebug);
+					if ($resolveResult === FALSE) {
+						if ($doDebug) {
+							echo "resolve_reminder for $inp_callsign and $token failed<br />";
+						}
+					}
+					
 				} else {
 					echo "Still have $unconfirmedCount unconfirmed students<br />";
 				}
