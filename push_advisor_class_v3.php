@@ -460,34 +460,76 @@ Resolution</a> for assistance.</b></span><br /></p>";
 						} else {
 							$content .= "The mail send function to $email_to failed.<br /><br />";
 						}
-						$effective_date		 	= date('Y-m-d H:i:s');
-						$closeStr				= strtotime("+5 days");
-						$close_date				= date('Y-m-d H:i:s', $closeStr);
-						$token					= mt_rand();
-						$email_text				= "<p></p>";
-						$reminder_text		= "<b>Student Participation Confirmation:</b> The makeup of your 
+						
+						// reminder --- put in a reminder unless one already exists
+						// first, see if there is an existing open reminder
+						$reminderSQL			= "select * from wpw1_cwa_reminders 
+													where call_sign = '$advisorCallSign' 
+													and token = 'studentConfirmation'  
+													and resolved != 'Y'";
+						$reminderCount			= $wpdb->get_results($reminderSQL);
+						if ($reminderCount == FALSE) {
+							handleWPDBError($jobname,$doDebug);
+						} else {
+							$numRRows			= $wpdb->num_rows;
+							if ($doDebug) {
+								echo "ran $reminderSQL<br />and retrieved $numRRows rows<br />";
+							} 
+							if ($numRRows == 0) {
+								$effective_date		 	= date('Y-m-d H:i:s');
+								$closeStr				= strtotime("+5 days");
+								$close_date				= date('Y-m-d H:i:s', $closeStr);
+								$token					= 'studentConfirmation';
+								$email_text				= "<p></p>";
+								$reminder_text		= "<b>Student Participation Confirmation:</b> The makeup of your 
 your class has changed. You should now contact each unconfirmed student, verify if that student will be attending, and then update the 
 student status. Click on <a href='cwa-manage-advisor-class-assignments/?strpass=5&inp_call_sign=$advisorCallSign&token=$token' target='_blank'>Manage Advisor Class</a> 
 to perform this task."; 
-						$inputParams		= array("effective_date|$effective_date|s",
-													"close_date|$close_date|s",
-													"resolved_date||s",
-													"send_reminder||s",
-													"send_once||s",
-													"call_sign|$advisorCallSign|s",
-													"role||s",
-													"email_text||s",
-													"reminder_text|$reminder_text|s",
-													"resolved||s",
-													"token|$token|s");
-						$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
-						if ($insertResult[0] === FALSE) {
-							if ($doDebug) {
-								echo "inserting reminder failed: $insertResult[1]<br />";
+								$inputParams		= array("effective_date|$effective_date|s",
+															"close_date|$close_date|s",
+															"resolved_date||s",
+															"send_reminder||s",
+															"send_once||s",
+															"call_sign|$advisorCallSign|s",
+															"role||s",
+															"email_text||s",
+															"reminder_text|$reminder_text|s",
+															"resolved||s",
+															"token|$token|s");
+								$insertResult		= add_reminder($inputParams,$testMode,$doDebug);
+								if ($insertResult[0] === FALSE) {
+									if ($doDebug) {
+										echo "inserting reminder failed: $insertResult[1]<br />";
+									}
+									$content		.= "Inserting reminder failed: $insertResult[1]<br />";
+								} else {
+									$content		.= "Task Reminder successfully added<br />";
+								}
+							} else {
+								// update close date in the existing reminder
+								if ($doDebug) {
+									echo "updating existing reminders<br />";
+								}
+								foreach($reminderCount as $reminderRow) {
+									$reminderID		= $reminderRow->record_id;
+									$close_date		= $reminderRow->close_date;
+									
+									$closeStr		= strtotime("+5 days");
+									$close_date		= date('Y-m-d H:i:s', $closeStr);
+									
+									$reminderUpdate	= $wpdb->update('wpw1_cwa_reminders', 
+																	array('close_date'=>$close_date),
+																	array('record_id'=>$reminderID),
+																	array('%s'),
+																	array('%d'));
+									if ($reminderUpdate === FALSE) {
+										handleWPDBError($jobname,$doDebug);
+										$content	.= "Reminder failed to update<br />";
+									} else {
+										$content	.= "Reminder close date updated<br />";
+									}
+								}
 							}
-							$content		.= "Inserting reminder failed: $insertResult[1]<br />";
-						} else {
-							$content		.= "Task Reminder successfully added<br />";
 						}
 					}
 				} else {
