@@ -2318,37 +2318,39 @@ td:last-child {
 							}
 						}
 						if ($doUnassign) {
-							$inp_data			= array('inp_student'=>$student_call_sign,
-														'inp_semester'=>$student_semester,
-														'inp_assigned_advisor'=>$student_assigned_advisor,
-														'inp_assigned_advisor_class'=>$student_assigned_advisor_class,
-														'inp_remove_status'=>'',
-														'inp_arbitrarily_assigned'=>$student_no_catalog,
-														'inp_method'=>'remove',
-														'jobname'=>$jobname,
-														'userName'=>$userName,
-														'testMode'=>$testMode,
-														'doDebug'=>$doDebug);
-								
-							$removeResult		= add_remove_student($inp_data);
-							if ($removeResult[0] === FALSE) {
-								$thisReason		= $removeResult[1];
-								if ($doDebug) {
-									echo "attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
+							if ($student_assigned_advisor != '') {
+								$inp_data			= array('inp_student'=>$student_call_sign,
+															'inp_semester'=>$student_semester,
+															'inp_assigned_advisor'=>$student_assigned_advisor,
+															'inp_assigned_advisor_class'=>$student_assigned_advisor_class,
+															'inp_remove_status'=>'',
+															'inp_arbitrarily_assigned'=>$student_no_catalog,
+															'inp_method'=>'remove',
+															'jobname'=>$jobname,
+															'userName'=>$userName,
+															'testMode'=>$testMode,
+															'doDebug'=>$doDebug);
+									
+								$removeResult		= add_remove_student($inp_data);
+								if ($removeResult[0] === FALSE) {
+									$thisReason		= $removeResult[1];
+									if ($doDebug) {
+										echo "attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
+									}
+									sendErrorEmail("$jobname Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason");
+									$content		.= "Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
+								} else {
+									$content		.= "Student removed from class and unassigned<br />
+														<p>Click 'Push' to push the information to the advisor:<br />
+														<form method='post' action='$pushURL' 
+														name='selection_form_41' ENCTYPE='multipart/form-data'>
+														<input type='hidden' name='strpass' value='2'>
+														<input type='hidden' name='inp_mode' value='$inp_mode'>
+														<input type='hidden' name='inp_semester' value='$student_semester'>
+														<input type='hidden' name='request_info' value='$student_assigned_advisor'>
+														<input type='hidden' name='request_type' value= 'Full'>
+														<input type='submit' class='formInputButton' value='Push'></form></p><br /><br />";
 								}
-								sendErrorEmail("$jobname Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason");
-								$content		.= "Attempting to remove $student_call_sign from $student_assigned_advisor class failed:<br />$thisReason<br />";
-							} else {
-								$content		.= "Student removed from class and unassigned<br />
-													<p>Click 'Push' to push the information to the advisor:<br />
-													<form method='post' action='$pushURL' 
-													name='selection_form_41' ENCTYPE='multipart/form-data'>
-													<input type='hidden' name='strpass' value='2'>
-													<input type='hidden' name='inp_mode' value='$inp_mode'>
-													<input type='hidden' name='inp_semester' value='$student_semester'>
-													<input type='hidden' name='request_info' value='$student_assigned_advisor'>
-													<input type='hidden' name='request_type' value= 'Full'>
-													<input type='submit' class='formInputButton' value='Push'></form></p><br /><br />";
 							}
 						}
 					}
