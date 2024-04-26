@@ -378,7 +378,7 @@ td:last-child {
 							if ($doDebug) {
 								echo "the student can be moved<br />";
 							}
-							$content	.= "<h3>Moved $inp_callSign from $inp_semesterA to $inp_semesterB</h3>";
+							$content	.= "<h3>Moveing $inp_callSign from $inp_semesterA to $inp_semesterB</h3>";
 							// determine if the move is into the current/next semester
 							$theSemester		= $currentSemester;
 							if ($currentSemester == 'Not in Session') {
