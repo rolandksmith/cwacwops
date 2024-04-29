@@ -468,7 +468,7 @@ Resolution</a> for assistance.</b></span><br /></p>";
 													and token = 'studentConfirmation'  
 													and resolved != 'Y'";
 						$reminderCount			= $wpdb->get_results($reminderSQL);
-						if ($reminderCount == FALSE) {
+						if ($reminderCount === FALSE) {
 							handleWPDBError($jobname,$doDebug);
 						} else {
 							$numRRows			= $wpdb->num_rows;

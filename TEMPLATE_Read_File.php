@@ -721,6 +721,37 @@
 
  
  
+/// reminders
+					$reminderResult		= $wpdb->get_results($reminderSQL);
+					if ($reminderResult === FALSE) {
+						handleWPDBError($jobname,$doDebug);
+					} else {
+						$numRRows		= $wpdb->num_rows;
+						if ($doDebug) {
+							echo "ran $reminderSQL<br />and retrieved $numRRows rows<br />";
+						}
+						$content		.= "have $numRRows reminder records<br />";
+						if ($numRRows > 0) {
+							foreach($reminderResult as $reminderResultRow) {
+								$record_id			= $reminderResultRow->record_id;
+								$effective_date		= $reminderResultRow->effective_date;
+								$close_date			= $reminderResultRow->close_date;
+								$resolved_date		= $reminderResultRow->resolved_date;
+								$send_reminder		= $reminderResultRow->send_reminder;
+								$send_once			= $reminderResultRow->send_once;
+								$call_sign			= $reminderResultRow->call_sign;
+								$role				= $reminderResultRow->role;
+								$email_text			= $reminderResultRow->email_text;	
+								$reminder_text		= $reminderResultRow->reminder_text;		
+								$resolved			= $reminderResultRow->resolved;	
+								$token				= $reminderResultRow->token;
+								$repeat_sent_date	= $reminderResultRow->repeate_sent_date;		
+								$date_created		= $reminderResultRow->date_created;	
+								$date_modified		= $reminderResultRow->date_modified;	
+
+							}
+						}
+					}
  
  
 

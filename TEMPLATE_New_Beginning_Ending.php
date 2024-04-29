@@ -6,12 +6,7 @@ function this_is_a_function_func() {
 	$testMode						= FALSE;
 	$initializationArray 			= data_initialization_func();
 	$validUser 						= $initializationArray['validUser'];
-/*
-	if ($validUser == 'N') {				// turn off debug and testmode
-		$doDebug					= FALSE;
-		$testMode					= FALSE;
-	}
-*/
+
 	$versionNumber				 	= "1";
 	if ($doDebug) {
 		echo "Initialization Array:<br /><pre>";
@@ -22,10 +17,18 @@ function this_is_a_function_func() {
 	$currentTimestamp	= $initializationArray['currentTimestamp'];
 	$validTestmode		= $initializationArray['validTestmode'];
 	$siteURL			= $initializationArray['siteurl'];
+	$userEmail			= $initializationArray['userEmail'];
+	$userDisplayName	= $initializationArray['userDisplayName'];
+	$userRole			= $initializationArray['userRole'];
 	
 //	CHECK THIS!								//////////////////////
 	if ($validUser == "N") {
 		return "YOU'RE NOT AUTHORIZED!<br />Goodby";
+	}
+
+	if (!in_array($userName,$validTestmode) && $doDebug) {	// turn off doDebug if not a testmode user
+		$doDebug			= FALSE;
+		$testMode			= FALSE;
 	}
 
 //	ini_set('memory_limit','256M');
