@@ -89,10 +89,7 @@ function student_management_func() {
 	$semesterTwo				= $initializationArray['semesterTwo'];
 	$semesterThree				= $initializationArray['semesterThree'];
 	$semesterFour				= $initializationArray['semesterFour'];
-	$proximateSemester			= $currentSemester;
-	if ($currentSemester == 'Not in Session') {
-		$proximateSemester		= $nextSemester;
-	}
+	$proximateSemester			= $initializationArray['proximateSemester'];
 	
 	$searchRange				= array(0=>'0|400',
 										100=>'0|500',
@@ -1165,7 +1162,7 @@ td:last-child {
 
 		$sql					= "select * from $studentTableName 
 									where intervention_required != '' 
-									and semester = '$nextSemester'";
+									and semester = '$proximateSemester'";
 		$wpw1_cwa_student		= $wpdb->get_results($sql);
 		if ($wpw1_cwa_student === FALSE) {
 			handleWPDBError("$jobname MGMT 8",$doDebug);

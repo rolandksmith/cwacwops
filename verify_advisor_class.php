@@ -471,6 +471,12 @@ Advisor Call Sign: <input type='text' class='formInputText' name='inp_advisor' s
 																echo "Bypassing this student<br/>";
 															}
 														}
+														if ($student_promotable == 'W') {
+															$doProceed							= FALSE;
+															if ($doDebug) {
+																echo "Bypassing student already withdrawn<br />";
+															}
+														}
 														if ($doProceed) {								
 															if ($doDebug) {
 																echo "Got a student $student_last_name, $student_first_name ($student_call_sign) $student_time_zone; $student_level<br />";

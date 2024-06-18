@@ -16,7 +16,7 @@ function manage_advisor_class_assignments_func() {
 	$doDebug					= FALSE;
 	$testMode					= FALSE;
 	$initializationArray 		= data_initialization_func();
-	$validUser 						= $initializationArray['validUser'];
+	$validUser 					= $initializationArray['validUser'];
 	if ($validUser == 'N') {				// turn off debug and testmode
 		$doDebug					= FALSE;
 		$testMode					= FALSE;

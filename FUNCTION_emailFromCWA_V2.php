@@ -19,6 +19,7 @@ function emailFromCWA_v2($mailParameters) {
 													    'theSubject'=>$theSubject,
 													    'theContent'=>$theContent,
 													    'theCc'=>$theCc,
+													    'theBcc'=>$theBcc,
 													    'theAttachment'=>$theAttachment,
 													    'mailCode'=>$mailCode,
 													    'jobname'=>$jobname,
@@ -50,6 +51,7 @@ function emailFromCWA_v2($mailParameters) {
 	19 to Bob tcc Roland, Andy
 	20 to Bob, Joe Tcc Roland, Andy
 	21 to theRecipient Bcc Bob, Roland, Andy
+	99 to Roland (dockerMode)
 	
 	In testmode, if the increment is greater than 10, the email is not sent nor stored
 	
@@ -57,32 +59,21 @@ function emailFromCWA_v2($mailParameters) {
 
 	global $wpdb;
 
-	$initializationArray 	= data_initialization_func();
-	$siteURL				= $initializationArray['siteurl'];
-
-	$dockerMode				= FALSE;
-	$myInt					= strpos($siteURL,'localhost');
-	if ($myInt !== FALSE) {
-		$dockerMode			= TRUE;
-	}
-	
 	$theRecipient			= "rolandksmith@gmail.com";
 	$theSubject				= "CW Academy";
 	$theContent				= "";
 	$theCc					= "";
+	$theBcc					= "";
 	$theAttachment			= array();
 	$mailCode				= 1;
 	$jobname				= '';
 	$increment				= 0;
 	$testMode				= FALSE;
 	$doDebug				= TRUE;
-	
+
 	if (isset($mailParameters)) {
 		foreach($mailParameters as $myKey=>$myValue) {
 			$$myKey			= $myValue;
-//			if ($doDebug) {
-//				echo "setting $$myKey to $myValue<br />";
-//			}
 		}
 	} else {
 		echo "mailParameters doesn't exist<br />";
@@ -90,8 +81,18 @@ function emailFromCWA_v2($mailParameters) {
 	}
 // $doDebug = TRUE;	
 	if ($doDebug) {
-		echo "<br />Entering FUNCTION emailFromCWA with mailCode: $mailCode and increment: $increment<br />";
+		echo "<br />Entering FUNCTION emailFromCWA<br />
+				theRecipient: $theRecipient<br />
+				theSubject: $theSubject<br />
+				mailCode: $mailCode<br />
+				jobname: $jobname<br />
+				increment: $increment<br />";
 	}
+
+
+	$initializationArray 	= data_initialization_func();
+	$siteURL				= $initializationArray['siteurl'];
+
 
 	if ($testMode) {
 		$emailTableName		= "wpw1_cwa_testmode_email";
@@ -103,39 +104,30 @@ function emailFromCWA_v2($mailParameters) {
 	error_reporting(E_ALL);	
 
 
+
 	$myHeaders 		= array('Content-Type: text/html; charset=UTF-8',
-						    'from: CW Academy <cwacademy@cwa.cwops.org>',
+						    'From: CW Academy <cwacademy@cwa.cwops.org>',
 							'Reply-To: no reply <noreply@cwa.cwops.org>');
 
-	if ($dockerMode) {
-		if ($doDebug) {
-			echo "dockerMode set to TRUE<br />";
-		}
-
-		//	Intervention ... send all email to roland and to no one else
 							
-		$thisTo			= 'rolandksmith@gmail.com';
-		$thisCc			= '';
-		$thisBcc		= '';
-		$thisTcc		= '';
-							
-		$theSubject		= "TESTMODE $theSubject";	
-		$sendEmail		= TRUE;
-	}							
-							
-							
-  if (!$dockerMode) {							
 	$roland			= "rolandksmith@gmail.com";
 	$bob			= "kcgator@gmail.com";
 	$andy		 	= "abunker@gmail.com";
-	$joe			= "joe@aa8ta.net";
-	$kate			= "k6htn@arrl.net";
-	
+
 	$thisTo			= '';
-	$thisCc			= '';
+	$theCc			= '';
 	$thisBcc		= '';
 	$thisTcc		= '';
 
+
+	$myInt					= strpos($siteURL,'localhost');
+	if ($myInt !== FALSE) {
+		$mailCode			= 99;
+		
+		if ($doDebug) {
+			echo "dockerMode. setting mailCode to 99<br />";
+		}
+	}
 
 	switch($mailCode) {
 		case 1:								// Test Mode to Roland
@@ -204,27 +196,26 @@ function emailFromCWA_v2($mailParameters) {
 			$thisBcc		= "";
 			$thisTcc		= "$roland,$bob,$andy";
 			break;
-		case 12:					// to theRecipient bcc Joe tcc Roland, Bob, Andy
+		case 12:					// to theRecipient tcc Roland, Bob, Andy
 			if ($doDebug) {
 				echo "doing case 12<br />";
 			}
-//			$myHeaders[]	= "bcc: $joe";
 			$thisTo			= $theRecipient;
 			$thisBcc		= '';
 			$thisTcc		= "$bob,$roland,$andy";
 			break;
-		case 13:					// to theRecipient bcc Kate table Roland, Bob, Andy
+		case 13:					// to theRecipient Bcc Roland table Bob, Andy
 			if ($doDebug) {
 				echo "doing case 13<br />";
 			}
 			$thisTo			= $theRecipient;
-			$thisTcc		= "$bob,$roland,$andy";
+			$thisBcc		= "$roland";
+			$thisTcc		= "$bob,$andy";
 			break;
-		case 14:					// to theRecipient bcc Joe, Kate table Roland, Bob, Andy
+		case 14:					// to theRecipient table Roland, Bob, Andy
 			if ($doDebug) {
 				echo "doing case 14<br />";
 			}
-//			$myHeaders[]	= "bcc: $joe";
 			$thisTo			= $theRecipient;
 			$thisBcc		= "";
 			$thisTcc		= "$bob,$roland,$andy";
@@ -281,11 +272,19 @@ function emailFromCWA_v2($mailParameters) {
 			if ($doDebug) {
 				echo "doing case 21<br />";
 			}
-			$myHeaders[]	= "bcc: $bob,$roland,$andy";
 			$thisTo			= $theRecipient;
+			$thisBcc		= "$bob,$roland,$andy";
+			$thisTcc		= "";
+			break;
+		case 99:					// docker mode. Send only to Roland
+			if ($doDebug) {
+				echo "doing case 99 (docker mode)<br />";
+			}
+			$thisTo			= $roland;
 			$thisBcc		= "";
 			$thisTcc		= "";
 			break;
+		
 		default:
 			if ($doDebug) {
 				echo "Fell through to default<br />";
@@ -293,6 +292,7 @@ function emailFromCWA_v2($mailParameters) {
 			$thisTo			= $theRecipient;
 			$thisBcc		= "";
 			$thisTcc		= $roland;
+			$theSubject		= "TESTMODE $theSubject";	
 			break;
 	}
 	
@@ -304,6 +304,7 @@ function emailFromCWA_v2($mailParameters) {
 	}
 
 	$sendEmail				= TRUE;
+							
 	if ($testMode) {
 		if ($doDebug) {
 			echo "Operating in test mode with mailCode of $mailCode. Headers:<br /><pre>";
@@ -318,15 +319,20 @@ function emailFromCWA_v2($mailParameters) {
 		}
 	} else {
 		if ($theCc != '') {
-			$myHeaders[]	= "cc: $theCc";
+			$myHeaders[]	= "Cc: $theCc";
+		}
+		if ($thisBcc != '') {
+			$myHeaders[]	= "Bcc: $thisBcc";
 		}
 		if ($doDebug) {
-			echo "Operating in production mode with mailCode of $mailCode and thisTo of $thisTo; Headers:<br /><pre>";
+			echo "Operating in production mode with mailCode of $mailCode<br />
+			      thisTo of $thisTo<br />
+			      theSubject of $theSubject<br />
+			      Headers:<br /><pre>";
 			print_r($myHeaders);
 			echo "</pre><br />";
 		}
 	}
-  }
 
 	if ($doDebug) {
 		echo "theAttachment:<br /><pre>";
@@ -338,25 +344,23 @@ function emailFromCWA_v2($mailParameters) {
 		$result			= wp_mail($thisTo,$theSubject,$theContent,$myHeaders,$theAttachment);
 		if ($result === FALSE) {
 			if ($doDebug) {
-				echo "Sending the email to $thisTo failed<br /><pre>";
-				echo "thisTo: $thisTo<br />";
-				echo "theSubject; $theSubject<br />";
+				echo "Sending the email to $thisTo failed<br />
+					   thisTo: $thisTo<br />
+					   theSubject; $theSubject<br />
+					   Headers:<br /><pre>";
 				print_r($myHeaders);
-//				print_r($result);
 				echo "</pre><br />";
+//				echo "Mailer Error: " . $wp_error->get_error_message() ."<br />";
+
 			}
 			return FALSE;
 		} else {
-			if ($doDebug) {
-				echo "Sending the email to $thisTo was successful<br />";
-			}
-//			$theContent	= $theContent,ENT_HTML5;
 			if ($doDebug) {
 				echo "sending email worked ... writing to email log<br />";
 			}
 			$emailresult= $wpdb->insert($emailTableName,
 										array('email_to'=>$thisTo,
-											  'email_cc'=>$thisCc,
+											  'email_cc'=>$theCc,
 											  'email_bcc'=>$thisBcc,
 											  'email_tcc'=>$thisTcc,
 											  'email_subject'=>$theSubject,

@@ -366,7 +366,7 @@ email sent to the advisor ";
 							$token					= mt_rand();
 							$email_text				= "<p></p>";
 							$reminder_text			= "<b>Mid-term Student Verification</b> 
-Please click <a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode'&token=$token>
+Please click <a href='$verifyURL?strpass=2&inp_advisor=$advisor_call_sign&extmode=$extMode&token=$token' target='_blank'>
 HERE</a> to verify the current makeup of your class(es). A web page will be displayed showing each 
 of your students for you to select whether or not that student is in your class as well as allow 
 you to identify any additional students.";

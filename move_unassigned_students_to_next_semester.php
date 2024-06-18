@@ -306,9 +306,6 @@ td:last-child {
 				echo "ran $myStr<br />and retrieved $numSRows rows from $studentTableName table<br />";
 			}
 			if ($numSRows > 0) {
-				if ($doDebug) {
-					echo "found $numSRows rows in $studentTableName<br />";
-				}
 				if ($inp_type == 'NOTIFY') {
 					$content	.= "<table style='width:1000px;'><tr>
 									<th>Call Sign</th>
@@ -415,8 +412,7 @@ td:last-child {
 									&nbsp;&nbsp;&nbsp;&nbsp;Response: $student_response<br />
 									&nbsp;&nbsp;&nbsp;&nbsp;Status: $student_student_status<br />
 									&nbsp;&nbsp;&nbsp;&nbsp;Class Priority: $student_class_priority<br />";
-						}
-					
+						}				
 						$updateStr								= '';
 						$the_level		= substr($student_level,0,3);
 
@@ -452,7 +448,7 @@ td:last-child {
 											</tr><tr>
 												<td colspan='7'>$newActionLog</td></tr>";
 												
-							$thisOffset		= getOffsetFromIdentifier($student_timezone_id,$nextSemester,$doDebug=FALSE);
+							$thisOffset		= getOffsetFromIdentifier($student_timezone_id,$nextSemester,$doDebug);
 												
 							$updateParams	= array();
 							$updateFormat	= array();
@@ -522,18 +518,13 @@ td:last-child {
 															'doDebug'=>$doDebug);
 							$updateResult	= updateStudent($studentUpdateData);
 							if ($updateResult[0] === FALSE) {
-								$myError	= $wpdb->last_error;
-								$mySql		= $wpdb->last_query;
-								$errorMsg	= "$jobname Processing $student_call_sign in $studentTableName failed. Reason: $updateResult[1]<br />SQL: $mySql<br />Error: $myError<br />";
-								if ($doDebug) {
-									echo $errorMsg;
-								}
-								sendErrorEmail($errorMsg);
+								handleWPDBError($jobname,$doDebug);
 								$content		.= "Unable to update content in $studentTableName<br />";
 							} else {
 								if ($doDebug) {
 									echo "current student record updated. Preparing to send email<br />";
 								}
+								
 								$studentsMoved++;
 								$stringToPass	= "studentid=$student_ID&inp_mode=$run_mode&program_action=valid";
 								$enstr			= base64_encode($stringToPass);
@@ -624,7 +615,7 @@ Resolution</a> for assistance.</b></span><br /></p>";
 																		'doDebug'=>$doDebug));
 							if ($mailResult === TRUE) {
 								if ($doDebug) {
-									echo "Am email was sent to $theRecipient<br />";
+									echo "An email was sent to $theRecipient<br />";
 								}
 								if ($inp_type == 'NOTIFY') {
 									$content .= "<tr><td colspan='10'>An email was sent to $theRecipient</td></tr>
