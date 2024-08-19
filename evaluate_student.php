@@ -138,6 +138,16 @@ function evaluate_student_func() {
 	$student78						= '';
 	$student79						= '';
 	$student80						= '';
+	$student81						= '';
+	$student82						= '';
+	$student83						= '';
+	$student84						= '';
+	$student85						= '';
+	$student86						= '';
+	$student87						= '';
+	$student88						= '';
+	$student89						= '';
+	$student90						= '';
 	$inp_sunday						= '';
 	$inp_monday						= '';
 	$inp_tuesday					= '';
@@ -418,6 +428,36 @@ function evaluate_student_func() {
 			}
 			if ($str_key 		== "student80") {
 				$student80		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student81") {
+				$student81		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student82") {
+				$student82		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student83") {
+				$student83		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student84") {
+				$student84		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student85") {
+				$student85		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student86") {
+				$student86		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student87") {
+				$student87		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student88") {
+				$student88		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student89") {
+				$student89		 = strtoupper($str_value);
+			}
+			if ($str_key 		== "student90") {
+				$student90		 = strtoupper($str_value);
 			}
 			if ($str_key 		== "inp_first_name") {
 				$inp_first_name	 = htmlentities($str_value);
@@ -1557,7 +1597,7 @@ evaluationComplete: $class_evaluation_complete<br />";
 		$content					.= "<h3>Evaluate Students</h3>";
 // Go through each of the student records
 		$prelimUnevaluatedCount		= 0;
-		for ($snum=10;$snum<81;$snum++) {
+		for ($snum=10;$snum<91;$snum++) {
 			$strSnum			= strval($snum);
 			$theInfo			= ${'student' . $strSnum};
 			if ($doDebug) {
