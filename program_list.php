@@ -293,18 +293,11 @@ if ($userRole == 'administrator') {
 			<td style='width:33%;vertical-align:top;'>
 			<h4>Frequently Used Functions</h4>
 			<ul>
-			<li><a href='$siteURL/cwa-display-and-update-advisor-information/' target='_blank'>Display and Update Advisor Information</a>
-			<li><a href='$siteURL/cwa-display-and-update-student-information/' target='_blank'>Display and Update Student Information</a><br /><br />
 			<li><a href='$siteURL/wp-admin/index.php' target='_blank'>Dashboard<br />
 			<li><a href='$siteURL/wp-login.php/?action=logout'>Logout<br ><br />
 			<li><a href='$siteURL/cwa-student-management/?strpass=2' target='_blank'>Pre-assign Student to an Advisor</a>
-			<li><a href='$siteURL/cwa-student-management/?strpass=90' target='_blank'>Assign a Student to an Advisor regardless</a>
-			<li><a href='$siteURL/cwa-student-management/?strpass=70' target='_blank'>Find Possible Classes for a Student</a>
-			<li><a href='$siteURL/cwa-student-management/?strpass=80' target='_blank'>Find Possible Students for an Advisor's Class</a><br /><br />
 			<li><a href='$siteURL/cwa-automatic-student-backfill-v1/' target='_blank'>Automatic Student Backfill</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
-			<li><a href='$siteURL/cwa-push-advisor-class/' target='_blank'>Push Advisor Class</a><br /><br />
-			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a>
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart-v2/' target='_blank'>Student and Advisor Color Chart V2</a><br /><br />
 			<li><a href='$siteURL/cwa-display-users-program-list/' target='_blank'>Display Users Program List (FAKE)<a>
 			<li><a href='$siteURL/cwa-user-administration/' target='_blank'>User Administration (Take Over Acct)
@@ -397,6 +390,18 @@ if ($userRole == 'administrator') {
 			</ul>
 
 			<td style='vertical-align:top;'>
+			<h4>Common Student / Advisor Management Tasks</h4>
+			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a><br /><br />
+			<li><a href='$siteURL/cwa-display-and-update-advisor-information/' target='_blank'>Display and Update Advisor Information</a>
+			<li><a href='$siteURL/cwa-display-and-update-student-information/' target='_blank'>Display and Update Student Information</a><br /><br />
+			<li><a href='$siteURL/cwa-student-management/?strpass=90' target='_blank'>Assign a Student to an Advisor regardless</a>
+			<li><a href='$siteURL/cwa-student-management/?strpass=70' target='_blank'>Find Possible Classes for a Student</a>
+			<li><a href='$siteURL/cwa-student-management/?strpass=80' target='_blank'>Find Possible Students for an Advisor's Class</a>
+			<li><a href='$siteURL/cwa-student-management/?strpass=50' target='_blank'>Unassign a Student Regardless of Status</a>
+			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blank'>Move Student to Different Semester</a>
+			<li><a href='$siteURL/cwa-student-management/?strpass=55' target='_blank'>Re-assign a Student to Another Advisor</a><br /><br />
+			<li><a href='$siteURL/cwa-push-advisor-class/' target='_blank'>Push Advisor Class</a><br /><br />
+			
 			<h4>Scheduled Programs</h4>
 			<ul>
 			<li><a href='$siteURL/cwa-daily-cron-process/' target='_blank'>Daily Cron Process</a>
@@ -465,7 +470,6 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-manage-directory/' target='_blank'>Manage Directory</a>
 			<li><a href='siteURL/cwa-manage-reminders/' target='_blank'>Manage Reminders</a>
 			<li><a href='$siteURL/cwa-perform-assessment/' target='_blank'>Perform Assessment/a>
-			<li><a href='$siteURL/cwa-move-student-to-different-semester/' target='_blansment</a>
 			<li><a href='$siteURL/cwa-recover-deleted-record/' target='_blank'>Recover Deleted Record</a>
 			<li><a href='siteURL/cwa-remove-item/' target='_blank'>Remove Item</a>
 			<li><a href='$siteURL/cwa-search-audit-log/' target='_blank'>Search Audit Log</a>
