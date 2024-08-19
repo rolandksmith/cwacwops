@@ -429,6 +429,7 @@ td:last-child {
 																				FALSE,				// show verified
 																				TRUE,				// include header
 																				$doPreAssigned,		// do preassigned and assigned or assigned only
+																				TRUE,				// doFind: whether or not to show link for finding students
 																				$testMode,
 																				$doDebug); 
 						if ($result[0] === FALSE) {
