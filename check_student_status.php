@@ -473,10 +473,10 @@ td:last-child {
 													<a href='https://cwops.org/cwa-class-resolution/' 
 													target='_blank'>CW Academy Class Resolution</a>.</p>";
 					} else {
-						if ($daysToSemester > 45) {
+						if ($daysToSemester > 48) {
 							if ($student_response == 'Y') {
 								sendErrorEmail("$jobname -- $userName -- response is set to Y and more 
-than 45 days before the semester. Possible error");
+than 48 days before the semester. Possible error");
 							}
 							if ($student_no_catalog == 'Y') {
 								$thisOptions				= '';
