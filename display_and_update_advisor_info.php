@@ -279,6 +279,7 @@ function display_and_update_advisor_info_func() {
 					$advisorClassTableName	= 'wpw1_cwa_consolidated_advisorclass2';
 					$advisorDeletedTableName	= 'wpw1_cwa_advisor_deleted2';
 					$advisorClassDeletedTableName	= 'wpw1_cwa_advisorclass_deleted2';
+					$testMode		= TRUE;
 				} else {
 					echo "<b>ERROR:</b> No table specified!";
 				}
@@ -903,6 +904,10 @@ td:last-child {
 															<td>$class_comments</td></tr>
 														<tr><td>Copy Control</td>
 															<td>$copycontrol</td></tr>
+														<fe><td>Date Created</td>
+															<td>$advisorClass_date_created</td></tr>
+														<tr><td>Date Updated</td>
+															<td>$advisorClass_date_updated</td></tr>
 														</table>
 														To update the advisorClass info, click on the advisorClass_ID, or click 
 														<a href='$theURL?inp_class_id=$advisorClass_ID&inp_table=$inp_table&strpass=5&inp_verbose=$inp_verbose'>Update Class Info</a><br />";
