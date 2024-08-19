@@ -19,22 +19,20 @@ $defaultClassSize				= 6;
 $userName						= "";
 
 // determine if current user is a valid user
-	$validUsers 				= array('wr7q','WR7Q','Roland','kcgator','n7ast','N7AST','k7ojl','K7OJL',);
-	$validTestmode				= array('Roland','kcgator','n7ast', 'N7AST', 'k7ojl','K7OJL','wr7q','WR7Q');
+	$validUsers 				= array('wr7q','WR7Q','Roland','kcgator','n7ast','N7AST','k7ojl','K7OJL','VE2KM',); 
+	$validTestmode				= array('Roland','kcgator','n7ast', 'N7AST', 'k7ojl','K7OJL','wr7q','WR7Q','VE2KM',);
 	$current_user 				= wp_get_current_user();
-/*	
-	echo "current_user:<br /><pre>";
-	print_r($current_user);
-	echo "</pre><br />";
-*/	
+	
+//	echo "current_user:<br /><pre>";
+//	print_r($current_user);
+//	echo "</pre><br />";
+	
 	
 	$user_name 					= trim($current_user->user_login);
 	$user_email					= $current_user->user_email;
 	$user_display_name			= $current_user->display_name;
+	$userID						= get_current_user_id();
 	
-//	echo "curent_user array:<br /><pre>";
-//	print_r($current_user);
-//	echo "</pre><br />";
 	
 	if (in_array($user_name,$validUsers)) {
 		$validUser 				= "Y";
@@ -44,12 +42,11 @@ $userName						= "";
 	
 // determine if current user is an administrator
 	$user_role					= '';
-	$userArray					= wp_get_current_user();
-	if (in_array('administrator', (array) $userArray->roles)) {
+	if (in_array('administrator', (array) $current_user->roles)) {
 		$user_role				= 'administrator';
-	} elseif (in_array('advisor', (array) $userArray->roles)) {
+	} elseif (in_array('advisor', (array) $current_user->roles)) {
 		$user_role				= 'advisor';
-	} elseif (in_array('student', (array) $userArray->roles)) {
+	} elseif (in_array('student', (array) $current_user->roles)) {
 		$user_role				= 'student';
 	}
 
@@ -199,8 +196,10 @@ $userName						= "";
 		$proximateSemester		= $currentSemester;
 	}
 
+// set up pastSemesters
 	$pastSemesters				= '2020 Jan/Feb|2020 APR/MAY|2020 SEP/OCT|2021 Jan/Feb|2021 Apr/May|2021 Sep/Oct|2022 Jan/Feb|2022 May/Jun|2022 Sep/Oct|2023 Jan/Feb|2023 May/Jun|2023 Sep/Oct|2024 Jan/Feb|2024 May/Jun';
-	$pastSemestersArray			= array('2024 Jan/Feb',
+	$pastSemestersArray			= array('2024 May/Jun',
+										'2024 Jan/Feb',
 										'2023 Sep/Oct',
 										'2023 May/Jun',
 										'2023 Jan/Feb',
@@ -224,6 +223,7 @@ $userName						= "";
 		$result 					= array('validUser'=>$validUser,
 											'userRole'=>$user_role,
 											'userName'=>$user_name,
+											'userID'=>$userID,
 											'userEmail'=>$user_email,
 											'userDisplayName'=>$user_display_name,
 											'currentTimestamp'=>$currentTimestamp,
@@ -252,6 +252,7 @@ $userName						= "";
 		$result 					= array('validUser'=>$validUser,
 											'userRole'=>$user_role,
 											'userName'=>$user_name,
+											'userID'=>$userID,
 											'userEmail'=>$user_email,
 											'userDisplayName'=>$user_display_name,
 											'currentTimestamp'=>$myInterim,
