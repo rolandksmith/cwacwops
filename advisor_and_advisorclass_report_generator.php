@@ -73,7 +73,7 @@ function advisor_and_advisorclass_report_generator_func() {
 	$messenger = '';
 	
 	// advisorclass fields
-	$advisorclass_id = '';
+	$advisorclass_ID = '';
 	$advisor_call_sign = '';
 	$sequence = '';
 	$level = '';
@@ -302,10 +302,10 @@ function advisor_and_advisorclass_report_generator_func() {
 				}
 			}
 
-			if($str_key == "advisorclass_id") {
-				$advisorclass_id = 'X';
+			if($str_key == "advisorclass_ID") {
+				$advisorclass_ID = 'X';
 				if($doDebug) {
-					echo "set advisorclass_id to X<br />";
+					echo "set advisorclass_ID to X<br />";
 				}
 			}
 			if($str_key == "advisor_call_sign") {
@@ -526,7 +526,7 @@ function advisor_and_advisorclass_report_generator_func() {
 	</table></p>
 	<p>Select the advisorClass fields to be on the report:
 	<table>
-	<tr><td><input type='checkbox' name='advisorclass_ID' value='advisorclass_ID'> AdvisorClass_ID</td><td>advisorclass_id</td></tr>
+	<tr><td><input type='checkbox' name='advisorclass_ID' value='advisorclass_ID'> AdvisorClass_ID</td><td>advisorClass_ID</td></tr>
 	<tr><td><input type='checkbox' name='advisor_call_sign' value='advisor_call_sign'> Call Sign</td><td>advisor_call_sign</td></tr>
 	<tr><td><input type='checkbox' name='sequence' value='sequence'> Sequence</td><td>sequence</td></tr>
 	<tr><td><input type='checkbox' name='level' value='level'> Level</td><td>level</td></tr>
@@ -599,7 +599,7 @@ function advisor_and_advisorclass_report_generator_func() {
 	$nameConversionArray['telegram'] = 'Telegram';
 	$nameConversionArray['messenger'] = 'Messenger';
 
-	$nameConversionArray['advisorclass_id'] = 'AdvisorClass ID';
+	$nameConversionArray['advisorClass_ID'] = 'AdvisorClass ID';
 	$nameConversionArray['advisor_call_sign'] = 'Call Sign';
 	$nameConversionArray['advisor_id'] = 'Advisor ID';
 	$nameConversionArray['advisor_first_name'] = 'First Name';
@@ -672,7 +672,7 @@ function advisor_and_advisorclass_report_generator_func() {
 	a.class_verified,
 	a.date_created,
 	a.date_updated,
-	b.advisorclass_id,
+	b.advisorClass_ID,
 	b.advisor_call_sign,
 	b.sequence,
 	b.level,
@@ -862,8 +862,8 @@ function advisor_and_advisorclass_report_generator_func() {
 					$headerName = $nameConversionArray['date_updated'];
 					$content .= "<th>$headerName</th>";
 				}
-	if ($advisorclass_id == 'X') {
-	$headerName = $nameConversionArray['advisorclass_id'];
+	if ($advisorClass_ID == 'X') {
+	$headerName = $nameConversionArray['advisorClass_ID'];
 	$content .= "<th>$headerName</th>";
 	}
 
@@ -1123,11 +1123,11 @@ function advisor_and_advisorclass_report_generator_func() {
 					$needComma = TRUE;
 				}
 
-	if ($advisorclass_id == 'X') {
+	if ($advisorClass_ID == 'X') {
 	if ($needComma) {
 	$content .= '	';
 	}
-	$content .= "'$advisorclass_id'";
+	$content .= "'$advisorClass_ID'";
 	$needComma = TRUE;
 	}
 
@@ -1281,7 +1281,7 @@ function advisor_and_advisorclass_report_generator_func() {
 						$advisor_class_verified 			= $advisorRow->class_verified;
 						$advisor_date_created 				= $advisorRow->date_created;
 						$advisor_date_updated 				= $advisorRow->date_updated;
-						$advisorclass_ID				 		= $advisorRow->advisorclass_id;
+						$advisorClass_ID				 		= $advisorRow->advisorClass_ID;
 						$advisorclass_advisor_call_sign 		= $advisorRow->advisor_call_sign;
 						$advisorclass_sequence 					= $advisorRow->sequence;
 						$advisorclass_level 					= $advisorRow->level;
@@ -1402,8 +1402,8 @@ function advisor_and_advisorclass_report_generator_func() {
 							if ($date_updated == 'X') {
 								$content .= "<td style='vertical-align:top;'>${'student' . '_date_updated'}</td>";
 							}
-	if ($advisorclass_id 	== 'X') {
-	$content .= "<td style='vertical-align:top;'>$advisorclass_ID</td>";
+	if ($advisorClass_ID	== 'X') {
+	$content .= "<td style='vertical-align:top;'>$advisorClass_ID</td>";
 	}
 	if ($advisor_call_sign 	== 'X') {
 	$content .= "<td style='vertical-align:top;'>$advisorclass_advisor_call_sign</td>";
@@ -1677,7 +1677,7 @@ function advisor_and_advisorclass_report_generator_func() {
 								$content .= "${'student' . '_date_updated'}";
 								$needComma = TRUE;
 							}
-	if ($advisorClass_id == 'X') {
+	if ($advisorClass_ID == 'X') {
 	if ($needComma) {
 	$content .= ',';
 	}
