@@ -50,6 +50,7 @@ function student_registration_v11_func() {
 	Modified 20Nov23 by Roland for the portal process
 	Modified 30Jan24 by Roland to allow Beginners to skip the assessment
 	Modified 15Mar24 by Roland to fix changing the semester
+	Modified 19July24 by Roland to fix the check for needing assessment in pass 101
 		
 */
     
@@ -76,7 +77,7 @@ function student_registration_v11_func() {
 	$userEmail					= $initializationArray['userEmail'];
 	$fakeIt						= "Y";
 	$replacementPeriod			= $initializationArray['validReplacementPeriod'];
-	if ($userName != 'administrator') {				// turn off debug and testmode
+	if ($userRole != 'administrator') {				// turn off debug and testmode
 		$doDebug					= FALSE;
 		$testMode					= FALSE;
 	}
@@ -1542,6 +1543,9 @@ td:last-child {
 					}
 				
 					$daysToGo			= days_to_semester($student_semester);
+					if ($doDebug) {
+						echo "daysToGo calculated to be $daysToGo<br />";
+					}
 				
 					$currentSemester_checked 	= '';
 					if ($student_semester == $currentSemester) {
@@ -1563,14 +1567,40 @@ td:last-child {
 					$nextPass				= "8";
 					$extraHidden			= "";
 /* What changes are possible
-Student can change anything up until about 10 days after the start of the semester.
-After that, only personal information can be changed. 
-Can't change semester, level, or class choices
+
+	If there are less than 21 days until the start of the semester and 
+	student has been assigned to an advisor, then only limited changes 
+	are allowed
+	
+	If the student semetser equal to current semester and the student is 
+	assigned to an advisor, only limited changes are allowed
+	
+	Otherwise, student can change anything
 */		
+
 					$canChangeAnything			= TRUE;
+					if ($doDebug) {
+						echo "verifying what can be changed<br />daysToGo: $daysToGo<br />assigned advisor: $student_assigned_advisor<br />";
+					}
+					if ($daysToGo < 21) {								// student askign for upcoming semester
+						if ($student_assigned_advisor != '') {			// student is assigned to an advisor
+							$canChangeAnything	= FALSE;				// limited changes only
+							if ($doDebug) {
+								echo "daysToGo is less than 21 and student has an assigned advisor<br />canChangeAnything set to FALSE<br />";
+							}
+						}
+					} else {			// if assigned advisor, something is wrong
+						if ($student_assigned_advisor != '') {
+							sendErrorEmail("$jobname Student $student_call_sign more than 21 days to the semester and student has $student_assigned_advisor assigned as an advisor. Program being run by $userName");
+						}
+					}
+
 					if ($student_semester == $currentSemester) {		// semester is underway
-						if (!$validReplacementPeriod) {					// more than 10 days into the semester
-							$canChangeAnything	= FALSE;
+						if ($student_assigned_advisor != '') {			//student is assigned
+							$canChangeAnything	= FALSE;				// limited changes only
+							if ($doDebug) {
+								echo "semester is underway and student has an assigned advisor<br />canChangeAnything set to FALSE<br />";
+							}
 						}
 					}
 					if ($doDebug) {
@@ -1588,8 +1618,12 @@ Can't change semester, level, or class choices
 						if ($doDebug) {
 							echo "putting out limited changes option<br />";
 						}
-						$content		.= "<p>Because the $currentSemester is well underway, you may only make limited 
-											changes to your sign-up information.</p>";
+						$content		.= "<p>Because you are signed up for the $student_semester semester and you have been 
+											assigned to a class, you may only make limited 
+											changes to your sign-up information. If you need to drop out of the 
+											class or move to a different semester, please contact a 
+											systems administrator at <a href='https://cwops.org/cwa-class-resolution/' target='_blank'>
+											Class Resolution</a></p>";
 						$firstLine		= "<tr><td style='vertical-align:top;'>
 													<b>Semester</b><br />
 													$student_semester</td>
@@ -2655,7 +2689,9 @@ Can't change semester, level, or class choices
 				} else {
 					$myStr		.= "foundARecord is FALSE ";
 				}
-				sendErrorEmail("$jobname Pass2: no record found for $inp_callsign but allowSignup is FALSE. email: $inp_email. Phone: $inp_phone. $myStr");
+				$variableDump	= get_defined_vars();
+				$newStr			= print_r($variableDump,TRUE);
+				sendErrorEmail("$jobname Pass2: no record found for $inp_callsign but allowSignup is FALSE. email: $inp_email. Phone: $inp_phone. $myStr\n<br />$newStr");
 				$content		.= "A fatal program error has occurred. System admin has been notified.";
 			}
 		}
@@ -6549,19 +6585,9 @@ no record. Can not store the update";
 				handleWPDBError($jobname,$doDebug);
 				$content		.= "Unable to obtain content from $studentTableName<br />";
 			} else {
-				$lastError			= $wpdb->last_error;
-				if ($lastError != '') {
-					handleWPDBError($jobname,$doDebug);
-					$content		.= "Fatal program error. System Admin has been notified";
-					if (!$doDebug) {
-						return $content;
-					}
-				}
-
 				$numSRows			= $wpdb->num_rows;
 				if ($doDebug) {
-					$myStr			= $wpdb->last_query;
-					echo "ran $myStr<br />and found $numSRows rows<br />";
+					echo "ran $sql<br />and found $numSRows rows<br />";
 				}
 				if ($numSRows > 0) {
 					foreach ($wpw1_cwa_student as $studentRow) {
@@ -6632,6 +6658,11 @@ no record. Can not store the update";
 
 						$student_last_name 						= no_magic_quotes($student_last_name);
 						$student_excluded_advisor_array			= explode("|",$student_excluded_advisor);
+						
+						if ($doDebug) {
+							echo "found Level: $student_level, Promotable: $student_promotable<br />
+									Response: $student_response, Status: $student_student_status<br />";
+						}
 												
 						if ($student_response != 'R') {
 							if ($student_student_status == 'Y' || $student_student_status == 'S') {
@@ -6642,15 +6673,22 @@ no record. Can not store the update";
 									$doProceed		= FALSE;
 									$allowSignup	= FALSE;
 									if ($doDebug) {
-										echo "doProceed and allowSignup set to FALSE<br />";
+										echo "doProceed and allowSignup set to FALSE as end-of-semester evaluation not yet done<br />";
+									}
+								} else {
+									$lastLevel		= $student_level;
+									$lastPromotable	= $student_promotable;
+									$lastSemester	= $student_semester;
+									if ($doDebug) {
+										echo "Set lastLevel to $lastLevel, lastPromotable to $lastPromotable, and lastSemester to $lastSemester<br />";
 									}
 								}
-							} else {
-								$lastLevel		= $student_level;
-								$lastPromotable	= $student_promotable;
-								$lastSemester	= $student_semester;
-							}
+							} 
 						}
+					}
+				} else {
+					if ($doDebug) {
+						echo "numSRows of $numSRows was not greater than zero<br />";
 					}
 				}
 			}
@@ -6661,27 +6699,52 @@ no record. Can not store the update";
 			$stringToPass 				= "inp_callsign=$inp_callsign&inp_phone=$inp_phone&inp_ph_code=$inp_ph_code&inp_email=$inp_email&inp_semester=$inp_semester&inp_mode=$inp_mode&inp_verbose=$inp_verbose&thisOption=$thisOption&firsttime=$firsttime&timezone=$timezone&allowSignup=$allowSignup&inp_level=$inp_level";
 			$enstr						= base64_encode($stringToPass);
 			if ($doDebug) {
-				echo "enstr set to: $enstr<br />";
+				echo "enstr encoded from: $stringToPass<br />";
 			}
 			
 			
-			$levelUp					= array('Advanced' => 'Advanced', 
-												'Intermediate' => 'Advanced', 
-												'Fundamental' => 'Intermediae', 
-												'Beginner' => 'Fundamental');
-			$lookLevel					= $levelUp[$inp_level];
+			$levelDown					= array('Advanced' => 'Intermediate', 
+												'Intermediate' => 'Fundamental', 
+												'Fundamental' => 'Beginner', 
+												'Beginner' => 'Beginner');
+			$lookLevel					= $levelDown[$inp_level];
 
 			$needsAssessment			= TRUE;
 
 			// see if student has previous class in the last semester
+			if ($doDebug) {
+				echo "checking to see if needs assessment<br />
+					   lastLevel: $lastLevel (if blank, must take assessment)<br />
+					   if lastLevel of $lastLevel equal to lookLevel of $lookLevel OR<br />
+					   lastLevel of $lastLevel equal to inp_level of $inp_level THEN<br />
+					   Check semester<br />
+					   Comparing $lastSemester to $prevSemester. If same, check promotable<br />
+					   lastPromotable: $lastPromotable if P, no assessment needed<br />";
+			}
 			if ($lastLevel != '') {		// there is a previous class
+				if ($doDebug) {
+					echo "lastLevel of $lastLevel is not blank<br />";
+				}
 				if ($student_level == $lookLevel || $lastLevel == $inp_level) {	// Levels ok, check semester
+					if ($doDebug) {
+						echo "student_level of $student_level is equal to lookLevel of $lookLevel<br />
+							  or lastLevel of $lastLevel is equal to $inp_level<br />";
+					}
 					if ($lastSemester == $prevSemester) {						// semester ok. Promotable?
+						if ($doDebug) {
+							echo "lastSemester of $lastSemester equal to prevSemester of $prevSemester. Check promotable<br />";
+						}
 						$needsAssessment	= FALSE;
+						if ($doDebug) {
+							echo "did not check promotable, set needsAssessment to FALSE<br />";
+						}
 					}
 				}				
 			}
 			if ($needsAssessment) {					// see if there is an assessment in the last 60 days
+				if ($doDebug) {
+					echo "needsAssessment is TRUE. Looking for previous assessments<br />";
+				}
 				$last60Days				= strtotime("-60 days");
 				$last60Date				= date('Y-m-d 00:00:00',$last60Days);
 				
