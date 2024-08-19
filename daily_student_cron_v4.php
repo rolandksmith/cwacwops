@@ -107,7 +107,7 @@ function daily_student_cron_v4_func() {
 
 /// get the time that the process started
 	$startingMicroTime			= microtime(TRUE);
-	$studentEmailCount			= 130;
+	$studentEmailCount			= 90;
 	
 	$initializationArray 	= data_initialization_func();
 	$userName				= $initializationArray['userName'];
