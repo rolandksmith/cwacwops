@@ -51,7 +51,7 @@ function send_email_to_student_to_evaluate_advisor_func() {
 		ini_set('display_errors','1');
 		error_reporting(E_ALL);	
 //	}
-	$myInt					= 500;
+	$myInt					= 100;
 	$myDate					= date('d/m/Y');
 	$totalStudents			= 0;
 	$increment				= 0;
