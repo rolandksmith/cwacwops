@@ -77,6 +77,7 @@ function student_management_func() {
 	$inp_prev_advisor			= '';
 	$inp_prev_advisor_class		= '';
 	$theURL						= "$siteURL/cwa-student-management/";
+	$prodURL					= "https://cwa.cwops.org/cwa-student-management/";
 	$colorChartURL				= "$siteURL/cwa-student-and-advisor-color-chart/";
 	$studentHistoryURL			= "$siteURL/cwa-show-detailed-history-for-student/";
 	$changeSemesterURL			= "$siteURL/cwa-move-student-to-different-semester/";
@@ -247,6 +248,9 @@ function getTheReason($strReasonCode) {
 	}
 	if ($strReasonCode == 'A') {
 		return "(A) Student hard-assigned to AC6AC";
+	}
+	if ($strReasonCode == 'B') {
+		return "(B) Student is a Bad Actor";
 	}
 	return "($strReasonCode) unknown";
 }	
@@ -472,14 +476,6 @@ td:last-child {
 							<div style='float:right;'><a href=\"javascript:window.alert('Program removes the excluded_advisor, setting that field to blank,
 							and removes the X from intervention_required. The advisor is no longer excluded.');\">
 							<span style='color:orange;'><em>Note</em></span></span></div></div>	
-
-							<div style='clear:both;'>
-							<div style='float:left;'>
-								<li style='margin-left:2em;'><a href='$theURL?strpass=95' target='_blank'>Change Student Call Sign</a></div>
-							<div style='float:right;'><a href=\"javascript:window.alert('Progam goes through all tables and changes the 
-							student call sign from the previous call sign to the new call sign.');\">
-							<span style='color:orange;'><em>Note</em></span></span></div></div>	
-
 
 								</ol><br /><br />
 							<li><strong>Useful Functions After Students Have Been Assigned to Advisors</strong>
@@ -1162,7 +1158,12 @@ td:last-child {
 
 		$sql					= "select * from $studentTableName 
 									where intervention_required != '' 
-									and semester = '$proximateSemester'";
+									and (semester = '$proximateSemester' or 
+									     semester = '$nextSemester' or 
+									     semester = '$semesterTwo' or 
+									     semester = '$semesterThree' or 
+									     semester = '$semesterFour') 
+									     order by call_sign";
 		$wpw1_cwa_student		= $wpdb->get_results($sql);
 		if ($wpw1_cwa_student === FALSE) {
 			handleWPDBError("$jobname MGMT 8",$doDebug);
@@ -1575,26 +1576,24 @@ td:last-child {
 
 		$sql					= "select * from $studentTableName 
 									where call_sign='$inp_student_callsign' 
-									and semester='$proximateSemester'";
+									and (semester='$proximateSemester' or 
+									     semester='$nextSemester' or 
+									     semester='$semesterTwo' or
+									     semester='$semesterThree' or
+									     semester='$semesterFour') 
+									     limit 1";
 		$wpw1_cwa_student		= $wpdb->get_results($sql);
 		if ($wpw1_cwa_student === FALSE) {
 			handleWPDBError("$jobname MGMT 26",$doDebug);
 		} else {
-			$lastError			= $wpdb->last_error;
-			if ($lastError != '') {
-				handleWPDBError("$jobname MGMT 26",$doDebug);
-				$content		.= "Fatal program error. System Admin has been notified";
-				if (!$doDebug) {
-					return $content;
-				}
-			}
-
 			$numSRows			= $wpdb->num_rows;
 			if ($doDebug) {
-				$myStr			= $wpdb->last_query;
-				echo "ran $myStr<br />and found $numSRows rows<br />";
+				echo "ran $sql<br />and found $numSRows rows<br />";
 			}
 			if ($numSRows > 0) {
+				if ($doDebug) {
+					echo "have $numSRows rows<br />";
+				}
 				foreach ($wpw1_cwa_student as $studentRow) {
 					$student_ID								= $studentRow->student_id;
 					$student_call_sign						= strtoupper($studentRow->call_sign);
@@ -1660,7 +1659,9 @@ td:last-child {
 					$student_date_updated			  		= $studentRow->date_updated;
 
 					$student_last_name 						= no_magic_quotes($student_last_name);
-
+					if ($doDebug) {
+						echo "found intevention_required of $student_intervention_required<br />";
+					}
 					if ($student_intervention_required != '') {   	// only interested in those requiring intervention
 						$content	.= "<h3>Resolve Student Hold on $inp_student_callsign</h3>
 										<table><tr>
@@ -4726,7 +4727,7 @@ taking any further action.<br /><br />Otherwise:<br />";
 												}
 											}
 										} else {		/// student is in the next semester
-/////////????????/////////											
+										
 										}
 									}			
 								}				/// end of the student while
@@ -4775,6 +4776,7 @@ taking any further action.<br /><br />Otherwise:<br />";
 													Advisor Time Zone: $advisorClass_timezone_offset<br />
 													Class is held at about $advisorClass_class_schedule_times_utc UTC on $advisorClass_class_schedule_days_utc 
 													($advisorClass_class_schedule_times on $advisorClass_class_schedule_days Local)</p>
+													<p><b>Any Pre-Assignments Occur in Production</b></p>
 													<table>
 													<tr><th>Call Sign</th>
 														<th>Name</th>
@@ -4817,7 +4819,7 @@ taking any further action.<br /><br />Otherwise:<br />";
 											$content		.= "<td>&nbsp;</td>
 																<td><a href='$theURL?strpass=40&inp_advisor_callsign=$inp_advisor_callsign&inp_student_callsign=$thisCallSign&level=$advisorClass_level' target='_blank'>Assign</a></td></tr>";
 										} else {
-											$content		.= "<td><a href='$theURL?strpass=2&inp_advisor_callsign=$inp_advisor_callsign&inp_student_callsign=$thisCallSign' target='_blank'>Pre-Assign</a></td>
+											$content		.= "<td><a href='$prodURL?strpass=2&inp_advisor_callsign=$inp_advisor_callsign&inp_student_callsign=$thisCallSign' target='_blank'>Pre-Assign</a></td>
 																<td><a href='$theURL?strpass=40&inp_advisor_callsign=$inp_advisor_callsign&inp_student_callsign=$thisCallSign&level=$advisorClass_level' target='_blank'>Assign</a></td></tr>";
 										}
 									}
@@ -5559,341 +5561,6 @@ taking any further action.<br /><br />Otherwise:<br />";
 		}			
 
 
-
-
-//////////////// pass 95		change student call sign
-	} elseif ("95" == $strPass) {
-		if ($doDebug) {
-			echo "Arrived at pass 95<br />";
-		}
-		$jobname	= "Change Student Call Sign";
-		$content .= "<h3>$jobname</h3>
-					<p>Enter the previous call sign and the new call sign.</p>
-					<form method='post' action='$theURL' 
-					name='selection_form' ENCTYPE='multipart/form-data'>
-					<input type='hidden' name='strpass' value='96'>
-					<table style='border-collapse:collapse;'>
-					<tr><td style='width:150px;'>Previous Call Sign:</td>
-						<td><input class='formInputText' type='text' size= '30' maxlength='30' name='inp_student_callsign' autofocus></td></tr>
-					<tr><td style='width:150px;'>New Call Sign:</td>
-						<td><input class='formInputText' type='text' size= '30' maxlength='30' name='inp_new_callsign'></td></tr>
-					$testModeOption
-					<tr><td>&nbsp;</td>
-						<td><input class='formInputButton' type='submit' value='Change Call Sign' /></td></tr>
-					</table>
-					</form>";
-
-	} elseif ("96" == $strPass) {				// make the call sign change
-		if ($doDebug) {
-			echo "At pass 96 with previous call sign $inp_student_callsign and new call sign $inp_new_callsign<br />";
-		}
-		$jobname	= "Change Student Call Sign";
-		$content				.= "<h3>$jobname from $inp_student_callsign to $inp_new_callsign</h3>";
-		if ($inp_student_callsign == '' || $inp_new_callsign == '') {
-			$content			.= "Either the previous call sign or the new call sign missing";
-		} else {
-			//// start with studentTableName and get any class records that have to be fixed
-			$sql				= "select student_id, 
-										  call_sign, 
-										  first_name, 
-										  last_name, 
-										  semester, 
-										  assigned_advisor, 
-										  assigned_advisor_class, 
-										  action_log 
-									from $studentTableName 
-									where call_sign='$inp_student_callsign'";
-			$wpw1_cwa_student	= $wpdb->get_results($sql);
-			if ($wpw1_cwa_student === FALSE) {
-				handleWPDBError("$jobname MGMT 96",$doDebug);
-			} else {
-				$numSRows		= $wpdb->num_rows;
-				if ($doDebug) {
-					$myStr		= $wpdb->last_query;
-					echo "ran $myStr<br />and retrieved $numSRows rows from $studentTableName table<br />";
-				}
-				if ($numSRows > 0) {
-					if ($doDebug) {
-						echo "found $numSRows rows in $studentTableName<br />";
-					}
-					foreach ($wpw1_cwa_student as $studentRow) {
-						$student_ID								= $studentRow->student_id;
-						$student_call_sign						= strtoupper($studentRow->call_sign);
-						$student_first_name						= $studentRow->first_name;
-						$student_last_name						= stripslashes($studentRow->last_name);
-						$student_semester						= $studentRow->semester;
-						$student_assigned_advisor				= $studentRow->assigned_advisor;
-						$student_assigned_advisor_class			= $studentRow->assigned_advisor_class;
-						$student_action_log						= $studentRow->action_log;
-
-						$student_last_name 						= no_magic_quotes($student_last_name);
-						
-						/// make the change
-						$student_action_log			= "$student_action_log / MGMT95 $actionDate 
-$userName changed call sign from $inp_student_callsign to $inp_new_callsign ";
-						$updateParams				= array('call_sign' => $inp_new_callsign,
-															'action_log' => $student_action_log);
-						$updateFormat				= array('%s','%s');
-						$updateData	= array('tableName'=>$studentTableName,
-											'inp_data'=>$updateParams,
-											'inp_format'=>$updateFormat,
-											'inp_method'=>'update',
-											'jobname'=>'MGMT95',
-											'inp_id'=>$student_ID,
-											'inp_callsign'=>$student_call_sign,
-											'inp_semester'=>$student_semester,
-											'inp_who'=>$userName,
-											'testMode'=>$testMode,
-											'doDebug'=>$doDebug);
-						$updateResult	= updateStudent($updateData);
-						if ($updateResult[0] === FALSE) {
-							handleWPDBError("$jobname MGMT 96",$doDebug);
-						} else {
-							$lastError			= $wpdb->last_error;
-							if ($lastError != '') {
-								handleWPDBError("$jobname MGMT 96",$doDebug);
-								$content		.= "Fatal program error. System Admin has been notified";
-								if (!$doDebug) {
-									return $content;
-								}
-							}
-
-							$content			.= "Successfully changed student call sign from $inp_student_callsign to $inp_new_callsign on $studentTableName<br />";
-						}
-						///// Now fix up the advisorClass records
-						if ($student_assigned_advisor != '') {
-							if ($doDebug) {
-								echo "fixing up $student_assigned_advisor class record<br />";
-							}
-							$content						.= "<br />";
-							$sql						= "select * from $advisorClassTableName 
-															where advisor_call_sign='$student_assigned_advisor' 
-																and sequence=$student_assigned_advisor_class 
-																and semester='$student_semester'";
-							$wpw1_cwa_advisorclass	= $wpdb->get_results($sql);
-							if ($wpw1_cwa_advisorclass === FALSE) {
-								handleWPDBError("$jobname MGMT 96",$doDebug);
-							} else {
-								$numACRows				= $wpdb->num_rows;
-								if ($doDebug) {
-									$myStr				= $wpdb->last_query;
-									echo "ran $myStr<br />and found $numACRows rows in $advisorClassTableName table<br />";
-								}
-								if ($numACRows > 0) {
-									foreach ($wpw1_cwa_advisorclass as $advisorClassRow) {
-										$advisorClass_ID				 		= $advisorClassRow->advisorclass_id;
-										$advisorClass_advisor_callsign 		= $advisorClassRow->advisor_call_sign;
-										$advisorClass_advisor_first_name 		= $advisorClassRow->advisor_first_name;
-										$advisorClass_advisor_last_name 		= stripslashes($advisorClassRow->advisor_last_name);
-										$advisorClass_advisor_id 				= $advisorClassRow->advisor_id;
-										$advisorClass_sequence 				= $advisorClassRow->sequence;
-										$advisorClass_semester 				= $advisorClassRow->semester;
-										$advisorClass_timezone 				= $advisorClassRow->time_zone;
-										$advisorClass_timezone_id				= $advisorClassRow->timezone_id;		// new
-										$advisorClass_timezone_offset			= $advisorClassRow->timezone_offset;	// new
-										$advisorClass_level 					= $advisorClassRow->level;
-										$advisorClass_class_size 				= $advisorClassRow->class_size;
-										$advisorClass_class_schedule_days 		= $advisorClassRow->class_schedule_days;
-										$advisorClass_class_schedule_times 	= $advisorClassRow->class_schedule_times;
-										$advisorClass_class_schedule_days_utc 	= $advisorClassRow->class_schedule_days_utc;
-										$advisorClass_class_schedule_times_utc	= $advisorClassRow->class_schedule_times_utc;
-										$advisorClass_action_log 				= $advisorClassRow->action_log;
-										$advisorClass_class_incomplete 		= $advisorClassRow->class_incomplete;
-										$advisorClass_date_created				= $advisorClassRow->date_created;
-										$advisorClass_date_updated				= $advisorClassRow->date_updated;
-										$advisorClass_student01 				= $advisorClassRow->student01;
-										$advisorClass_student02 				= $advisorClassRow->student02;
-										$advisorClass_student03 				= $advisorClassRow->student03;
-										$advisorClass_student04 				= $advisorClassRow->student04;
-										$advisorClass_student05 				= $advisorClassRow->student05;
-										$advisorClass_student06 				= $advisorClassRow->student06;
-										$advisorClass_student07 				= $advisorClassRow->student07;
-										$advisorClass_student08 				= $advisorClassRow->student08;
-										$advisorClass_student09 				= $advisorClassRow->student09;
-										$advisorClass_student10 				= $advisorClassRow->student10;
-										$advisorClass_student11 				= $advisorClassRow->student11;
-										$advisorClass_student12 				= $advisorClassRow->student12;
-										$advisorClass_student13 				= $advisorClassRow->student13;
-										$advisorClass_student14 				= $advisorClassRow->student14;
-										$advisorClass_student15 				= $advisorClassRow->student15;
-										$advisorClass_student16 				= $advisorClassRow->student16;
-										$advisorClass_student17 				= $advisorClassRow->student17;
-										$advisorClass_student18 				= $advisorClassRow->student18;
-										$advisorClass_student19 				= $advisorClassRow->student19;
-										$advisorClass_student20 				= $advisorClassRow->student20;
-										$advisorClass_student21 				= $advisorClassRow->student21;
-										$advisorClass_student22 				= $advisorClassRow->student22;
-										$advisorClass_student23 				= $advisorClassRow->student23;
-										$advisorClass_student24 				= $advisorClassRow->student24;
-										$advisorClass_student25 				= $advisorClassRow->student25;
-										$advisorClass_student26 				= $advisorClassRow->student26;
-										$advisorClass_student27 				= $advisorClassRow->student27;
-										$advisorClass_student28 				= $advisorClassRow->student28;
-										$advisorClass_student29 				= $advisorClassRow->student29;
-										$advisorClass_student30 				= $advisorClassRow->student30;
-										$class_number_students					= $advisorClassRow->number_students;
-										$class_evaluation_complete 				= $advisorClassRow->evaluation_complete;
-										$class_comments							= $advisorClassRow->class_comments;
-										$copycontrol							= $advisorClassRow->copy_control;
-		
-										$advisorClass_advisor_last_name  		= no_magic_quotes($advisorClass_advisor_last_name);
-		
-										for ($snum=1;$snum<31;$snum++) {
-											if ($snum < 10) {
-												$strSnum 						= str_pad($snum,2,'0',STR_PAD_LEFT);
-											} else {
-												$strSnum						= strval($snum);
-											}
-											$studentCallSign					= ${'advisorClass_student' . $strSnum};
-											if ($studentCallSign == $inp_student_callsign) { 		// if so, change the callsign
-												$advisorClass_action_log	= "$advisorClass_action_log / $actionDate $userName MGNT95 
-student$strSnum call sign changed from $inp_student_callsign to $inp_new_callsign ";
-												$updateArray["student$strSnum"]	= $inp_new_callsign;
-												$updateArray["action_log"]		= $advisorClass_action_log;
-												$classUpdateData		= array('tableName'=>$advisorClassTableName,
-																				'inp_method'=>'update',
-																				'inp_data'=>$updateArray,
-																				'inp_format'=>array('%s','%s'),
-																				'jobname'=>'MGMT95',
-																				'inp_id'=>$advisorClass_ID,
-																				'inp_callsign'=>$advisorClass_advisor_callsign,
-																				'inp_semester'=>$advisorClass_semester,
-																				'inp_who'=>$userName,
-																				'testMode'=>$testMode,
-																				'doDebug'=>$doDebug);
-												$updateResult	= updateClass($classUpdateData);
-												if ($updateResult[0] === FALSE) {
-													handleWPDBError("$jobname MGMT 96",$doDebug);
-												} else {
-													$lastError			= $wpdb->last_error;
-													if ($lastError != '') {
-														handleWPDBError("$jobname MGMT 96",$doDebug);
-														$content		.= "Fatal program error. System Admin has been notified";
-														if (!$doDebug) {
-															return $content;
-														}
-													}
-		
-													if ($doDebug) {
-														echo "Successfully updated $past_student_call_sign record at $past_student_ID<br />";
-													}
-													$content			.= "Successfully changed student call sign from $inp_student_callsign to $inp_new_callsign on $advisorClassTableName $advisorClass_advisor_callsign $advisorClass_sequence $advisorClass_semester<br />";
-												}
-											}
-										}
-									}
-								}
-							}
-						} else {
-							if ($doDebug) {
-								echo "No assigned advisor class to be updated<br />";
-							}
-						}
-					}
-				}
-			}
-			
-			// update any audio assessment records
-			$sql			= "select * from $audioAssessmentTableName 
-								where call_sign = '$inp_student_callsign'";
-			$audioResult	= $wpdb->get_results($sql);
-			if ($audioResult === FALSE) {
-				handleWPDBError("$jobname MGMT 96",$doDebug);
-			} else {
-				$numRows				= $wpdb->num_rows;
-				if ($doDebug) {
-					$myStr				= $wpdb->last_query;
-					echo "Ran $myStr<br />and retrieved $numRows records from $audioAssessmentTableName<br />";
-				}
-				if ($numRows > 0) {
-					foreach ($audioResult as $audioRow) {
-						$assessment_record_id				= $audioRow->record_id;
-						$assessment_call_sign				= $audioRow->call_sign;
-						$assessment_assessment_date			= $audioRow->assessment_date;
-						$assessment_assessment_level		= $audioRow->assessment_level;
-						$assessment_assessment_clip			= $audioRow->assessment_clip;
-						$assessment_assessment_score		= $audioRow->assessment_score;
-						$assessment_assessment_clip_name	= $audioRow->assessment_clip_name;
-						$assessment_assessment_notes		= $audioRow->assessment_notes;
-						$assessment_assessment_program		= $audioRow->assessment_program;
-
-						$assessmentResult					= $wpdb->update($audioAssessmentTableName,
-																			array('call_sign'=>$inp_new_callsign),
-																			array('record_id'=>$assessment_record_id),
-																			array('%s'),
-																			array('%d'));
-						if ($assessmentResult === FALSE) {
-							handleWPDBError("$jobname MGMT 96",$doDebug);
-						} else {
-							$lastError			= $wpdb->last_error;
-							if ($lastError != '') {
-								handleWPDBError("$jobname MGMT 96",$doDebug);
-								$content		.= "Fatal program error. System Admin has been notified";
-								if (!$doDebug) {
-									return $content;
-								}
-							}
-
-						}
-					}
-				}
-			}
-			// update any new assessment data records
-			$sql 				= "select * from $newAssessmentTableName 
-									where callsign = '$inp_student_callsign'";
-			$assessmentResult	= $wpdb->get_results($sql);
-			if ($assessmentResult === FALSE) {
-				handleWPDBError("$jobname pass 96",$doDebug);
-			} else {
-				$numRows			= $wpdb->num_rows;
-				if ($doDebug) {
-					echo "ran $sql<br />and retrieved $numRows rows<br />";
-				}
-				if ($numRows > 0) {
-					foreach($assessmentResult as $assessmentRow) {
-						$record_id		= $assessmentRow->record_id;
-						$thisCallsign	= $assessmentRow->callsign;
-						
-						$updateResult	= $wpdb->update($newAssessmentTableName,
-												array('callsign'=>$inp_new_callsign),
-												array('record_id'=>$record_id),
-												array("%s"),
-												array('%d'));
-						if ($updateResult === FALSE) {
-							handleWPDBError("$jobname pass 96",$doDebug);
-						}
-					}
-				}
-			}
-			
-			// fix up temp_data
-			$sql 				= "select * from $tempDataTableName 
-									where callsign = '$inp_student_callsign'";
-			$tempResult			= $wpdb->get_results($sql);
-			if ($tempResult === FALSE) {
-				handleWPDBError("$jobname pass 96",$doDebug);
-			} else {
-				$numRows			= $wpdb->num_rows;
-				if ($doDebug) {
-					echo "ran $sql<br />and retrieved $numRows rows<br />";
-				}
-				if ($numRows > 0) {
-					foreach($tempResult as $tempRow) {
-						$record_id		= $tempRow->record_id;
-						$thisCallsign	= $tempRow->callsign;
-						
-						$updateResult	= $wpdb->update($tempDataTableName,
-												array('callsign'=>$inp_new_callsign),
-												array('record_id'=>$record_id),
-												array("%s"),
-												array('%d'));
-						if ($updateResult === FALSE) {
-							handleWPDBError("$jobname pass 96",$doDebug);
-						}
-					}
-				}
-			}
-		}
 
 
 
