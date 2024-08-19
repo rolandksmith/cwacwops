@@ -346,7 +346,7 @@ user_login $user_login with token $token deleted 0 rows. Query: $lastQuery<br />
 						
 									$myInt			= strpos($meta_value,'administrator');
 									if ($myInt !== FALSE) {
-										$user_role	= 'aministrator';
+										$user_role	= 'administrator';
 									}
 									$myInt			= strpos($meta_value,'student');
 									if ($myInt !== FALSE) {
