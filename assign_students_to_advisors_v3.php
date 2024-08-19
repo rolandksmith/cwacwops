@@ -818,7 +818,7 @@ td:last-child {
 		} elseif ($inp_advisors_param == 'Specific') {
 			$content										.= "Processing only these advisors: $inp_specific_advisors<br />";
 			$parameterArray['inp_advisors_param_specific']	= 'checked';
-			$parameterArray['inp_specific_advisors']		= $inp_specific_advisors;
+			$parameterArray['inp_specific_advisors']		= $inp_specific_advisors;			
 			$specificAdvisorArray							= explode(",",$inp_specific_advisors);
 			$specificAdvisors								= TRUE;
 		}
@@ -1084,12 +1084,13 @@ td:last-child {
 							$doAdvisor						= FALSE;
 						}
 					}
-					if ($advisorClass_class_size == '' || $advisorClass_class_size == 0) {
-						$advisorClass_class_size		= $defaultClassSize;
-					}
+// changed 5Aug24 to allow zero class size					
+//					if ($advisorClass_class_size == '' || $advisorClass_class_size == 0) {
+//						$advisorClass_class_size		= $defaultClassSize;
+//					}
 					if ($advisorClass_level == 'Beginner' && $force_class_size_beg != '') {
 						if (!in_array($advisor_call_sign,$BeginnerExemptionsArray)) {
-							if ($advisorClass_class_size != $force_class_size_beg) {
+							if ($advisorClass_class_size >= $force_class_size_beg) {
 								$overrideArray[]				= "$advisor_call_sign Beginner class size of $advisorClass_class_size overriden to $force_class_size_beg<br />";
 							}
 							$advisorClass_class_size		= $force_class_size_beg;
@@ -1097,7 +1098,7 @@ td:last-child {
 					}
 					if ($advisorClass_level == 'Fundamental' && $force_class_size_fun != '') {
 						if (!in_array($advisor_call_sign,$FundamentalExemptionsArray)) {
-							if ($advisorClass_class_size != $force_class_size_fun) {
+							if ($advisorClass_class_size >= $force_class_size_fun) {
 								$overrideArray[]				= "$advisor_call_sign Fundamental class size of $advisorClass_class_size overriden to $force_class_size_fun<br />";
 							}
 							$advisorClass_class_size		= $force_class_size_fun;
@@ -1105,7 +1106,7 @@ td:last-child {
 					}
 					if ($advisorClass_level == 'Intermediate' && $force_class_size_int != '') {
 						if (!in_array($advisor_call_sign,$IntermediateExemptionsArray)) {
-							if ($advisorClass_class_size != $force_class_size_int) {
+							if ($advisorClass_class_size >= $force_class_size_int) {
 								$overrideArray[]				= "$advisor_call_sign Intermediate class size of $advisorClass_class_size overriden to $force_class_size_int<br />";
 							}
 							$advisorClass_class_size		= $force_class_size_int;
@@ -1113,7 +1114,7 @@ td:last-child {
 					}
 					if ($advisorClass_level == 'Advanced' && $force_class_size_adv != '') {
 						if (!in_array($advisor_call_sign,$AdvancedExemptionsArray)) {
-							if ($advisorClass_class_size != $force_class_size_adv) {
+							if ($advisorClass_class_size >= $force_class_size_adv) {
 								$overrideArray[]				= "$advisor_call_sign Advanced class size of $advisorClass_class_size overriden to $force_class_size_adv<br />";
 							}
 							$advisorClass_class_size		= $force_class_size_adv;
@@ -1820,13 +1821,13 @@ td:last-child {
 			
 		}				// done with the processStudent array
 				
-		
+/*		
 		// Now backfill AC6AC if any available unavailable students meet his class times
 		
 		if ($keepDebug) {
 			$debugReport	.=  "<br /><b>Backfilling AC6AC</b><br />";
 		}
-		
+ 		
 		$ii							= 0;
 		$gotClass					= TRUE;
 		while ($gotClass) {
@@ -1934,7 +1935,7 @@ td:last-child {
 				$gotClass				= FALSE;
 			}
 		}		
-				
+/*	
 		////// dump the arrays
 
 		sort($arbitraryArray);
@@ -2301,8 +2302,9 @@ Please log into <a href='$siteURL/program-list'>CW Academy</a> to obtain your st
 							$debugReport	.=  "inserting reminder failed: $insertResult[1]<br />";
 						}
 						$content		.= "Inserting reminder failed: $insertResult[1]<br />";
-					} else {
-						$content		.= "Reminder successfully added<br />";
+// changed 5Aug24 by roland. Don't need the info
+//					} else {
+//						$content		.= "Reminder successfully added<br />";
 					}
 
 					
