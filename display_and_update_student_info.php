@@ -347,6 +347,10 @@ th {color:#ffff;background-color:#000;padding:5px;font-size:small;}
 td {padding:5px;font-size:small;}
 </style>";	
 	
+if ($testMode) {
+	$content		.= "<p><b>Operating in testMode</b></p>";
+}
+	
 	
 /*
  * When strPass is equal to 1 then get the information needed to access the student
