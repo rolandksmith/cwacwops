@@ -265,6 +265,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-send-evaluation-email-to-advisors/' target='_blank'>Send Evaluation Email to Advisors</a>
 			<li><a href='$siteURL/cwa-send-mid-term-verification-email/' target='_blank'>Send Mid-term Verification Email</a>
 			<li><a href='$siteURL/cwa-show-advisor-class-assignments/' target='_blank'>Show Advisor Class Assignments</a>
+			<li><a href='$siteURL/cwa-show-available-classes-for-an-advisor/' target='_blank'>Show Available Classes for an Advisor</a>
 			<li><a href='$siteURL/cwa-show-detailed-history-for-student/' target='_blank'>Show Detailed History for Student</a>
 			<li><a href='$siteURL/cwa-show-saved-email/' target='_blank'>Show Saved Email</a>
 			<li><a href='$siteURL/cwa-student-and-advisor-color-chart-v2/' target='_blank'>Student and Advisor Color Chart V2</a>
@@ -394,6 +395,7 @@ if ($userRole == 'administrator') {
 			<li><a href='$siteURL/cwa-student-and-advisor-assignments/' target='_blank'>Student and Advisor Assignments (#1 Report)</a><br /><br />
 			<li><a href='$siteURL/cwa-display-and-update-advisor-information/' target='_blank'>Display and Update Advisor Information</a>
 			<li><a href='$siteURL/cwa-display-and-update-student-information/' target='_blank'>Display and Update Student Information</a><br /><br />
+			<li><a href='$siteURL/cwa-show-available-classes-for-an-advisor/' target='_blank'>Show Available Classes for an Advisor</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=90' target='_blank'>Assign a Student to an Advisor regardless</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=70' target='_blank'>Find Possible Classes for a Student</a>
 			<li><a href='$siteURL/cwa-student-management/?strpass=80' target='_blank'>Find Possible Students for an Advisor's Class</a>
